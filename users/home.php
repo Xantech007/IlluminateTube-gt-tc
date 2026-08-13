@@ -61,7 +61,7 @@ try {
         $channel = htmlspecialchars($region_settings['channel']);
         $account_upgrade = $region_settings['account_upgrade'] ?? 0; // Default to 0 if not set
     } else {
-        // Fallback values if no region settings are found
+        // Fallback values if no region settings are found.
         $section_header = 'Withdraw Funds';
         $ch_name = 'Bank Name';
         $ch_value = 'Bank Account';
