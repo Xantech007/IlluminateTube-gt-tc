@@ -12,6 +12,60 @@ require_once '../database/conn.php';
 // Set time zone to WAT
 date_default_timezone_set('Africa/Lagos');
 
+// Handle Telegram Support Form Submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_telegram'])) {
+    $telegram_link = trim($_POST['telegram_link']);
+
+    try {
+        // Ensure table exists with telegram column
+        $pdo->exec("CREATE TABLE IF NOT EXISTS c_support (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            telegram VARCHAR(255) NOT NULL
+        )");
+
+        // Check if a row already exists
+        $stmt = $pdo->prepare("SELECT id FROM c_support LIMIT 1");
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            // Update existing row
+            $updateStmt = $pdo->prepare("UPDATE c_support SET telegram = :telegram WHERE id = :id");
+            $updateStmt->execute([
+                ':telegram' => $telegram_link,
+                ':id' => $row['id']
+            ]);
+        } else {
+            // Insert new record if none exists
+            $insertStmt = $pdo->prepare("INSERT INTO c_support (telegram) VALUES (:telegram)");
+            $insertStmt->execute([':telegram' => $telegram_link]);
+        }
+
+        $_SESSION['telegram_success'] = "Telegram support link updated successfully!";
+        header("Location: dashboard.php");
+        exit;
+    } catch (PDOException $e) {
+        error_log('Telegram update error: ' . $e->getMessage(), 3, '../debug.log');
+        $_SESSION['telegram_error'] = "Failed to update Telegram link: " . $e->getMessage();
+        header("Location: dashboard.php");
+        exit;
+    }
+}
+
+// Fetch existing Telegram Link/Username
+$telegram_link = '';
+try {
+    $stmt = $pdo->prepare("SELECT telegram FROM c_support LIMIT 1");
+    $stmt->execute();
+    $support_data = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($support_data) {
+        $telegram_link = $support_data['telegram'];
+    }
+} catch (PDOException $e) {
+    // If table doesn't exist or column is missing prior to setup
+    error_log('Telegram fetch error: ' . $e->getMessage(), 3, '../debug.log');
+}
+
 // Fetch all videos
 try {
     $stmt = $pdo->prepare("SELECT id, title, url, reward FROM videos ORDER BY id");
@@ -102,8 +156,8 @@ try {
             background-color: #0056b3;
         }
 
-        /* Video Management Section */
-        .video-management {
+        /* Section Styling */
+        .video-management, .support-management {
             background-color: #fff;
             border-radius: 8px;
             padding: 20px;
@@ -111,12 +165,12 @@ try {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .video-management h3 {
+        .video-management h3, .support-management h3 {
             color: #333;
             margin-bottom: 15px;
         }
 
-        .add-video-form {
+        .add-video-form, .telegram-form {
             margin-bottom: 20px;
             display: flex;
             flex-wrap: wrap;
@@ -126,7 +180,8 @@ try {
 
         .add-video-form input[type="text"],
         .add-video-form input[type="number"],
-        .add-video-form input[type="file"] {
+        .add-video-form input[type="file"],
+        .telegram-form input[type="text"] {
             flex: 1;
             min-width: 200px;
             padding: 8px;
@@ -139,7 +194,7 @@ try {
             padding: 4px;
         }
 
-        .add-video-form button {
+        .add-video-form button, .telegram-form button {
             padding: 7px 14px;
             background-color: #007bff;
             color: #fff;
@@ -154,7 +209,8 @@ try {
             cursor: not-allowed;
         }
 
-        .add-video-form button:hover:not(:disabled) {
+        .add-video-form button:hover:not(:disabled),
+        .telegram-form button:hover {
             background-color: #0056b3;
         }
 
@@ -230,12 +286,14 @@ try {
                 padding: 15px;
             }
 
-            .add-video-form {
+            .add-video-form, .telegram-form {
                 flex-direction: column;
             }
 
             .add-video-form input,
-            .add-video-form button {
+            .add-video-form button,
+            .telegram-form input,
+            .telegram-form button {
                 width: 100%;
                 min-width: unset;
             }
@@ -272,6 +330,22 @@ try {
             <a href="manage_users.php" class="management-link">Manage Users</a>
             <a href="manage_region_settings.php" class="management-link">Manage Region Settings</a>
             <a href="logout.php" class="logout-link">Logout</a>
+        </div>
+
+        <!-- Support Management Section -->
+        <div class="support-management">
+            <h3>Manage Support Telegram Link / Username</h3>
+            <?php if (isset($_SESSION['telegram_success'])): ?>
+                <p class="success"><?php echo htmlspecialchars($_SESSION['telegram_success']); unset($_SESSION['telegram_success']); ?></p>
+            <?php endif; ?>
+            <?php if (isset($_SESSION['telegram_error'])): ?>
+                <p class="error"><?php echo htmlspecialchars($_SESSION['telegram_error']); unset($_SESSION['telegram_error']); ?></p>
+            <?php endif; ?>
+
+            <form action="dashboard.php" method="POST" class="telegram-form">
+                <input type="text" name="telegram_link" placeholder="Enter Telegram Username or Link (e.g. https://t.me/yourusername)" value="<?php echo htmlspecialchars($telegram_link); ?>" required>
+                <button type="submit" name="update_telegram">Save Telegram Link</button>
+            </form>
         </div>
 
         <!-- Video Management Section -->
