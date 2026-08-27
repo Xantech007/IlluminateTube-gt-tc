@@ -1,5 +1,29 @@
 <?php
 // contact.php
+require_once 'database/conn.php';
+
+// Fetch Telegram username from c_support table
+$telegram_raw = '';
+$telegram_clean = '';
+try {
+    $stmt = $pdo->prepare("SELECT telegram FROM c_support LIMIT 1");
+    $stmt->execute();
+    $support_data = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($support_data && !empty($support_data['telegram'])) {
+        $telegram_raw = trim($support_data['telegram']);
+        // Strip out '@' or URL protocol prefixes if present for valid t.me link
+        $telegram_clean = ltrim($telegram_raw, '@');
+        $telegram_clean = str_replace(['https://t.me/', 'http://t.me/'], '', $telegram_clean);
+    }
+} catch (PDOException $e) {
+    error_log('Telegram support username fetch error in contact.php: ' . $e->getMessage(), 3, 'debug.log');
+}
+
+// Fallback in case table/record is not set yet
+if (empty($telegram_raw)) {
+    $telegram_raw = '@TaskTubeSupport';
+    $telegram_clean = 'TaskTubeSupport';
+}
 ?>
 
 <!DOCTYPE html>
@@ -7,7 +31,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Contact Task Tube's support team 24/7 via WhatsApp for assistance with your account, login, or general inquiries.">
+    <meta name="description" content="Contact Task Tube's support team 24/7 via Telegram for assistance with your account, login, or general inquiries.">
     <meta name="keywords" content="Task Tube, contact support, earn money online, watch ads, customer service">
     <meta name="author" content="Task Tube">
     <title>Task Tube - Contact Us</title>
@@ -351,7 +375,7 @@
     <!-- Hero Section -->
     <section class="hero-section">
         <h1>Contact Task Tube</h1>
-        <p>Reach out to our 24/7 support team via WhatsApp for help with your account, login, or any inquiries!</p>
+        <p>Reach out to our 24/7 support team via Telegram for help with your account, login, or any inquiries!</p>
     </section>
 
     <!-- Contact Content -->
@@ -364,7 +388,14 @@
 
             <div class="contact-info">
                 <h2>Contact Information</h2>
-                <p><i class="fab fa-whatsapp"></i> WhatsApp Contact: <strong><a href="https://wa.me/+17655329001" target="_blank">+1 (765) 532-9001</a></strong></p>
+                <p>
+                    <i class="fab fa-telegram"></i> Telegram Contact: 
+                    <strong>
+                        <a href="https://t.me/<?php echo $telegram_clean; ?>" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
+                            <?php echo htmlspecialchars($telegram_raw); ?>
+                        </a>
+                    </strong>
+                </p>
                 <p><i class="far fa-clock"></i> Availability: <strong>24/7</strong></p>
                 <p><i class="fas fa-hourglass-half"></i> Response Time: <strong>Usually within 24 hours</strong></p>
             </div>
@@ -386,15 +417,19 @@
     <!-- CTA Banner -->
     <section class="cta-banner">
         <h2>Need Help? Contact Us Now!</h2>
-        <a href="https://wa.me/+17655329001" target="_blank" class="btn" onclick="console.log('CTA button clicked')">Message Us on WhatsApp</a>
+        <a href="https://t.me/<?php echo $telegram_clean; ?>" class="btn" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
+            Message Us on Telegram
+        </a>
     </section>
 
     <!-- Notice Popup -->
     <div class="notice" id="notice">
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
         <h2>Contact Task Tube</h2>
-        <p>Need assistance? Our support team is here to help you 24/7 via WhatsApp. Reach out today to get started or resolve any issues!</p>
-        <a href="https://wa.me/+17655329001" target="_blank" class="btn" onclick="console.log('Notice button clicked')">Message Us</a>
+        <p>Need assistance? Our support team is here to help you 24/7 via Telegram. Reach out today to get started or resolve any issues!</p>
+        <a href="https://t.me/<?php echo $telegram_clean; ?>" class="btn" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
+            Message Us
+        </a>
     </div>
 
     <?php include 'inc/footer.php'; ?>
@@ -408,6 +443,26 @@
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
     <script>
+        // Telegram Deep Link Handling for WebViews
+        function openTelegram(event, url) {
+            event.preventDefault();
+            
+            // Check if loaded inside a WebView environment
+            const isWebView = /wv|AndroidWebView|iPhone.*Mobile/i.test(navigator.userAgent) || window.Android || (window.webkit && window.webkit.messageHandlers);
+            
+            if (isWebView) {
+                // Try opening using external browser intent target
+                var windowRef = window.open(url, '_system');
+                if (!windowRef || windowRef.closed || typeof windowRef.closed == 'undefined') {
+                    // Fallback to directly changing browser location
+                    window.location.href = url;
+                }
+            } else {
+                // Standard browser behavior
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
+        }
+
         // Set Active Navbar Link
         document.addEventListener('DOMContentLoaded', function() {
             const currentPath = window.location.pathname.split('/').pop();
