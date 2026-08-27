@@ -44,41 +44,6 @@ try {
     exit;
 }
 
-// Fetch region settings based on user's country
-try {
-    $stmt = $pdo->prepare("
-        SELECT section_header, ch_name, ch_value, COALESCE(channel, 'Bank') AS channel, account_upgrade
-        FROM region_settings 
-        WHERE country = ?
-    ");
-    $stmt->execute([$user_country]);
-    $region_settings = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($region_settings) {
-        $section_header = htmlspecialchars($region_settings['section_header']);
-        $ch_name = htmlspecialchars($region_settings['ch_name']);
-        $ch_value = htmlspecialchars($region_settings['ch_value']);
-        $channel = htmlspecialchars($region_settings['channel']);
-        $account_upgrade = $region_settings['account_upgrade'] ?? 0; // Default to 0 if not set
-    } else {
-        // Fallback values if no region settings are found.
-        $section_header = 'Withdraw Funds';
-        $ch_name = 'Bank Name';
-        $ch_value = 'Bank Account';
-        $channel = 'Bank';
-        $account_upgrade = 0; // Default to verification flow
-        error_log('No region settings found for country: ' . $user_country, 3, '../debug.log');
-    }
-} catch (PDOException $e) {
-    error_log('Region settings fetch error: ' . $e->getMessage(), 3, '../debug.log');
-    // Fallback values on error
-    $section_header = 'Withdraw Funds';
-    $ch_name = 'Bank Name';
-    $ch_value = 'Bank Account';
-    $channel = 'Bank';
-    $account_upgrade = 0; // Default to verification flow
-}
-
 // Check for success or error message
 $success_message = isset($_GET['success']) ? htmlspecialchars($_GET['success']) : null;
 $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null;
@@ -374,117 +339,6 @@ try {
             background: var(--accent-hover);
         }
 
-        .form-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 6px 16px var(--shadow-color);
-            margin: 24px 0;
-            animation: slideIn 0.5s ease-out 0.6s backwards;
-        }
-
-        .form-card h2 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .form-card h2::before {
-            content: '💸';
-            font-size: 1.2rem;
-            margin-right: 8px;
-        }
-
-        .input-container {
-            position: relative;
-            margin-bottom: 28px;
-        }
-
-        .input-container input {
-            width: 100%;
-            padding: 14px 8px;
-            font-size: 16px;
-            border: none;
-            border-bottom: 2px solid var(--border-color);
-            background: transparent;
-            color: var(--text-color);
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        .input-container input:focus,
-        .input-container input:not(:placeholder-shown) {
-            border-bottom-color: var(--accent-color);
-        }
-
-        .input-container label {
-            position: absolute;
-            top: 14px;
-            left: 8px;
-            font-size: 16px;
-            color: var(--subtext-color);
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-
-        .input-container input:focus ~ label,
-        .input-container input:not(:placeholder-shown) ~ label,
-        .input-container .active {
-            top: -18px;
-            left: 0;
-            font-size: 12px;
-            color: var(--accent-color);
-        }
-
-        .input-container input.has-value ~ label {
-            top: -18px;
-            left: 0;
-            font-size: 12px;
-            color: var(--accent-color);
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent-color);
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-
-        .submit-btn:hover {
-            background: var(--accent-hover);
-            transform: scale(1.02);
-        }
-
-        .submit-btn:disabled {
-            background: #6b7280;
-            cursor: not-allowed;
-        }
-
-        .verify-btn {
-            width: 100%;
-            padding: 14px;
-            background: #3b82f6;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-            margin-top: 20px;
-        }
-
-        .verify-btn:hover {
-            background: #2563eb;
-            transform: scale(1.02);
-        }
-
         @media (max-width: 768px) {
             .container {
                 padding: 16px;
@@ -504,10 +358,6 @@ try {
 
             .video-section video {
                 width: 100%;
-            }
-
-            .form-card {
-                padding: 20px;
             }
 
             .notification {
@@ -657,45 +507,6 @@ try {
             <?php endif; ?>
         </div>
 
-        <div class="form-card">
-            <h2><?php echo $section_header; ?></h2>
-            <form id="fundForm" action="process_withdrawal.php" method="POST" role="form">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                <div class="input-container">
-                    <input type="text" id="channel" name="channel" required aria-required="true">
-                    <label for="channel"><?php echo htmlspecialchars($channel); ?></label>
-                </div>
-                <div class="input-container">
-                    <input type="text" id="bankName" name="bank_name" required aria-required="true">
-                    <label for="bankName"><?php echo htmlspecialchars($ch_name); ?></label>
-                </div>
-                <div class="input-container">
-                    <input type="text" id="bankAccount" name="bank_account" required aria-required="true">
-                    <label for="bankAccount"><?php echo htmlspecialchars($ch_value); ?></label>
-                </div>
-                <div class="input-container">
-                    <input type="number" id="amount" name="amount" step="0.01" min="0.01" max="<?php echo $user['balance']; ?>" required aria-required="true">
-                    <label for="amount">Amount ($)</label>
-                </div>
-                <button type="submit" class="submit-btn" aria-label="Withdraw funds" 
-                    <?php echo ($verification_status !== 'verified' && $upgrade_status !== 'upgraded') ? 'disabled' : ''; ?>>
-                    Withdraw
-                </button>
-            </form>
-            <?php if ($account_upgrade == 1 && $verification_status !== 'verified' && $upgrade_status !== 'upgraded'): ?>
-                <p class="error">Please upgrade your account to enable withdrawals.</p>
-                <button class="verify-btn" onclick="window.location.href='upgrade_account.php'" aria-label="Upgrade account">
-                    Upgrade Account
-                </button>
-            <?php endif; ?>
-            <?php if ($account_upgrade != 1 && $upgrade_status !== 'upgraded' && $verification_status !== 'verified'): ?>
-                <p class="error">Please verify your account to enable withdrawals.</p>
-                <button class="verify-btn" onclick="window.location.href='verify_account.php'" aria-label="Verify account">
-                    Verify Account
-                </button>
-            <?php endif; ?>
-        </div>
-
         <div id="notificationContainer"></div>
     </div>
 
@@ -754,65 +565,6 @@ try {
                 menuItems.forEach((menuItem) => menuItem.classList.remove('active'));
                 item.classList.add('active');
             });
-        });
-
-        // Initialize and Update Label Positions
-        function updateLabelPosition(input) {
-            const label = input.nextElementSibling;
-            if (label && label.tagName === 'LABEL') {
-                if (input.value !== '') {
-                    label.classList.add('active');
-                    input.classList.add('has-value');
-                } else {
-                    label.classList.remove('active');
-                    input.classList.remove('has-value');
-                }
-            }
-        }
-
-        document.querySelectorAll('.input-container input').forEach((input) => {
-            updateLabelPosition(input); // Initialize on load
-            input.addEventListener('input', () => updateLabelPosition(input)); // Update on input
-            input.addEventListener('focus', () => {
-                const label = input.nextElementSibling;
-                if (label && label.tagName === 'LABEL') {
-                    label.classList.add('active');
-                }
-            });
-            input.addEventListener('blur', () => updateLabelPosition(input)); // Update on blur
-        });
-
-        // Form Validation
-        document.getElementById('fundForm').addEventListener('submit', function(e) {
-            const amountInput = document.getElementById('amount');
-            const maxAmount = parseFloat(<?php echo json_encode($user['balance']); ?>);
-            const amount = parseFloat(amountInput.value);
-            const channel = document.getElementById('channel').value.trim();
-            const bankName = document.getElementById('bankName').value.trim();
-            const bankAccount = document.getElementById('bankAccount').value.trim();
-
-            if (amount <= 0) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Amount',
-                    text: 'Withdrawal amount must be greater than $0.'
-                });
-            } else if (amount > maxAmount) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Insufficient Balance',
-                    text: `Withdrawal amount cannot exceed your balance of $${maxAmount.toFixed(2)}.`
-                });
-            } else if (!channel || !bankName || !bankAccount) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Missing Fields',
-                    text: 'Please fill in all required fields.'
-                });
-            }
         });
 
         // Logout Button
