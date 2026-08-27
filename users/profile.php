@@ -341,55 +341,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             margin-top: 10px;
         }
 
-        /* Floating Sidebar Buttons */
-        .actions-sidebar {
-            position: absolute;
-            right: 16px;
-            bottom: 110px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            z-index: 10;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-            transition: transform 0.2s ease;
-        }
-
-        .action-btn:active {
-            transform: scale(0.9);
-        }
-
-        .action-btn i {
-            font-size: 28px;
-            margin-bottom: 4px;
-        }
-
-        .action-btn.liked i {
-            color: #ef4444;
-            animation: heartBounce 0.4s ease;
-        }
-
-        .action-btn span {
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        @keyframes heartBounce {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
-
         /* Notifications Toast */
         .notification {
             position: fixed;
@@ -518,17 +469,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     <button type="button" class="change-passcode-btn" onclick="window.location.href='change_passcode.php'"><i class="fa-solid fa-key"></i> Change Passcode</button>
                 </form>
             </div>
-
-            <div class="actions-sidebar">
-                <button class="action-btn like-btn">
-                    <i class="fa-solid fa-heart"></i>
-                    <span class="like-count">0</span>
-                </button>
-                <button class="action-btn share-btn">
-                    <i class="fa-solid fa-share"></i>
-                    <span>Share</span>
-                </button>
-            </div>
         </div>
 
         <!-- Slide 2: Withdrawal Options -->
@@ -571,17 +511,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     </button>
                 <?php endif; ?>
             </div>
-
-            <div class="actions-sidebar">
-                <button class="action-btn like-btn">
-                    <i class="fa-solid fa-heart"></i>
-                    <span class="like-count">0</span>
-                </button>
-                <button class="action-btn share-btn">
-                    <i class="fa-solid fa-share"></i>
-                    <span>Share</span>
-                </button>
-            </div>
         </div>
 
     </div>
@@ -598,36 +527,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     </div>
 
     <script>
-        // Interactive Like Buttons
-        document.querySelectorAll('.like-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const isLiked = btn.classList.toggle('liked');
-                const countSpan = btn.querySelector('.like-count');
-                let count = parseInt(countSpan.textContent);
-                countSpan.textContent = isLiked ? count + 1 : count - 1;
-            });
-        });
-
-        // Native Share Button
-        document.querySelectorAll('.share-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Cash Tube Account Profile',
-                        url: window.location.href
-                    }).catch(console.error);
-                } else {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Share Profile',
-                        text: 'Link copied to clipboard!'
-                    });
-                }
-            });
-        });
-
         // Profile Form AJAX Handler
         document.getElementById('profileForm').addEventListener('submit', function(event) {
             event.preventDefault();
