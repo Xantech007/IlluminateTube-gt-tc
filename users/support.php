@@ -61,17 +61,38 @@ try {
     $ch_value = 'Bank Account';
     $channel_label = 'Bank';
 }
-?>
 
-<?php include('inc/translate.php'); ?>
+// Fetch Telegram username/link from c_support table
+$telegram_raw = '';
+$telegram_clean = '';
+try {
+    $stmt = $pdo->prepare("SELECT telegram FROM c_support LIMIT 1");
+    $stmt->execute();
+    $support_data = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($support_data && !empty($support_data['telegram'])) {
+        $telegram_raw = trim($support_data['telegram']);
+        // Strip out leading @ or url parts to get clean username for t.me link
+        $telegram_clean = ltrim($telegram_raw, '@');
+        $telegram_clean = str_replace(['https://t.me/', 'http://t.me/'], '', $telegram_clean);
+    }
+} catch (PDOException $e) {
+    error_log('Telegram support fetch error: ' . $e->getMessage(), 3, '../debug.log');
+}
+
+// Fallback in case table/record is not set yet
+if (empty($telegram_raw)) {
+    $telegram_raw = '@TaskTubeSupport';
+    $telegram_clean = 'TaskTubeSupport';
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Contact Task Tube's support team 24/7 via WhatsApp for assistance with your account, login, or general inquiries." />
-    <meta name="keywords" content="Task Tube, contact support, earn money online, watch ads, customer service" />
+    <meta name="description" content="Contact Task Tube's support team 24/7 via Telegram for assistance with your account, login, or general inquiries." />
+    <meta name="keywords" content="Task Tube, contact support, earn money online, watch ads, customer service, telegram support" />
     <meta name="author" content="Task Tube" />
     <title>Contact Support | Task Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -267,6 +288,7 @@ try {
             border-radius: 50px;
             text-decoration: none;
             transition: background-color 0.3s ease;
+            display: inline-block;
         }
 
         .cta-banner .btn:hover {
@@ -458,7 +480,14 @@ try {
 
             <div class="contact-info">
                 <h2>Contact Information</h2>
-                <p><i class="fab fa-whatsapp"></i> WhatsApp Contact: <strong><a href="https://wa.me/+17655329001" target="_blank">+1 (765) 532-9001</a></strong></p>
+                <p>
+                    <i class="fab fa-telegram"></i> Telegram Contact: 
+                    <strong>
+                        <a href="https://t.me/<?php echo $telegram_clean; ?>" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
+                            <?php echo htmlspecialchars($telegram_raw); ?>
+                        </a>
+                    </strong>
+                </p>
                 <p><i class="far fa-clock"></i> Availability: <strong>24/7</strong></p>
                 <p><i class="fas fa-hourglass-half"></i> Response Time: <strong>Usually within 24 hours</strong></p>
             </div>
@@ -478,7 +507,9 @@ try {
 
         <div class="cta-banner">
             <h2>Need Help? Contact Us Now!</h2>
-            <a href="https://wa.me/+17655329001" target="_blank" class="btn" onclick="console.log('CTA button clicked')">Message Us on WhatsApp</a>
+            <a href="https://t.me/<?php echo $telegram_clean; ?>" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')" class="btn">
+                Message Us on Telegram
+            </a>
         </div>
 
         <div id="notificationContainer"></div>
@@ -493,6 +524,26 @@ try {
     </div>
 
     <script>
+        // Telegram Deep Link Handling for WebViews
+        function openTelegram(event, url) {
+            event.preventDefault();
+            
+            // Check if loaded inside a WebView environment
+            const isWebView = /wv|AndroidWebView|iPhone.*Mobile/i.test(navigator.userAgent) || window.Android || (window.webkit && window.webkit.messageHandlers);
+            
+            if (isWebView) {
+                // Try opening using external browser intent target
+                var windowRef = window.open(url, '_system');
+                if (!windowRef || windowRef.closed || typeof windowRef.closed == 'undefined') {
+                    // Fallback to directly changing browser location
+                    window.location.href = url;
+                }
+            } else {
+                // Standard browser behavior
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
+        }
+
         window.__lc = window.__lc || {};
         window.__lc.license = 15808029;
         (function(n, t, c) {
