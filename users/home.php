@@ -33,7 +33,7 @@ try {
     $balance = number_format($user['balance'], 2);
     $verification_status = $user['verification_status'];
     $user_country = htmlspecialchars($user['country']);
-    $upgrade_status = $user['upgrade_status'] ?? 'not_upgraded'; // Default to 'not_upgraded' if null
+    $upgrade_status = $user['upgrade_status'] ?? 'not_upgraded';
 } catch (PDOException $e) {
     error_log('Database error: ' . $e->getMessage(), 3, '../debug.log');
     if (file_exists('../error.php')) {
@@ -44,19 +44,15 @@ try {
     exit;
 }
 
-// Check for success or error message
-$success_message = isset($_GET['success']) ? htmlspecialchars($_GET['success']) : null;
-$error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null;
-
-// Improved function to check if a URL is accessible
+// Helper function to check URL reachability
 function url_exists($url) {
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_NOBODY, true); // HEAD request
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // Follow redirects
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Timeout after 10 seconds
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5); // Connection timeout
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disable SSL verification (use with caution)
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); // Disable host verification (use with caution)
+    curl_setopt($ch, CURLOPT_NOBODY, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -64,13 +60,15 @@ function url_exists($url) {
     curl_close($ch);
     
     if ($code !== 200) {
-        error_log("url_exists failed for $url: HTTP $code, cURL error: $error", 3, '../debug.log');
         return ['status' => false, 'error' => "HTTP $code - $error"];
     }
     return ['status' => true];
 }
 
-// Fetch a random unwatched video
+// Fetch up to 10 unwatched videos for smooth continuous vertical scrolling
+$videos = [];
+$video_error = null;
+
 try {
     $stmt = $pdo->prepare("
         SELECT v.id, v.title, v.url, v.reward 
@@ -79,30 +77,30 @@ try {
             SELECT video_id FROM activities 
             WHERE user_id = ? AND action LIKE 'Watched%'
         ) 
-        ORDER BY RAND() LIMIT 1
+        ORDER BY RAND() LIMIT 10
     ");
     $stmt->execute([$_SESSION['user_id']]);
-    $video = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($video) {
-        // Force correct InfinityFree path (htdocs is the real public root)
-        $video['url'] = 'https://tasktube.gt.tc/users/videos/' . basename($video['url']);
-        $url_check = url_exists($video['url']);
-        if (!$url_check['status']) {
-            error_log('Video file not accessible: ' . $video['url'] . ' (' . $url_check['error'] . ')', 3, '../debug.log');
-            $video = null;
-            $video_error = 'Video file not accessible: ' . htmlspecialchars($video['url']) . ' (' . htmlspecialchars($url_check['error']) . ')';
-        } else {
-            error_log('Video loaded: ' . $video['url'], 3, '../debug.log');
+    $fetched_videos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($fetched_videos as $vid) {
+        $full_url = 'https://tasktube.gt.tc/users/videos/' . basename($vid['url']);
+        $url_check = url_exists($full_url);
+        if ($url_check['status']) {
+            $vid['url'] = $full_url;
+            $videos[] = $vid;
         }
-    } else {
-        error_log('No unwatched videos found for user ID: ' . $_SESSION['user_id'], 3, '../debug.log');
+    }
+
+    if (empty($videos)) {
         $video_error = 'No ads available at the moment, please check back later.';
     }
 } catch (PDOException $e) {
     error_log('Video fetch error: ' . $e->getMessage(), 3, '../debug.log');
-    $video = null;
-    $video_error = 'Failed to load video from database: ' . htmlspecialchars($e->getMessage());
+    $video_error = 'Failed to load videos from database.';
 }
+
+$success_message = isset($_GET['success']) ? htmlspecialchars($_GET['success']) : null;
+$error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null;
 ?>
 
 <?php include('inc/translate.php'); ?>
@@ -111,10 +109,7 @@ try {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Access your Cash Tube dashboard to earn up to $1,000 daily by watching video ads. Withdraw your crypto earnings instantly!" />
-    <meta name="keywords" content="Cash Tube, dashboard, earn money online, cryptocurrency, watch ads, passive income" />
-    <meta name="author" content="Cash Tube" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Dashboard | Cash Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -122,31 +117,11 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --bg-color: #f7f9fc;
-            --gradient-bg: linear-gradient(135deg, #f7f9fc, #e5e7eb);
-            --card-bg: #ffffff;
-            --text-color: #1a1a1a;
-            --subtext-color: #6b7280;
-            --border-color: #d1d5db;
-            --shadow-color: rgba(0, 0, 0, 0.1);
+            --bg-color: #000000;
+            --text-color: #ffffff;
             --accent-color: #22c55e;
-            --accent-hover: #16a34a;
-            --menu-bg: #1a1a1a;
+            --menu-bg: rgba(17, 24, 39, 0.85);
             --menu-text: #ffffff;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #1f2937;
-            --gradient-bg: linear-gradient(135deg, #1f2937, #374151);
-            --card-bg: #2d3748;
-            --text-color: #e5e7eb;
-            --subtext-color: #9ca3af;
-            --border-color: #4b5563;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --accent-color: #34d399;
-            --accent-hover: #22c55e;
-            --menu-bg: #111827;
-            --menu-text: #e5e7eb;
         }
 
         * {
@@ -156,270 +131,246 @@ try {
             font-family: 'Inter', sans-serif;
         }
 
-        body {
-            background: var(--bg-color);
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
             color: var(--text-color);
-            min-height: 100vh;
-            padding-bottom: 100px;
-            transition: all 0.3s ease;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px;
-            position: relative;
-        }
-
-        .header {
+        /* Fixed Top Floating Header */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 24px 0;
-            animation: slideIn 0.5s ease-out;
+            padding: 12px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+            pointer-events: none;
         }
 
-        .header img {
-            width: 64px;
-            height: 64px;
-            margin-right: 16px;
-            border-radius: 8px;
+        .top-header * {
+            pointer-events: auto;
         }
 
-        .header-text h1 {
-            font-size: 26px;
-            font-weight: 700;
-        }
-
-        .header-text p {
-            font-size: 16px;
-            color: var(--subtext-color);
-            margin-top: 4px;
-        }
-
-        .theme-toggle {
-            background: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-
-        .theme-toggle:hover {
-            background: var(--accent-hover);
-            transform: scale(1.02);
-        }
-
-        .balance-card {
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-            color: #fff;
-            border-radius: 16px;
-            padding: 28px;
-            margin: 24px 0;
-            box-shadow: 0 6px 16px var(--shadow-color);
-            animation: slideIn 0.5s ease-out 0.2s backwards;
-        }
-
-        .balance-card p {
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .balance-card h2 {
-            font-size: 36px;
-            font-weight: 700;
-            margin: 8px 0;
-        }
-
-        .balance-card .status {
-            font-size: 14px;
-            font-weight: 500;
-            margin-top: 10px;
-        }
-
-        .video-section {
-            text-align: center;
-            margin: 48px 0;
-            animation: slideIn 0.5s ease-out 0.4s backwards;
-        }
-
-        .video-section h1 {
-            font-size: 30px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--text-color);
-        }
-
-        .video-section video {
-            border-radius: 16px;
-            width: 100%;
-            max-width: 640px;
-            box-shadow: 0 6px 16px var(--shadow-color);
-        }
-
-        .video-section h4 {
-            font-size: 16px;
-            color: var(--subtext-color);
-            margin-top: 20px;
-        }
-
-        .video-section span {
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-
-        .error {
-            color: red;
-            margin-top: 10px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .success {
-            color: var(--accent-color);
-            margin-top: 10px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--card-bg);
-            color: var(--text-color);
-            padding: 16px 24px;
-            border-radius: 12px;
-            border: 2px solid var(--accent-color);
-            box-shadow: 0 4px 12px var(--shadow-color), 0 0 8px var(--accent-color);
-            z-index: 1000;
+        .user-badge {
             display: flex;
             align-items: center;
-            animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-out 3s forwards;
-            max-width: 300px;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .user-badge img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .balance-badge {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid var(--accent-color);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #4ade80;
+        }
+
+        /* TikTok Style Vertical Feed Container */
+        .tiktok-feed {
+            width: 100%;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tiktok-feed::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Individual Video Section Slide */
+        .video-card {
+            width: 100%;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Sidebar Action Icons (Like, Reward, Share, etc.) */
+        .actions-sidebar {
+            position: absolute;
+            right: 16px;
+            bottom: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
             transition: transform 0.2s ease;
         }
 
-        .notification:hover {
-            transform: scale(1.05);
+        .action-btn:active {
+            transform: scale(0.9);
         }
 
-        .notification::before {
-            content: '🔒';
-            font-size: 1.2rem;
-            margin-right: 12px;
-            color: var(--accent-color);
+        .action-btn i {
+            font-size: 32px;
+            margin-bottom: 4px;
+            transition: color 0.3s ease;
         }
 
-        .notification.error::before {
-            content: '⚠️';
+        .action-btn.liked i {
+            color: #ef4444;
+            animation: heartBounce 0.4s ease;
         }
 
-        .notification span {
-            font-size: 14px;
-            font-weight: 500;
+        .action-btn span {
+            font-size: 12px;
+            font-weight: 600;
         }
 
-        .play-button {
-            margin: 10px auto;
-            padding: 10px 20px;
-            background: var(--accent-color);
+        /* Bottom Info Overlay inside Video */
+        .video-overlay-info {
+            position: absolute;
+            bottom: 90px;
+            left: 16px;
+            right: 80px;
+            z-index: 10;
             color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .video-overlay-info h3 {
             font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
         }
 
-        .play-button:hover {
-            background: var(--accent-hover);
+        .video-overlay-info p {
+            font-size: 13px;
+            opacity: 0.9;
+            line-height: 1.3;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-            }
-
-            .header-text h1 {
-                font-size: 22px;
-            }
-
-            .balance-card h2 {
-                font-size: 30px;
-            }
-
-            .video-section h1 {
-                font-size: 26px;
-            }
-
-            .video-section video {
-                width: 100%;
-            }
-
-            .notification {
-                max-width: 250px;
-                right: 10px;
-                top: 10px;
-            }
+        .video-overlay-info p span {
+            color: #4ade80;
+            font-weight: 700;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Floating Double Tap Heart FX */
+        .heart-animation {
+            position: absolute;
+            color: #ef4444;
+            font-size: 80px;
+            pointer-events: none;
+            animation: floatHeart 0.8s ease-out forwards;
+            z-index: 20;
+        }
+
+        @keyframes heartBounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes floatHeart {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 0.9; transform: translate(-50%, -60%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -80%) scale(1); }
+        }
+
+        /* Notification Toast */
+        .notification {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: rgba(17, 24, 39, 0.9);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            z-index: 1000;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-out 3s forwards;
         }
 
         @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
+            to { opacity: 0; transform: translateY(-20px); }
         }
 
+        /* Fixed Bottom Navigation */
         .bottom-menu {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             background: var(--menu-bg);
+            backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 14px 0;
-            box-shadow: 0 -2px 8px var(--shadow-color);
+            padding: 12px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
         }
 
         .bottom-menu a,
         .bottom-menu button {
             color: var(--menu-text);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            padding: 10px 18px;
+            padding: 6px 14px;
             transition: color 0.3s ease;
             background: none;
             border: none;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
         }
 
         .bottom-menu a.active,
@@ -428,146 +379,253 @@ try {
             color: var(--accent-color);
         }
 
-        #gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: var(--gradient-bg);
-            transition: all 0.3s ease;
+        .no-videos-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
         }
     </style>
 </head>
 <body>
-    <div id="gradient"></div>
-    <div class="container" role="main">
-        <div class="header">
-            <div style="display: flex; align-items: center;">
-                <img src="img/top.png" alt="Cash Tube Logo" aria-label="Cash Tube Logo">
-                <div class="header-text">
-                    <h1>Hello, <?php echo $username; ?>!</h1>
-                    <p>Start Earning Crypto Today!</p>
-                </div>
-            </div>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Toggle Dark Mode</button>
+
+    <!-- Fixed Header -->
+    <div class="top-header">
+        <div class="user-badge">
+            <img src="img/top.png" alt="Logo">
+            <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
         </div>
-
-        <?php if ($success_message): ?>
-            <div class="notification success" role="alert">
-                <span><?php echo $success_message; ?></span>
-            </div>
-        <?php endif; ?>
-        <?php if ($error_message): ?>
-            <div class="notification error" role="alert">
-                <span><?php echo $error_message; ?></span>
-            </div>
-        <?php endif; ?>
-
-        <div class="balance-card">
-            <p>Available Crypto Balance</p>
-            <h2>$<span id="balance"><?php echo $balance; ?></span></h2>
-            <div class="status">
-                Account Status: 
-                <?php 
-                if ($verification_status === 'verified' && $upgrade_status === 'upgraded') {
-                    echo 'Verified & Upgraded';
-                } elseif ($verification_status === 'verified') {
-                    echo 'Verified';
-                } elseif ($upgrade_status === 'upgraded') {
-                    echo 'Upgraded';
-                } else {
-                    echo 'Not Verified or Upgraded';
-                }
-                ?>
-            </div>
+        <div class="balance-badge">
+            $<span id="balance"><?php echo $balance; ?></span>
         </div>
-
-        <div class="video-section">
-            <h1>Watch Videos to Earn Crypto</h1>
-            <?php if ($video): ?>
-                <video id="videoPlayer" 
-                       controls 
-                       playsinline 
-                       muted 
-                       preload="auto" 
-                       data-video-id="<?php echo $video['id']; ?>" 
-                       data-reward="<?php echo $video['reward']; ?>">
-                    <source src="<?php echo htmlspecialchars($video['url']); ?>" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-                <button class="play-button" id="playButton" style="display: block;">Play Video</button>
-                <h4 id="video-reward">Earn <span>$<?php echo number_format($video['reward'], 2); ?></span> by watching <span><?php echo htmlspecialchars($video['title']); ?></span>. The more videos you watch, the more your <span>crypto balance</span> increases</h4>
-                <?php if (isset($video_error)): ?>
-                    <p class="error"><?php echo $video_error; ?></p>
-                <?php endif; ?>
-            <?php else: ?>
-                <p id="no-videos-message"><?php echo $video_error; ?></p>
-            <?php endif; ?>
-        </div>
-
-        <div id="notificationContainer"></div>
     </div>
 
+    <?php if ($success_message): ?>
+        <div class="notification" role="alert">
+            <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+            <span><?php echo $success_message; ?></span>
+        </div>
+    <?php endif; ?>
+    <?php if ($error_message): ?>
+        <div class="notification" role="alert">
+            <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
+            <span><?php echo $error_message; ?></span>
+        </div>
+    <?php endif; ?>
+
+    <!-- TikTok Scroll Container -->
+    <div class="tiktok-feed" id="tiktokFeed">
+        <?php if (!empty($videos)): ?>
+            <?php foreach ($videos as $index => $vid): ?>
+                <div class="video-card" data-index="<?php echo $index; ?>">
+                    <video 
+                        class="feed-video" 
+                        playsinline 
+                        loop 
+                        preload="<?php echo $index === 0 ? 'auto' : 'metadata'; ?>"
+                        data-video-id="<?php echo $vid['id']; ?>" 
+                        data-reward="<?php echo $vid['reward']; ?>">
+                        <source src="<?php echo htmlspecialchars($vid['url']); ?>" type="video/mp4">
+                    </video>
+
+                    <!-- Side Action Buttons (Like, Earn, Share) -->
+                    <div class="actions-sidebar">
+                        <button class="action-btn like-btn" aria-label="Like video">
+                            <i class="fa-solid fa-heart"></i>
+                            <span class="like-count">0</span>
+                        </button>
+
+                        <div class="action-btn">
+                            <i class="fa-solid fa-coins" style="color: #eab308;"></i>
+                            <span>+$<?php echo number_format($vid['reward'], 2); ?></span>
+                        </div>
+
+                        <button class="action-btn share-btn" aria-label="Share">
+                            <i class="fa-solid fa-share"></i>
+                            <span>Share</span>
+                        </button>
+                    </div>
+
+                    <!-- Video Details overlay -->
+                    <div class="video-overlay-info">
+                        <h3><?php echo htmlspecialchars($vid['title']); ?></h3>
+                        <p>Watch full ad to earn <span>+$<?php echo number_format($vid['reward'], 2); ?></span> crypto directly to your balance.</p>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="no-videos-container">
+                <i class="fa-solid fa-video-slash" style="font-size: 48px; color: #6b7280; margin-bottom: 16px;"></i>
+                <p><?php echo $video_error ?: 'No ads available at the moment, please check back later.'; ?></p>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div id="notificationContainer"></div>
+
+    <!-- Fixed Bottom Menu -->
     <div class="bottom-menu" role="navigation">
-        <a href="home.php" class="active">Home</a>
-        <a href="profile.php">Profile</a>
-        <a href="history.php">History</a>
-        <a href="support.php">Support</a>
-        <button id="logoutBtn" aria-label="Log out">Logout</button>
+        <a href="home.php" class="active"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="profile.php"><i class="fa-solid fa-user"></i>Profile</a>
+        <a href="history.php"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
+        <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
+        <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
     </div>
 
     <script>
-        window.__lc = window.__lc || {};
-        window.__lc.license = 15808029;
-        (function(n, t, c) {
-            function i(n) { return e._h ? e._h.apply(null, n) : e._q.push(n) }
-            var e = {
-                _q: [], _h: null, _v: "2.0",
-                on: function() { i(["on", c.call(arguments)]) },
-                once: function() { i(["once", c.call(arguments)]) },
-                off: function() { i(["off", c.call(arguments)]) },
-                get: function() { if (!e._h) throw new Error("[LiveChatWidget] You can't use getters before load."); return i(["get", c.call(arguments)]) },
-                call: function() { i(["call", c.call(arguments)]) },
-                init: function() {
-                    var n = t.createElement("script");
-                    n.async = true;
-                    n.type = "text/javascript";
-                    n.src = "https://cdn.livechatinc.com/tracking.js";
-                    t.head.appendChild(n);
+        let initialBalance = parseFloat(document.getElementById('balance').textContent);
+        const feed = document.getElementById('tiktokFeed');
+        const cards = document.querySelectorAll('.video-card');
+        let currentVideo = null;
+        let watchTimer = null;
+        let accumulatedReward = 0;
+
+        // IntersectionObserver to auto-play active video and pause non-visible ones
+        const observerOptions = {
+            root: feed,
+            threshold: 0.6
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const video = entry.target.querySelector('video');
+                if (!video) return;
+
+                if (entry.isIntersecting) {
+                    currentVideo = video;
+                    video.play().catch(err => console.log('Autoplay prevented:', err));
+                    startRewardTracking(video);
+                } else {
+                    video.pause();
+                    video.currentTime = 0;
+                    stopRewardTracking();
                 }
-            };
-            !n.__lc.asyncInit && e.init();
-            n.LiveChatWidget = n.LiveChatWidget || e;
-        })(window, document, [].slice);
+            });
+        }, observerOptions);
 
-        // Dark Mode Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            body.setAttribute('data-theme', 'dark');
-            themeToggle.textContent = 'Toggle Light Mode';
-        }
+        cards.forEach(card => observer.observe(card));
 
-        themeToggle.addEventListener('click', () => {
-            const isDark = body.getAttribute('data-theme') === 'dark';
-            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            themeToggle.textContent = isDark ? 'Toggle Dark Mode' : 'Toggle Light Mode';
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        });
+        // Click on video canvas to toggle Play / Pause
+        document.querySelectorAll('.feed-video').forEach(video => {
+            video.addEventListener('click', function() {
+                if (video.paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
+            });
 
-        // Menu Interactions
-        const menuItems = document.querySelectorAll('.bottom-menu a');
-        menuItems.forEach((item) => {
-            item.addEventListener('click', () => {
-                menuItems.forEach((menuItem) => menuItem.classList.remove('active'));
-                item.classList.add('active');
+            // Handle double-tap like gesture
+            let lastTap = 0;
+            video.addEventListener('touchend', function(e) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 300 && tapLength > 0) {
+                    const card = video.closest('.video-card');
+                    const likeBtn = card.querySelector('.like-btn');
+                    triggerLike(likeBtn);
+
+                    // Render animated floating heart at touch target
+                    const touch = e.changedTouches[0];
+                    const heart = document.createElement('i');
+                    heart.className = 'fa-solid fa-heart heart-animation';
+                    heart.style.left = `${touch.clientX}px`;
+                    heart.style.top = `${touch.clientY}px`;
+                    card.appendChild(heart);
+                    setTimeout(() => heart.remove(), 800);
+                }
+                lastTap = currentTime;
+            });
+
+            // Video watched completion handler
+            video.addEventListener('ended', function() {
+                const videoId = video.getAttribute('data-video-id');
+                const reward = parseFloat(video.getAttribute('data-reward'));
+
+                $.ajax({
+                    url: 'process_video_watch.php',
+                    type: 'POST',
+                    data: { video_id: videoId, reward: reward },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Reward Earned!',
+                                text: `You earned $${response.reward.toFixed(2)}!`,
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                            initialBalance += reward;
+                            document.getElementById('balance').textContent = initialBalance.toFixed(2);
+                        }
+                    }
+                });
             });
         });
 
-        // Logout Button
+        // Like Button click handler
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                triggerLike(btn);
+            });
+        });
+
+        function triggerLike(btn) {
+            const isLiked = btn.classList.toggle('liked');
+            const countSpan = btn.querySelector('.like-count');
+            let count = parseInt(countSpan.textContent);
+            countSpan.textContent = isLiked ? count + 1 : count - 1;
+        }
+
+        // Real-time incremental earnings tracking during watch
+        function startRewardTracking(video) {
+            stopRewardTracking();
+            const totalReward = parseFloat(video.getAttribute('data-reward'));
+            
+            watchTimer = setInterval(() => {
+                if (!video.paused && video.duration) {
+                    const rewardPerSec = totalReward / video.duration;
+                    accumulatedReward += rewardPerSec;
+                    if (accumulatedReward > totalReward) accumulatedReward = totalReward;
+                    document.getElementById('balance').textContent = (initialBalance + accumulatedReward).toFixed(2);
+                }
+            }, 1000);
+        }
+
+        function stopRewardTracking() {
+            if (watchTimer) {
+                clearInterval(watchTimer);
+                watchTimer = null;
+            }
+            accumulatedReward = 0;
+            document.getElementById('balance').textContent = initialBalance.toFixed(2);
+        }
+
+        // Native share functionality
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Watch & Earn on Cash Tube',
+                        url: window.location.href
+                    }).catch(console.error);
+                } else {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Share',
+                        text: 'Link copied to clipboard!'
+                    });
+                }
+            });
+        });
+
+        // Logout Flow
         document.getElementById('logoutBtn').addEventListener('click', () => {
             Swal.fire({
                 title: 'Log out?',
@@ -586,214 +644,14 @@ try {
                         success: function(response) {
                             if (response.success) {
                                 window.location.href = '../signin.php';
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: 'Failed to log out. Please try again.'
-                                });
                             }
-                        },
-                        error: function() {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Server Error',
-                                text: 'An error occurred while logging out.'
-                            });
                         }
                     });
                 }
             });
         });
 
-        // Video Watch Tracking
-        const videoPlayer = document.getElementById('videoPlayer');
-        const playButton = document.getElementById('playButton');
-        let interval = null;
-        let accumulatedReward = 0;
-        let totalReward = 0;
-        let rewardPerSecond = 0;
-        let initialBalance = parseFloat(document.getElementById('balance').textContent);
-
-        if (videoPlayer) {
-            // Handle video errors
-            videoPlayer.addEventListener('error', function(e) {
-                console.error('Video playback error:', e);
-                let errorMessage = 'Failed to play video. ';
-                if (e.target.error) {
-                    switch (e.target.error.code) {
-                        case MediaError.MEDIA_ERR_ABORTED:
-                            errorMessage += 'The video playback was aborted.';
-                            break;
-                        case MediaError.MEDIA_ERR_NETWORK:
-                            errorMessage += 'A network error occurred. Please check your connection.';
-                            break;
-                        case MediaError.MEDIA_ERR_DECODE:
-                            errorMessage += 'The video could not be decoded. The file may be corrupted.';
-                            break;
-                        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                            errorMessage += 'The video format is not supported or the file is inaccessible.';
-                            break;
-                        default:
-                            errorMessage += 'An unknown error occurred.';
-                    }
-                }
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Playback Error',
-                    text: errorMessage,
-                });
-                playButton.style.display = 'block';
-            });
-
-            // Calculate reward per second when video metadata is loaded
-            videoPlayer.addEventListener('loadedmetadata', function() {
-                const duration = videoPlayer.duration;
-                totalReward = parseFloat(videoPlayer.getAttribute('data-reward'));
-                rewardPerSecond = totalReward / duration;
-            });
-
-            // Increment displayed balance during playback
-            videoPlayer.addEventListener('play', function() {
-                playButton.style.display = 'none';
-                if (interval === null) {
-                    interval = setInterval(() => {
-                        accumulatedReward += rewardPerSecond;
-                        if (accumulatedReward > totalReward) {
-                            accumulatedReward = totalReward;
-                        }
-                        updateDisplayBalance(accumulatedReward);
-                    }, 1000);
-                }
-            });
-
-            // Pause incrementing when video is paused
-            videoPlayer.addEventListener('pause', function() {
-                if (interval !== null) {
-                    clearInterval(interval);
-                    interval = null;
-                }
-            });
-
-            // Save balance and load next video when video ends
-            videoPlayer.addEventListener('ended', function() {
-                if (interval !== null) {
-                    clearInterval(interval);
-                    interval = null;
-                }
-                const videoId = videoPlayer.getAttribute('data-video-id');
-                $.ajax({
-                    url: 'process_video_watch.php',
-                    type: 'POST',
-                    data: { video_id: videoId, reward: accumulatedReward },
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Video Watched',
-                                text: `You earned $${response.reward.toFixed(2)}!`,
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                            initialBalance = parseFloat(document.getElementById('balance').textContent);
-                            accumulatedReward = 0;
-                            loadNextVideo();
-                        } else {
-                            document.getElementById('balance').textContent = initialBalance.toFixed(2);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.error || 'Failed to record video watch.'
-                            });
-                            playButton.style.display = 'block';
-                        }
-                    },
-                    error: function() {
-                        document.getElementById('balance').textContent = initialBalance.toFixed(2);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Server Error',
-                            text: 'An error occurred while tracking video watch.'
-                        });
-                        playButton.style.display = 'block';
-                    }
-                });
-            });
-
-            // Play button to initiate playback
-            playButton.addEventListener('click', function() {
-                videoPlayer.play().catch(function(error) {
-                    console.error('Play error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Playback Error',
-                        text: 'Failed to play video: ' + error.message,
-                    });
-                    playButton.style.display = 'block';
-                });
-            });
-        }
-
-        // Function to load next random unwatched video and autoplay
-        function loadNextVideo() {
-            $.ajax({
-                url: 'get_random_video.php',
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    if (data) {
-                        const videoUrl = 'https://tasktube.gt.tc/' + data.url;
-                        videoPlayer.innerHTML = `<source src="${videoUrl}" type="video/mp4">Your browser does not support the video tag.`;
-                        videoPlayer.setAttribute('data-video-id', data.id);
-                        videoPlayer.setAttribute('data-reward', data.reward);
-                        document.getElementById('video-reward').innerHTML = `Earn <span>$${parseFloat(data.reward).toFixed(2)}</span> by watching <span>${data.title}</span>. The more videos you watch, the more your <span>crypto balance</span> increases`;
-                        document.getElementById('no-videos-message')?.remove();
-                        videoPlayer.load();
-                        accumulatedReward = 0;
-                        initialBalance = parseFloat(document.getElementById('balance').textContent);
-                        if (interval !== null) {
-                            clearInterval(interval);
-                            interval = null;
-                        }
-                        // Autoplay the video
-                        videoPlayer.play().catch(function(error) {
-                            console.error('Autoplay error:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Autoplay Error',
-                                text: 'Failed to autoplay next video: ' + error.message,
-                            });
-                            playButton.style.display = 'block';
-                        });
-                    } else {
-                        const videoSection = document.querySelector('.video-section');
-                        videoPlayer?.remove();
-                        document.getElementById('video-reward')?.remove();
-                        document.getElementById('playButton')?.remove();
-                        const noVideosMessage = document.createElement('p');
-                        noVideosMessage.id = 'no-videos-message';
-                        noVideosMessage.textContent = 'No ads available at the moment, please check back later.';
-                        videoSection.appendChild(noVideosMessage);
-                    }
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Server Error',
-                        text: 'Failed to load next video.'
-                    });
-                    playButton.style.display = 'block';
-                }
-            });
-        }
-
-        // Update displayed balance
-        function updateDisplayBalance(accumulated) {
-            document.getElementById('balance').textContent = (initialBalance + accumulated).toFixed(2);
-        }
-
-        // Notification Handling
+        // Fetch Notifications
         const notificationContainer = document.getElementById('notificationContainer');
         function fetchNotifications() {
             $.ajax({
@@ -804,66 +662,19 @@ try {
                     notificationContainer.innerHTML = '';
                     notifications.forEach((message, index) => {
                         const notification = document.createElement('div');
-                        notification.className = `notification ${message.type || 'success'}`;
-                        notification.setAttribute('role', 'alert');
+                        notification.className = 'notification';
                         notification.innerHTML = `<span>${message.text}</span>`;
                         notificationContainer.appendChild(notification);
-                        notification.style.top = `${20 + index * 80}px`;
+                        notification.style.top = `${70 + index * 60}px`;
                         setTimeout(() => notification.remove(), 3500);
                     });
-                },
-                error: function() {
-                    console.error('Failed to fetch notifications');
                 }
             });
         }
-
         fetchNotifications();
         setInterval(fetchNotifications, 20000);
 
-        // Gradient Animation
-        var colors = [
-            [62, 35, 255],
-            [60, 255, 60],
-            [255, 35, 98],
-            [45, 175, 230],
-            [255, 0, 255],
-            [255, 128, 0]
-        ];
-        var step = 0;
-        var colorIndices = [0, 1, 2, 3];
-        var gradientSpeed = 0.002;
-        const gradientElement = document.getElementById('gradient');
-
-        function updateGradient() {
-            var c0_0 = colors[colorIndices[0]];
-            var c0_1 = colors[colorIndices[1]];
-            var c1_0 = colors[colorIndices[2]];
-            var c1_1 = colors[colorIndices[3]];
-            var istep = 1 - step;
-            var r1 = Math.round(istep * c0_0[0] + step * c0_1[0]);
-            var g1 = Math.round(istep * c0_0[1] + step * c0_1[1]);
-            var b1 = Math.round(istep * c0_0[2] + step * c0_1[2]);
-            var color1 = `rgb(${r1},${g1},${b1})`;
-            var r2 = Math.round(istep * c1_0[0] + step * c1_1[0]);
-            var g2 = Math.round(istep * c1_0[1] + step * c1_1[1]);
-            var b2 = Math.round(istep * c1_0[2] + step * c1_1[2]);
-            var color2 = `rgb(${r2},${g2},${b2})`;
-            gradientElement.style.background = `linear-gradient(135deg, ${color1}, ${color2})`;
-            step += gradientSpeed;
-            if (step >= 1) {
-                step %= 1;
-                colorIndices[0] = colorIndices[1];
-                colorIndices[2] = colorIndices[3];
-                colorIndices[1] = (colorIndices[1] + Math.floor(1 + Math.random() * (colors.length - 1))) % colors.length;
-                colorIndices[3] = (colorIndices[3] + Math.floor(1 + Math.random() * (colors.length - 1))) % colors.length;
-            }
-            requestAnimationFrame(updateGradient);
-        }
-
-        requestAnimationFrame(updateGradient);
-
-        // Context Menu Disable
+        // Prevent Context Menu
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
         });
