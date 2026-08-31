@@ -48,7 +48,6 @@
 
     .logo img {
         height: 50px;
-        border-radius: 50%;
     }
 
     .logo a {
