@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover Illuminate Task Tube, the elite platform where you can watch exclusive Illuminati videos and earn rewards. Explore our mission and join the elite.">
+    <meta name="keywords" content="Illuminate Task Tube, Illuminati videos, earn money online, secret archives, elite rewards, crypto payouts">
+    <meta name="author" content="Illuminate Task Tube">
+    <title>Illuminate Task Tube - About Us</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #0d0d0d;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #e0e0e0;
+            padding-top: 80px; /* Matches header height */
+            padding-bottom: 100px; /* Matches footer height */
+        }
+
+        /* Header Component */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: #141414;
+            border-bottom: 1px solid #d4af37;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .site-header .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #ffd700;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .site-header .logo i {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        /* Google Translate Element Wrapper */
+        #google_translate_element {
+            margin-left: auto;
+            margin-right: 15px;
+        }
+
+        /* Navbar / Bottom Navigation Component */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: #141414;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav .ham-menu ul {
+            display: flex;
+            list-style: none;
+            width: 100vw;
+            justify-content: space-around;
+            padding: 0;
+            margin: 0;
+        }
+
+        .bottom-nav .ham-menu ul li a {
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .bottom-nav .ham-menu ul li a i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .bottom-nav .ham-menu ul li.active a,
+        .bottom-nav .ham-menu ul li a:hover {
+            color: #ffd700;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            color: #ffd700;
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+            border-bottom: 2px solid #d4af37;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://source.unsplash.com/random/1920x1080/?gold,dark') no-repeat center center/cover;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .hero-section h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            color: #d4af37;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .hero-section p {
+            font-size: 18px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            position: relative;
+            z-index: 1;
+            color: #cccccc;
+        }
+
+        /* Main Container */
+        .index-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 600;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .about-content {
+            background: #141414;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .about-content h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffd700;
+            margin: 30px 0 15px;
+            text-align: left;
+        }
+
+        .about-content p {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .about-content ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .about-content ul li {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .about-content ul li::before {
+            content: '\f058';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: #ffd700;
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+
+        /* CTA Banner */
+        .cta-banner {
+            background: linear-gradient(135deg, #1a1a1a, #000000);
+            border: 1px solid #d4af37;
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px;
+            border-radius: 15px;
+            margin: 40px 20px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .cta-banner h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .cta-banner .btn {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .cta-banner .btn:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Button Styles */
+        .signup-link .btn {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .signup-link .btn:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Notice Popup */
+        .notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #141414;
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            display: none;
+            z-index: 1002;
+        }
+
+        .notice h2 {
+            font-size: 24px;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .notice p {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #ffd700;
+        }
+
+        .notice .btn {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .notice .btn:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Site Footer Component */
+        .site-footer {
+            background-color: #080808;
+            border-top: 1px solid #222;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        .site-footer a {
+            color: #d4af37;
+            text-decoration: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-section h1 {
+                font-size: 36px;
+            }
+
+            .hero-section p {
+                font-size: 16px;
+            }
+
+            .section-title {
+                font-size: 30px;
+            }
+
+            .about-content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+                padding-bottom: 80px;
+            }
+
+            .hero-section {
+                padding: 80px 20px;
+            }
+
+            .hero-section h1 {
+                font-size: 32px;
+            }
+
+            .hero-section p {
+                font-size: 15px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .cta-banner h2 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 60px;
+                padding-bottom: 60px;
+            }
+
+            .hero-section {
+                padding: 60px 15px;
+            }
+
+            .hero-section h1 {
+                font-size: 28px;
+            }
+
+            .hero-section p {
+                font-size: 14px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .about-content {
+                padding: 15px;
+            }
+
+            .cta-banner {
+                padding: 40px 15px;
+            }
+
+            .cta-banner h2 {
+                font-size: 24px;
+            }
+
+            .cta-banner .btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hardcoded header.html & translate.html -->
+    <header class="site-header">
+        <a href="index.html" class="logo">
+            <i class="fa-solid fa-eye"></i> Illuminate Tube
+        </a>
+        
+        <!-- Translate Component -->
+        <div id="google_translate_element"></div>
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en',
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                }, 'google_translate_element');
+            }
+        </script>
+        <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    </header>
+
+    <!-- Hardcoded navbar.html -->
+    <nav class="bottom-nav">
+        <div class="ham-menu">
+            <ul>
+                <li>
+                    <a href="index.html">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="about.html">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>About</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="tasks.html">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Tasks</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="register.html">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Register</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1>About Illuminate Task Tube</h1>
+        <p>Discover how Illuminate Task Tube connects you to secret archives and exclusive Illuminati-related media while granting you elite rewards.</p>
+    </section>
+
+    <!-- About Content -->
+    <div class="index-container">
+        <h2 class="section-title">Who We Are</h2>
+        <div class="about-content">
+            <h2>Welcome to Illuminate Task Tube</h2>
+            <p>
+                Illuminate Task Tube is an exclusive digital platform created to redefine video viewing and financial enlightenment. Rather than wasting hours on ordinary streaming, Illuminate Task Tube offers you direct access to fascinating Illuminati archives, historical lore, and hidden knowledge—all while rewarding you for your viewing time.
+            </p>
+            <p>
+                Powered by a high-tier blockchain security framework, Illuminate Task Tube lets members unlock elite earnings through dedicated participation. Whether you are seeking deeper insight or building passive wealth, our sanctuary gives you a prestigious path to claim digital rewards.
+            </p>
+
+            <h2>Our Mission</h2>
+            <p>
+                At Illuminate Task Tube, our mission is to empower initiates across the globe through secret knowledge and financial prosperity. We bridge the gap between intriguing secret content and decentralized finance, providing a transparent, elite, and seamless system where enlightenment translates into direct value.
+            </p>
+
+            <h2>How It Works</h2>
+            <p>
+                Embarking on your journey with Illuminate Task Tube is straightforward:
+            </p>
+            <ul>
+                <li><strong>Initiate Access:</strong> Create your profile in moments and set up your private 5-digit passcode.</li>
+                <li><strong>Watch Secret Videos:</strong> Stream exclusive Illuminati documentaries, hidden archives, and mysterious videos.</li>
+                <li><strong>Earn Rewards:</strong> Receive payout credits directly into your vault for every video watched.</li>
+                <li><strong>Claim Payouts:</strong> Withdraw your earned wealth securely through our crypto-backed payout network.</li>
+            </ul>
+
+            <h2>Why Choose Illuminate Task Tube?</h2>
+            <p>
+                Illuminate Task Tube stands as a premier destination for knowledge seekers and earners alike due to our unique offerings:
+            </p>
+            <ul>
+                <li><strong>Exclusive Content:</strong> Access rare and captivating Illuminati archives unavailable on conventional platforms.</li>
+                <li><strong>High Earning Potential:</strong> Elevate your status and unlock substantial payout rates as an active member.</li>
+                <li><strong>Encrypted & Safe:</strong> Advanced crypto encryption guarantees fast, private, and trustworthy reward transactions.</li>
+                <li><strong>Global Circle:</strong> Available worldwide to all who seek enlightenment and passive wealth creation.</li>
+            </ul>
+            <p>
+                Join thousands of initiates who are transforming their screen time into wealth and discovery with Illuminate Task Tube.
+            </p>
+            <p class="signup-link">
+                Ready to enter the circle? <a href="register.html" class="btn">Sign Up Now</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- CTA Banner -->
+    <section class="cta-banner">
+        <h2>Join Illuminate Task Tube Today</h2>
+        <a href="register.html" class="btn" onclick="console.log('CTA button clicked')">Start Earning Now</a>
+    </section>
+
+    <!-- Notice Popup -->
+    <div class="notice" id="notice">
+        <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
+        <h2>Enter Illuminate Task Tube</h2>
+        <p>Unlock secret video archives and earn premium crypto rewards today. Register now and join the elite!</p>
+        <a href="register.html" class="btn" onclick="console.log('Notice button clicked')">Get Started</a>
+    </div>
+
+    <!-- Hardcoded footer.html -->
+    <footer class="site-footer">
+        <p>&copy; 2026 Illuminate Task Tube. All Rights Reserved.</p>
+    </footer>
+
+    <!-- LiveChat Script -->
+    <script>
+        window.__lc = window.__lc || {};
+        window.__lc.license = 15808029;
+        (function(n,t,c){function i(n){return e._h?e._h.apply(null,n):e._q.push(n)}var e={_q:[],_h:null,_v:"2.0",on:function(){i(["on",c.call(arguments)])},once:function(){i(["once",c.call(arguments)])},off:function(){i(["off",c.call(arguments)])},get:function(){if(!e._h)throw new Error("[LiveChatWidget] You can't use getters before load.");return i(["get",c.call(arguments)])},call:function(){i(["call",c.call(arguments)])},init:function(){var n=t.createElement("script");n.async=!0,n.type="text/javascript",n.src="https://cdn.livechatinc.com/tracking.js",t.head.appendChild(n)}};!n.__lc.asyncInit&&e.init(),n.LiveChatWidget=n.LiveChatWidget||e}(window,document,[].slice))
+    </script>
+    <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
+
+    <script>
+        // Set Active Navbar Link
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname.split('/').pop();
+            const links = document.querySelectorAll('.ham-menu ul li a');
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.html')) {
+                    link.parentElement.classList.add('active');
+                }
+            });
+        });
+
+        // Notice Popup
+        function isNoticeShown() {
+            return localStorage.getItem('noticeShownAbout');
+        }
+
+        function setNoticeShown() {
+            localStorage.setItem('noticeShownAbout', true);
+        }
+
+        function showNotice() {
+            if (!isNoticeShown()) {
+                const notice = document.getElementById('notice');
+                setTimeout(() => {
+                    notice.style.display = 'block';
+                    setNoticeShown();
+                }, 2000);
+            }
+        }
+
+        function closeNotice() {
+            document.getElementById('notice').style.display = 'none';
+            setNoticeShown();
+        }
+
+        window.addEventListener('load', showNotice);
+
+        // Prevent right-click only on non-link elements
+        document.addEventListener('contextmenu', e => {
+            if (!e.target.closest('a')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
