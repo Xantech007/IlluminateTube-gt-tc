@@ -139,17 +139,17 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             color: var(--text-color);
         }
 
-        /* Fixed Top Floating Header */
+        /* Fixed Top Floating Header (Increased distance from top) */
         .top-header {
             position: fixed;
-            top: 0;
+            top: 20px;
             left: 0;
             width: 100%;
             z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 20px;
+            padding: 16px 20px;
             background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
             pointer-events: none;
         }
@@ -312,10 +312,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             100% { opacity: 0; transform: translate(-50%, -80%) scale(1); }
         }
 
-        /* Notification Toast */
+        /* Notification Toast (Adjusted top position to match header) */
         .notification {
             position: fixed;
-            top: 70px;
+            top: 90px;
             right: 20px;
             background: rgba(17, 24, 39, 0.9);
             color: #fff;
@@ -712,7 +712,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                         notification.className = 'notification';
                         notification.innerHTML = `<span>${message.text}</span>`;
                         notificationContainer.appendChild(notification);
-                        notification.style.top = `${70 + index * 60}px`;
+                        notification.style.top = `${90 + index * 60}px`;
                         setTimeout(() => notification.remove(), 3500);
                     });
                 }
