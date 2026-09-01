@@ -1,8 +1,3 @@
-<?php
-// index.php
-session_start(); // Start session to check user login status
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,8 +25,8 @@ session_start(); // Start session to check user login status
             display: flex;
             flex-direction: column;
             color: #e0e0e0;
-            padding-top: 80px; /* Matches header height */
-            padding-bottom: 100px; /* Matches footer height */
+            padding-top: 80px;
+            padding-bottom: 100px;
         }
 
         /* Hero Section */
@@ -347,7 +342,7 @@ session_start(); // Start session to check user login status
         }
 
         .faq-item h3::after {
-            content: '\f078'; /* Font Awesome chevron-down */
+            content: '\f078';
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             position: absolute;
@@ -580,20 +575,17 @@ session_start(); // Start session to check user login status
     </style>
 </head>
 <body>
-    <?php include 'inc/header.php'; ?>
-    <?php include 'inc/navbar.php'; ?>
+    <!-- Dynamic Component Holders (Option B) -->
+    <div id="header-container"></div>
+    <div id="navbar-container"></div>
 
     <!-- Hero Section -->
     <section class="hero-section">
         <h1>Unlock Wealth with Illuminate Tube</h1>
         <p>Step into the circle of enlightenment. Watch exclusive Illuminati-related videos and secret archives to unlock high-tier monetary rewards and passive wealth!</p>
         <div class="button-group">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="users/home.php" class="btn btn-dashboard" onclick="console.log('Dashboard button clicked')">Dashboard</a>
-            <?php else: ?>
-                <a href="register.php" class="btn btn-register" onclick="console.log('Register button clicked')">Get Started</a>
-                <a href="signin.php" class="btn btn-signin" onclick="console.log('Sign In button clicked')">Sign In</a>
-            <?php endif; ?>
+            <a href="register.html" class="btn btn-register" onclick="console.log('Register button clicked')">Get Started</a>
+            <a href="signin.html" class="btn btn-signin" onclick="console.log('Sign In button clicked')">Sign In</a>
         </div>
     </section>
 
@@ -641,7 +633,7 @@ session_start(); // Start session to check user login status
             <div class="feature-card">
                 <i class="fas fa-headset"></i>
                 <h3>Dedicated Concierge</h3>
-                <p>Enjoy round-the-clock member support via LiveChat or our <a href="contact.php" style="color: #ffd700;">Contact page</a>.</p>
+                <p>Enjoy round-the-clock member support via LiveChat or our <a href="contact.html" style="color: #ffd700;">Contact page</a>.</p>
             </div>
         </div>
     </div>
@@ -708,7 +700,7 @@ session_start(); // Start session to check user login status
             </div>
             <div class="faq-item">
                 <h3>Is Illuminate Tube secure?</h3>
-                <p>We maintain end-to-end security protocol to shield user activity. Review our <a href="privacy.php" style="color: #ffd700;">Privacy Policy</a> for full details.</p>
+                <p>We maintain end-to-end security protocol to shield user activity. Review our <a href="privacy.html" style="color: #ffd700;">Privacy Policy</a> for full details.</p>
             </div>
         </div>
     </div>
@@ -716,11 +708,7 @@ session_start(); // Start session to check user login status
     <!-- CTA Banner -->
     <section class="cta-banner">
         <h2>Unveil the Mysteries & Claim Your Rewards</h2>
-        <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="users/home.php" class="btn" onclick="console.log('Dashboard CTA clicked')">Go to Dashboard</a>
-        <?php else: ?>
-            <a href="register.php" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Tube Now</a>
-        <?php endif; ?>
+        <a href="register.html" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Tube Now</a>
     </section>
 
     <!-- Notice Popup -->
@@ -728,14 +716,10 @@ session_start(); // Start session to check user login status
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
         <h2>Welcome to Illuminate Tube</h2>
         <p>Unlock access to Illuminati secret videos and earn premium rewards today. Enter the portal now!</p>
-        <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="users/home.php" class="btn btn-dashboard" onclick="console.log('Notice dashboard clicked')">Go to Dashboard</a>
-        <?php else: ?>
-            <a href="register.php" class="btn btn-register" onclick="console.log('Notice button clicked')">Get Started</a>
-        <?php endif; ?>
+        <a href="register.html" class="btn btn-register" onclick="console.log('Notice button clicked')">Get Started</a>
     </div>
 
-    <?php include 'inc/footer.php'; ?>
+    <div id="footer-container"></div>
 
     <!-- LiveChat Script -->
     <script>
@@ -746,12 +730,17 @@ session_start(); // Start session to check user login status
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
     <script>
+        // Fetch HTML Components
+        fetch('inc/header.html').then(res => res.text()).then(data => document.getElementById('header-container').innerHTML = data);
+        fetch('inc/navbar.html').then(res => res.text()).then(data => document.getElementById('navbar-container').innerHTML = data);
+        fetch('inc/footer.html').then(res => res.text()).then(data => document.getElementById('footer-container').innerHTML = data);
+
         // Set Active Navbar Link
         document.addEventListener('DOMContentLoaded', function() {
             const currentPath = window.location.pathname.split('/').pop();
             const links = document.querySelectorAll('.ham-menu ul li a');
             links.forEach(link => {
-                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.php')) {
+                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.html')) {
                     link.parentElement.classList.add('active');
                 }
             });
