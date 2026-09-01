@@ -2,7 +2,7 @@
 // footer.php
 ?>
 <footer id="footer">
-    <p>&copy; <?php echo date("Y"); ?> Task Tube. All rights reserved.</p>
+    <p>&copy; <?php echo date("Y"); ?> Illuminate Tube. All rights reserved.</p>
 </footer>
 
 <style>
@@ -12,10 +12,11 @@
         left: 0;
         right: 0;
         width: 100%;
-        background: #fff;
+        background: #141414;
+        border-top: 1px solid #333;
         padding: 20px;
         text-align: center;
-        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
         z-index: 1000;
         opacity: 0;
         visibility: hidden;
@@ -29,8 +30,10 @@
 
     footer p {
         margin: 0;
-        color: #333;
+        color: #d4af37;
         font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
     }
 
     /* Responsive Design */
@@ -62,7 +65,7 @@
         const documentHeight = document.documentElement.scrollHeight;
         const scrollPosition = window.scrollY || window.pageYOffset;
 
-        // Show footer when scrolled to bottom
+        // Show footer when scrolled near the bottom
         if (scrollPosition + windowHeight >= documentHeight - 50) {
             footer.classList.add('visible');
         } else {
