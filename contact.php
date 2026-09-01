@@ -21,8 +21,8 @@ try {
 
 // Fallback in case table/record is not set yet
 if (empty($telegram_raw)) {
-    $telegram_raw = '@TaskTubeSupport';
-    $telegram_clean = 'TaskTubeSupport';
+    $telegram_raw = '@IlluminateTubeSupport';
+    $telegram_clean = 'IlluminateTubeSupport';
 }
 ?>
 
@@ -31,10 +31,10 @@ if (empty($telegram_raw)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Contact Task Tube's support team 24/7 via Telegram for assistance with your account, login, or general inquiries.">
-    <meta name="keywords" content="Task Tube, contact support, earn money online, watch ads, customer service">
-    <meta name="author" content="Task Tube">
-    <title>Task Tube - Contact Us</title>
+    <meta name="description" content="Contact Illuminate Tube's elite support team 24/7 via Telegram for assistance with your account, login, or secret archive inquiries.">
+    <meta name="keywords" content="Illuminate Tube, contact support, Illuminati videos, elite rewards, crypto payouts, customer service">
+    <meta name="author" content="Illuminate Tube">
+    <title>Illuminate Tube - Contact Us</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -47,24 +47,25 @@ if (empty($telegram_raw)) {
         }
 
         body {
-            background: #f5f7fa;
+            background: #0d0d0d;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            color: #333;
+            color: #e0e0e0;
             padding-top: 80px; /* Matches header height */
             padding-bottom: 100px; /* Matches footer height */
         }
 
         /* Hero Section */
         .hero-section {
-            background: linear-gradient(135deg, #6e44ff, #b5179e);
-            color: #fff;
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            color: #ffd700;
             text-align: center;
             padding: 100px 20px;
             position: relative;
             overflow: hidden;
             z-index: 10;
+            border-bottom: 2px solid #d4af37;
         }
 
         .hero-section::before {
@@ -74,8 +75,8 @@ if (empty($telegram_raw)) {
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('https://source.unsplash.com/random/1920x1080/?technology') no-repeat center center/cover;
-            opacity: 0.1;
+            background: url('https://source.unsplash.com/random/1920x1080/?gold,dark') no-repeat center center/cover;
+            opacity: 0.15;
             z-index: 0;
         }
 
@@ -85,6 +86,8 @@ if (empty($telegram_raw)) {
             margin-bottom: 20px;
             position: relative;
             z-index: 1;
+            color: #d4af37;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
 
         .hero-section p {
@@ -94,6 +97,7 @@ if (empty($telegram_raw)) {
             margin: 0 auto 30px;
             position: relative;
             z-index: 1;
+            color: #cccccc;
         }
 
         /* Main Container */
@@ -106,29 +110,30 @@ if (empty($telegram_raw)) {
         .section-title {
             font-size: 36px;
             font-weight: 600;
-            color: #333;
+            color: #d4af37;
             text-align: center;
             margin-bottom: 40px;
         }
 
         .contact-content {
-            background: #fff;
+            background: #141414;
+            border: 1px solid #333;
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
 
         .contact-content h2 {
             font-size: 24px;
             font-weight: 600;
-            color: #6e44ff;
+            color: #ffd700;
             margin: 30px 0 15px;
             text-align: left;
         }
 
         .contact-content p {
             font-size: 16px;
-            color: #666;
+            color: #aaa;
             line-height: 1.6;
             margin-bottom: 20px;
             text-align: left;
@@ -143,7 +148,7 @@ if (empty($telegram_raw)) {
 
         .contact-content ul li {
             font-size: 16px;
-            color: #666;
+            color: #aaa;
             line-height: 1.6;
             margin-bottom: 10px;
             position: relative;
@@ -154,19 +159,19 @@ if (empty($telegram_raw)) {
             content: '\f058';
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
-            color: #6e44ff;
+            color: #ffd700;
             position: absolute;
             left: 0;
             top: 2px;
         }
 
         .contact-info p strong {
-            color: #333;
+            color: #fff;
             font-weight: 600;
         }
 
         .contact-info p a {
-            color: #6e44ff;
+            color: #ffd700;
             text-decoration: none;
         }
 
@@ -176,50 +181,59 @@ if (empty($telegram_raw)) {
 
         /* CTA Banner */
         .cta-banner {
-            background: linear-gradient(135deg, #6e44ff, #b5179e);
+            background: linear-gradient(135deg, #1a1a1a, #000000);
+            border: 1px solid #d4af37;
             color: #fff;
             text-align: center;
             padding: 60px 20px;
             border-radius: 15px;
             margin: 40px 20px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
         }
 
         .cta-banner h2 {
             font-size: 32px;
             font-weight: 600;
+            color: #ffd700;
             margin-bottom: 20px;
         }
 
         .cta-banner .btn {
-            background-color: #fff;
-            color: #6e44ff;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
             padding: 15px 40px;
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             border-radius: 50px;
             text-decoration: none;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            display: inline-block;
         }
 
         .cta-banner .btn:hover {
-            background-color: #f0f0f0;
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
 
         /* Button Styles */
         .signup-link .btn {
-            background-color: #6e44ff;
-            color: #fff;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
             padding: 12px 30px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 700;
             border-radius: 25px;
             text-decoration: none;
             transition: all 0.3s ease;
             cursor: pointer;
+            display: inline-block;
         }
 
         .signup-link .btn:hover {
-            background-color: #5a00b5;
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
 
         /* Notice Popup */
@@ -228,9 +242,10 @@ if (empty($telegram_raw)) {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #fff;
+            background: #141414;
+            border: 2px solid #d4af37;
             border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
             padding: 30px;
             max-width: 400px;
             width: 90%;
@@ -241,13 +256,13 @@ if (empty($telegram_raw)) {
 
         .notice h2 {
             font-size: 24px;
-            color: #6e44ff;
+            color: #ffd700;
             margin-bottom: 15px;
         }
 
         .notice p {
             font-size: 16px;
-            color: #666;
+            color: #aaa;
             margin-bottom: 20px;
             text-align: center;
         }
@@ -258,27 +273,30 @@ if (empty($telegram_raw)) {
             right: 15px;
             font-size: 24px;
             cursor: pointer;
-            color: #999;
+            color: #888;
             transition: color 0.3s ease;
         }
 
         .close-btn:hover {
-            color: #333;
+            color: #ffd700;
         }
 
         .notice .btn {
-            background-color: #6e44ff;
-            color: #fff;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
             padding: 12px 30px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 700;
             border-radius: 25px;
             text-decoration: none;
             transition: all 0.3s ease;
+            display: inline-block;
         }
 
         .notice .btn:hover {
-            background-color: #5a00b5;
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
 
         /* Responsive Design */
@@ -374,8 +392,8 @@ if (empty($telegram_raw)) {
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <h1>Contact Task Tube</h1>
-        <p>Reach out to our 24/7 support team via Telegram for help with your account, login, or any inquiries!</p>
+        <h1>Contact Illuminate Tube</h1>
+        <p>Reach out to our 24/7 elite support team via Telegram for help with your account, vault access, or general inquiries!</p>
     </section>
 
     <!-- Contact Content -->
@@ -383,7 +401,7 @@ if (empty($telegram_raw)) {
         <h2 class="section-title">Get in Touch</h2>
         <div class="contact-content">
             <p>
-                We're here to help with any questions or issues you may have! At Task Tube, our dedicated support team is available 24/7. Whether you need help with your account, login, or have general inquiries, feel free to reach out.
+                We're here to assist you with any questions or issues you may have! At Illuminate Tube, our dedicated support team is available 24/7. Whether you need help with your initiate account, access code issues, or reward payout inquiries, feel free to reach out.
             </p>
 
             <div class="contact-info">
@@ -403,8 +421,9 @@ if (empty($telegram_raw)) {
             <div class="categories">
                 <h2>We Can Help With:</h2>
                 <ul>
-                    <li>Technical Support for Login/Access Issues</li>
-                    <li>Verification Requests</li>
+                    <li>Technical Support for Vault Login/Access Issues</li>
+                    <li>Initiate Passcode & Verification Requests</li>
+                    <li>Crypto Reward Payout & Vault Inquiries</li>
                 </ul>
             </div>
 
@@ -416,7 +435,7 @@ if (empty($telegram_raw)) {
 
     <!-- CTA Banner -->
     <section class="cta-banner">
-        <h2>Need Help? Contact Us Now!</h2>
+        <h2>Need Assistance? Contact Us Now!</h2>
         <a href="https://t.me/<?php echo $telegram_clean; ?>" class="btn" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
             Message Us on Telegram
         </a>
@@ -425,7 +444,7 @@ if (empty($telegram_raw)) {
     <!-- Notice Popup -->
     <div class="notice" id="notice">
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
-        <h2>Contact Task Tube</h2>
+        <h2>Contact Illuminate Tube</h2>
         <p>Need assistance? Our support team is here to help you 24/7 via Telegram. Reach out today to get started or resolve any issues!</p>
         <a href="https://t.me/<?php echo $telegram_clean; ?>" class="btn" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
             Message Us
