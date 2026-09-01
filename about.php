@@ -7,10 +7,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover Illuminate Tube, the elite platform where you can watch exclusive Illuminati videos and earn rewards. Explore our mission and join the elite.">
-    <meta name="keywords" content="Illuminate Tube, Illuminati videos, earn money online, secret archives, elite rewards, crypto payouts">
-    <meta name="author" content="Illuminate Tube">
-    <title>Illuminate Tube - About Us</title>
+    <meta name="description" content="Discover Illuminate Task Tube, the elite platform where you can watch exclusive Illuminati videos and earn rewards. Explore our mission and join the elite.">
+    <meta name="keywords" content="Illuminate Task Tube, Illuminati videos, earn money online, secret archives, elite rewards, crypto payouts">
+    <meta name="author" content="Illuminate Task Tube">
+    <title>Illuminate Task Tube - About Us</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -354,30 +354,30 @@
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <h1>About Illuminate Tube</h1>
-        <p>Discover how Illuminate Tube connects you to secret archives and exclusive Illuminati-related media while granting you elite rewards.</p>
+        <h1>About Illuminate Task Tube</h1>
+        <p>Discover how Illuminate Task Tube connects you to secret archives and exclusive Illuminati-related media while granting you elite rewards.</p>
     </section>
 
     <!-- About Content -->
     <div class="index-container">
         <h2 class="section-title">Who We Are</h2>
         <div class="about-content">
-            <h2>Welcome to Illuminate Tube</h2>
+            <h2>Welcome to Illuminate Task Tube</h2>
             <p>
-                Illuminate Tube is an exclusive digital platform created to redefine video viewing and financial enlightenment. Rather than wasting hours on ordinary streaming, Illuminate Tube offers you direct access to fascinating Illuminati archives, historical lore, and hidden knowledge—all while rewarding you for your viewing time.
+                Illuminate Task Tube is an exclusive digital platform created to redefine video viewing and financial enlightenment. Rather than wasting hours on ordinary streaming, Illuminate Task Tube offers you direct access to fascinating Illuminati archives, historical lore, and hidden knowledge—all while rewarding you for your viewing time.
             </p>
             <p>
-                Powered by a high-tier blockchain security framework, Illuminate Tube lets members unlock elite earnings through dedicated participation. Whether you are seeking deeper insight or building passive wealth, our sanctuary gives you a prestigious path to claim digital rewards.
+                Powered by a high-tier blockchain security framework, Illuminate Task Tube lets members unlock elite earnings through dedicated participation. Whether you are seeking deeper insight or building passive wealth, our sanctuary gives you a prestigious path to claim digital rewards.
             </p>
 
             <h2>Our Mission</h2>
             <p>
-                At Illuminate Tube, our mission is to empower initiates across the globe through secret knowledge and financial prosperity. We bridge the gap between intriguing secret content and decentralized finance, providing a transparent, elite, and seamless system where enlightenment translates into direct value.
+                At Illuminate Task Tube, our mission is to empower initiates across the globe through secret knowledge and financial prosperity. We bridge the gap between intriguing secret content and decentralized finance, providing a transparent, elite, and seamless system where enlightenment translates into direct value.
             </p>
 
             <h2>How It Works</h2>
             <p>
-                Embarking on your journey with Illuminate Tube is straightforward:
+                Embarking on your journey with Illuminate Task Tube is straightforward:
             </p>
             <ul>
                 <li><strong>Initiate Access:</strong> Create your profile in moments and set up your private 5-digit passcode.</li>
@@ -386,9 +386,9 @@
                 <li><strong>Claim Payouts:</strong> Withdraw your earned wealth securely through our crypto-backed payout network.</li>
             </ul>
 
-            <h2>Why Choose Illuminate Tube?</h2>
+            <h2>Why Choose Illuminate Task Tube?</h2>
             <p>
-                Illuminate Tube stands as a premier destination for knowledge seekers and earners alike due to our unique offerings:
+                Illuminate Task Tube stands as a premier destination for knowledge seekers and earners alike due to our unique offerings:
             </p>
             <ul>
                 <li><strong>Exclusive Content:</strong> Access rare and captivating Illuminati archives unavailable on conventional platforms.</li>
@@ -397,7 +397,7 @@
                 <li><strong>Global Circle:</strong> Available worldwide to all who seek enlightenment and passive wealth creation.</li>
             </ul>
             <p>
-                Join thousands of initiates who are transforming their screen time into wealth and discovery with Illuminate Tube.
+                Join thousands of initiates who are transforming their screen time into wealth and discovery with Illuminate Task Tube.
             </p>
             <p class="signup-link">
                 Ready to enter the circle? <a href="register.php" class="btn">Sign Up Now</a>
@@ -407,14 +407,14 @@
 
     <!-- CTA Banner -->
     <section class="cta-banner">
-        <h2>Join Illuminate Tube Today</h2>
+        <h2>Join Illuminate Task Tube Today</h2>
         <a href="register.php" class="btn" onclick="console.log('CTA button clicked')">Start Earning Now</a>
     </section>
 
     <!-- Notice Popup -->
     <div class="notice" id="notice">
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
-        <h2>Enter Illuminate Tube</h2>
+        <h2>Enter Illuminate Task Tube</h2>
         <p>Unlock secret video archives and earn premium crypto rewards today. Register now and join the elite!</p>
         <a href="register.php" class="btn" onclick="console.log('Notice button clicked')">Get Started</a>
     </div>
