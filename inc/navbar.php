@@ -4,11 +4,12 @@
 <style>
     .ham-menu {
         position: fixed;
-        top: 70px;
+        top: 80px;
         left: 0;
         width: 100%;
-        background: #fff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background: #141414;
+        border-bottom: 1px solid #333;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
         transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
         z-index: 999;
@@ -22,34 +23,39 @@
         margin: 0;
     }
     .ham-menu ul li {
-        margin: 10px 0;
+        margin: 12px 0;
     }
     .ham-menu ul li a {
-        color: #333;
+        color: #e0e0e0;
         text-decoration: none;
         font-weight: 500;
         font-size: 16px;
         transition: color 0.3s ease;
     }
     .ham-menu ul li a:hover {
-        color: #ff69b4;
+        color: #ffd700;
     }
     .ham-menu ul li.active a {
-        color: #6e44ff;
+        color: #d4af37;
         font-weight: 600;
     }
 
     /* Translator Styles */
     #google_translate_element {
-        margin: 12px 15px 12px 0;
+        margin: 12px 15px 12px 20px;
     }
     .goog-te-gadget-simple {
-        background: #ffffff !important;
-        border: 1px solid #ddd !important;
+        background: #0d0d0d !important;
+        border: 1px solid #333 !important;
         border-radius: 6px !important;
         padding: 6px 12px !important;
         font-size: 14px !important;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        color: #e0e0e0 !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+    .goog-te-gadget-simple span, 
+    .goog-te-menu-value span {
+        color: #e0e0e0 !important;
     }
     .goog-te-gadget-icon, .goog-te-gadget img {
         display: none !important;
@@ -75,6 +81,7 @@
             justify-content: flex-end;
             align-items: center;
             background: transparent;
+            border-bottom: none;
             gap: 15px;
         }
         .ham-menu ul {
@@ -93,6 +100,12 @@
         /* Adjust translator position on desktop */
         #google_translate_element {
             margin: 0 15px 0 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .ham-menu {
+            top: 70px;
         }
     }
 
