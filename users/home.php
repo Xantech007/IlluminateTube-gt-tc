@@ -122,6 +122,8 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             --accent-color: #22c55e;
             --menu-bg: rgba(17, 24, 39, 0.85);
             --menu-text: #ffffff;
+            --footer-height: 65px;
+            --header-height: 60px;
         }
 
         * {
@@ -145,12 +147,13 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             top: 0;
             left: 0;
             width: 100%;
+            height: var(--header-height);
             z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
             pointer-events: none;
         }
 
@@ -186,10 +189,11 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             color: #4ade80;
         }
 
-        /* TikTok Style Vertical Feed Container */
+        /* TikTok Style Vertical Feed Container adjusted to fit within header/footer bounds */
         .tiktok-feed {
             width: 100%;
-            height: 100vh;
+            height: calc(100vh - var(--footer-height));
+            margin-top: 0;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             -webkit-overflow-scrolling: touch;
@@ -199,10 +203,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             display: none;
         }
 
-        /* Individual Video Section Slide */
+        /* Individual Video Section Slide constrained above footer */
         .video-card {
             width: 100%;
-            height: 100vh;
+            height: calc(100vh - var(--footer-height));
             scroll-snap-align: start;
             scroll-snap-stop: always;
             position: relative;
@@ -210,19 +214,20 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             display: flex;
             justify-content: center;
             align-items: center;
+            padding-top: var(--header-height);
         }
 
         .video-card video {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
         }
 
         /* Sidebar Action Icons (Like, Reward, Share, etc.) */
         .actions-sidebar {
             position: absolute;
             right: 16px;
-            bottom: 110px;
+            bottom: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -262,10 +267,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             font-weight: 600;
         }
 
-        /* Bottom Info Overlay inside Video */
+        /* Bottom Info Overlay inside Video adjusted for spacing */
         .video-overlay-info {
             position: absolute;
-            bottom: 90px;
+            bottom: 20px;
             left: 16px;
             right: 80px;
             z-index: 10;
@@ -346,12 +351,13 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             bottom: 0;
             left: 0;
             width: 100%;
+            height: var(--footer-height);
             background: var(--menu-bg);
             backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 12px 0;
+            padding: 8px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 100;
         }
@@ -362,7 +368,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             text-decoration: none;
             font-size: 13px;
             font-weight: 500;
-            padding: 6px 14px;
+            padding: 4px 14px;
             transition: color 0.3s ease;
             background: none;
             border: none;
@@ -380,7 +386,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         }
 
         .no-videos-container {
-            height: 100vh;
+            height: calc(100vh - var(--footer-height));
             display: flex;
             flex-direction: column;
             justify-content: center;
