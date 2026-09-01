@@ -535,22 +535,25 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             span.textContent = formatLikes(rawLikes);
         });
 
-        // Parse initial persistent base total rendered from PHP backend
-        const initialDisplayBalance = parseFloat(document.getElementById('balance').textContent);
+        // Current user dynamic balance state
+        let currentBalance = parseFloat(document.getElementById('balance').textContent);
         const feed = document.getElementById('tiktokFeed');
         const cards = document.querySelectorAll('.video-card');
-        let watchTimer = null;
-        let currentVideoProgress = 0;
 
         // Sync local storage with PHP Session Watched array
         let watchedVideos = JSON.parse(localStorage.getItem('session_watched_ids') || '[]');
 
-        function updateDisplayBalance() {
-            const grandTotal = initialDisplayBalance + currentVideoProgress;
-            document.getElementById('balance').textContent = grandTotal.toFixed(2);
+        function scrollToNextVideo(card) {
+            const currentIdx = parseInt(card.getAttribute('data-index'));
+            const nextCard = document.querySelector(`.video-card[data-index="${currentIdx + 1}"]`);
+            if (nextCard) {
+                setTimeout(() => {
+                    nextCard.scrollIntoView({ behavior: 'smooth' });
+                }, 1000);
+            }
         }
 
-        // IntersectionObserver for video playback and reward tracking
+        // IntersectionObserver for video autoplay handling
         const observerOptions = {
             root: feed,
             threshold: 0.6
@@ -563,18 +566,16 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
                 if (entry.isIntersecting) {
                     video.play().catch(err => console.log('Autoplay prevented:', err));
-                    startRewardTracking(video);
                 } else {
                     video.pause();
                     video.currentTime = 0;
-                    stopRewardTracking();
                 }
             });
         }, observerOptions);
 
         cards.forEach(card => observer.observe(card));
 
-        // Video interact, tap, and completed event handlers
+        // Video interaction and completion logic
         document.querySelectorAll('.feed-video').forEach(video => {
             video.addEventListener('click', function() {
                 if (video.paused) {
@@ -605,13 +606,27 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                 lastTap = currentTime;
             });
 
-            // Video watched completion handler
+            // Video completion handler
             video.addEventListener('ended', function() {
                 const card = video.closest('.video-card');
                 const videoId = parseInt(video.getAttribute('data-video-id'));
                 const reward = parseFloat(video.getAttribute('data-reward'));
 
-                // Perform watch activity insertion into database
+                // Handle rewatched video logic
+                if (card.classList.contains('is-watched') || watchedVideos.includes(videoId)) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Already Watched',
+                        text: 'Rewatching this video will not add to your balance.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    scrollToNextVideo(card);
+                    return;
+                }
+
+                // First time watching completed video logic
                 $.ajax({
                     url: 'process_video_watch.php',
                     type: 'POST',
@@ -619,15 +634,19 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     dataType: 'json',
                     success: function(response) {
                         if (response.success) {
+                            // Update total balance UI dynamically
+                            currentBalance += reward;
+                            document.getElementById('balance').textContent = currentBalance.toFixed(2);
+
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Reward Earned!',
-                                text: `You earned $${reward.toFixed(2)}!`,
+                                text: `+$${reward.toFixed(2)} added to your balance!`,
                                 timer: 1500,
                                 showConfirmButton: false
                             });
 
-                            // Save reward persistently to PHP Session state
+                            // Save reward persistently to PHP session
                             $.ajax({
                                 url: window.location.href,
                                 type: 'POST',
@@ -642,14 +661,8 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                                 localStorage.setItem('session_watched_ids', JSON.stringify(watchedVideos));
                             }
 
-                            // Auto scroll smoothly to the next video
-                            const currentIdx = parseInt(card.getAttribute('data-index'));
-                            const nextCard = document.querySelector(`.video-card[data-index="${currentIdx + 1}"]`);
-                            if (nextCard) {
-                                setTimeout(() => {
-                                    nextCard.scrollIntoView({ behavior: 'smooth' });
-                                }, 1000);
-                            }
+                            // Auto scroll to next video
+                            scrollToNextVideo(card);
                         }
                     }
                 });
@@ -672,39 +685,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             
             countSpan.setAttribute('data-likes', rawCount);
             countSpan.textContent = formatLikes(rawCount);
-        }
-
-        // Live progressive earnings tracking while video plays
-        function startRewardTracking(video) {
-            stopRewardTracking();
-            const card = video.closest('.video-card');
-            const videoId = parseInt(video.getAttribute('data-video-id'));
-            const totalReward = parseFloat(video.getAttribute('data-reward'));
-
-            // If already marked watched, skip dynamic balance animation
-            if (card.classList.contains('is-watched') || watchedVideos.includes(videoId)) {
-                currentVideoProgress = 0;
-                updateDisplayBalance();
-                return;
-            }
-
-            watchTimer = setInterval(() => {
-                if (!video.paused && video.duration) {
-                    const rewardPerSec = totalReward / video.duration;
-                    currentVideoProgress += rewardPerSec;
-                    if (currentVideoProgress > totalReward) currentVideoProgress = totalReward;
-                    updateDisplayBalance();
-                }
-            }, 1000);
-        }
-
-        function stopRewardTracking() {
-            if (watchTimer) {
-                clearInterval(watchTimer);
-                watchTimer = null;
-            }
-            currentVideoProgress = 0;
-            updateDisplayBalance();
         }
 
         // Native share functionality
