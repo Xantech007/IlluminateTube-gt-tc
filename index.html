@@ -9,7 +9,6 @@
     <title>Illuminate Tube - Unlock Rewards Watching Exclusive Content</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
@@ -342,7 +341,7 @@
         }
 
         .faq-item h3::after {
-            content: '\f078'; /* Font Awesome chevron-down */
+            content: '\f078';
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             position: absolute;
@@ -459,133 +458,52 @@
 
         /* Responsive Design */
         @media (max-width: 1024px) {
-            .hero-section h1 {
-                font-size: 40px;
-            }
-
-            .hero-section p {
-                font-size: 18px;
-            }
-
-            .section-title {
-                font-size: 32px;
-            }
-
-            .step-card, .feature-card, .testimonial-card, .stat-card {
-                padding: 20px;
-            }
+            .hero-section h1 { font-size: 40px; }
+            .hero-section p { font-size: 18px; }
+            .section-title { font-size: 32px; }
+            .step-card, .feature-card, .testimonial-card, .stat-card { padding: 20px; }
         }
 
         @media (max-width: 768px) {
-            body {
-                padding-top: 70px;
-                padding-bottom: 80px;
-            }
-
-            .hero-section {
-                padding: 80px 20px;
-            }
-
-            .hero-section h1 {
-                font-size: 36px;
-            }
-
-            .hero-section p {
-                font-size: 16px;
-            }
-
-            .section-title {
-                font-size: 28px;
-            }
-
-            .button-group {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .btn {
-                padding: 12px 30px;
-                font-size: 16px;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-
-            .stat-card h3 {
-                font-size: 28px;
-            }
-
-            .cta-banner h2 {
-                font-size: 28px;
-            }
+            body { padding-top: 70px; padding-bottom: 80px; }
+            .hero-section { padding: 80px 20px; }
+            .hero-section h1 { font-size: 36px; }
+            .hero-section p { font-size: 16px; }
+            .section-title { font-size: 28px; }
+            .button-group { flex-direction: column; gap: 15px; }
+            .btn { padding: 12px 30px; font-size: 16px; }
+            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+            .stat-card h3 { font-size: 28px; }
+            .cta-banner h2 { font-size: 28px; }
         }
 
         @media (max-width: 480px) {
-            body {
-                padding-top: 60px;
-                padding-bottom: 60px;
-            }
-
-            .hero-section {
-                padding: 60px 15px;
-            }
-
-            .hero-section h1 {
-                font-size: 28px;
-            }
-
-            .hero-section p {
-                font-size: 14px;
-            }
-
-            .section-title {
-                font-size: 24px;
-            }
-
-            .step-card, .feature-card, .testimonial-card, .stat-card {
-                padding: 15px;
-            }
-
-            .stat-card h3 {
-                font-size: 24px;
-            }
-
-            .faq-item h3 {
-                font-size: 16px;
-            }
-
-            .faq-item p {
-                font-size: 14px;
-            }
-
-            .cta-banner {
-                padding: 40px 15px;
-            }
-
-            .cta-banner h2 {
-                font-size: 24px;
-            }
-
-            .cta-banner .btn {
-                padding: 12px 30px;
-                font-size: 16px;
-            }
+            body { padding-top: 60px; padding-bottom: 60px; }
+            .hero-section { padding: 60px 15px; }
+            .hero-section h1 { font-size: 28px; }
+            .hero-section p { font-size: 14px; }
+            .section-title { font-size: 24px; }
+            .step-card, .feature-card, .testimonial-card, .stat-card { padding: 15px; }
+            .stat-card h3 { font-size: 24px; }
+            .faq-item h3 { font-size: 16px; }
+            .faq-item p { font-size: 14px; }
+            .cta-banner { padding: 40px 15px; }
+            .cta-banner h2 { font-size: 24px; }
+            .cta-banner .btn { padding: 12px 30px; font-size: 16px; }
         }
     </style>
 </head>
 <body>
-    <!-- Dynamically loaded header and navbar components -->
+    <!-- Dynamically loaded header, navbar and footer containers -->
     <div id="header-container"></div>
-    <div id="navbar-container"></div>
 
     <!-- Hero Section -->
     <section class="hero-section">
         <h1>Unlock Wealth with Illuminate Tube</h1>
         <p>Step into the circle of enlightenment. Watch exclusive Illuminati-related videos and secret archives to unlock high-tier monetary rewards and passive wealth!</p>
         <div class="button-group" id="hero-button-group">
-            <a href="register.html" class="btn btn-register" onclick="console.log('Register button clicked')">Get Started</a>
-            <a href="signin.html" class="btn btn-signin" onclick="console.log('Sign In button clicked')">Sign In</a>
+            <a href="register.html" class="btn btn-register">Get Started</a>
+            <a href="signin.html" class="btn btn-signin">Sign In</a>
         </div>
     </section>
 
@@ -709,7 +627,7 @@
     <section class="cta-banner">
         <h2>Unveil the Mysteries & Claim Your Rewards</h2>
         <div id="cta-button-container">
-            <a href="register.html" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Tube Now</a>
+            <a href="register.html" class="btn">Join Illuminate Tube Now</a>
         </div>
     </section>
 
@@ -719,11 +637,11 @@
         <h2>Welcome to Illuminate Tube</h2>
         <p>Unlock access to Illuminati secret videos and earn premium rewards today. Enter the portal now!</p>
         <div id="notice-button-container">
-            <a href="register.html" class="btn btn-register" onclick="console.log('Notice button clicked')">Get Started</a>
+            <a href="register.html" class="btn btn-register">Get Started</a>
         </div>
     </div>
 
-    <!-- Dynamically loaded footer component -->
+    <!-- Footer Container -->
     <div id="footer-container"></div>
 
     <!-- LiveChat Script -->
@@ -735,23 +653,25 @@
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
     <script>
-        // Fetch external HTML templates into containers
+        // Fetch external HTML templates safely with absolute fallback path options
         async function loadIncludes() {
             try {
-                const [headerRes, navbarRes, footerRes] = await Promise.all([
-                    fetch('inc/header.html'),
-                    fetch('inc/navbar.html'),
-                    fetch('inc/footer.html')
+                // Fetch unified header & footer partials
+                const [headerRes, footerRes] = await Promise.all([
+                    fetch('inc/header.html').catch(() => fetch('/inc/header.html')),
+                    fetch('inc/footer.html').catch(() => fetch('/inc/footer.html'))
                 ]);
 
-                if (headerRes.ok) {
+                if (headerRes && headerRes.ok) {
                     document.getElementById('header-container').innerHTML = await headerRes.text();
+                } else {
+                    console.warn('Could not load header. Ensure server is running and inc/header.html exists.');
                 }
-                if (navbarRes.ok) {
-                    document.getElementById('navbar-container').innerHTML = await navbarRes.text();
-                }
-                if (footerRes.ok) {
+
+                if (footerRes && footerRes.ok) {
                     document.getElementById('footer-container').innerHTML = await footerRes.text();
+                } else {
+                    console.warn('Could not load footer. Ensure server is running and inc/footer.html exists.');
                 }
 
                 setActiveNavLink();
@@ -760,14 +680,17 @@
             }
         }
 
-        // Set Active Navbar Link
         function setActiveNavLink() {
-            const currentPath = window.location.pathname.split('/').pop();
-            const links = document.querySelectorAll('.ham-menu ul li a');
+            const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+            const links = document.querySelectorAll('.ham-menu ul li a, .header-container nav a');
             links.forEach(link => {
                 const href = link.getAttribute('href');
                 if (href === currentPath || (currentPath === '' && href === 'index.html')) {
-                    link.parentElement.classList.add('active');
+                    if (link.parentElement.tagName === 'LI') {
+                        link.parentElement.classList.add('active');
+                    } else {
+                        link.classList.add('active');
+                    }
                 }
             });
         }
@@ -775,56 +698,52 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadIncludes();
 
-            // Client-side Session Handling simulation using localStorage/cookies
+            // Client-side Session Handling
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
             if (isLoggedIn) {
                 document.getElementById('hero-button-group').innerHTML = 
-                    '<a href="users/home.html" class="btn btn-dashboard" onclick="console.log(\'Dashboard button clicked\')">Dashboard</a>';
+                    '<a href="users/home.html" class="btn btn-dashboard">Dashboard</a>';
                 document.getElementById('cta-button-container').innerHTML = 
-                    '<a href="users/home.html" class="btn" onclick="console.log(\'Dashboard CTA clicked\')">Go to Dashboard</a>';
+                    '<a href="users/home.html" class="btn">Go to Dashboard</a>';
                 document.getElementById('notice-button-container').innerHTML = 
-                    '<a href="users/home.html" class="btn btn-dashboard" onclick="console.log(\'Notice dashboard clicked\')">Go to Dashboard</a>';
+                    '<a href="users/home.html" class="btn btn-dashboard">Go to Dashboard</a>';
             }
         });
 
-        // Notice Popup
+        // Notice Popup Logic
         function isNoticeShown() {
             return localStorage.getItem('noticeShownIndex');
         }
 
         function setNoticeShown() {
-            localStorage.setItem('noticeShownIndex', true);
+            localStorage.setItem('noticeShownIndex', 'true');
         }
 
         function showNotice() {
             if (!isNoticeShown()) {
                 const notice = document.getElementById('notice');
-                setTimeout(() => {
-                    notice.style.display = 'block';
-                    setNoticeShown();
-                }, 2000);
+                if (notice) {
+                    setTimeout(() => {
+                        notice.style.display = 'block';
+                        setNoticeShown();
+                    }, 2000);
+                }
             }
         }
 
         function closeNotice() {
-            document.getElementById('notice').style.display = 'none';
+            const notice = document.getElementById('notice');
+            if (notice) notice.style.display = 'none';
             setNoticeShown();
         }
 
         window.addEventListener('load', showNotice);
 
-        // FAQ Toggle
+        // FAQ Accordion Toggle
         document.querySelectorAll('.faq-item').forEach(item => {
             item.addEventListener('click', () => {
                 item.classList.toggle('active');
             });
-        });
-
-        // Prevent right-click only on non-link elements
-        document.addEventListener('contextmenu', e => {
-            if (!e.target.closest('a')) {
-                e.preventDefault();
-            }
         });
     </script>
 </body>
