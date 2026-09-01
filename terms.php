@@ -7,10 +7,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Read the Terms and Conditions for using Task Tube. Understand our policies for account registration, user conduct, and more.">
-    <meta name="keywords" content="Task Tube, terms and conditions, user agreement, policies">
-    <meta name="author" content="Task Tube">
-    <title>Task Tube - Terms and Conditions</title>
+    <meta name="description" content="Read the Terms and Conditions for using Illuminate Tube. Understand our policies for account registration, initiate privileges, vault access, and platform rules.">
+    <meta name="keywords" content="Illuminate Tube, terms and conditions, user agreement, initiate access, vault security, policies">
+    <meta name="author" content="Illuminate Tube">
+    <title>Illuminate Tube - Terms and Conditions</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -24,24 +24,25 @@
         }
 
         body {
-            background: #f5f7fa;
+            background: #0d0d0d;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            color: #333;
+            color: #e0e0e0;
             padding-top: 80px; /* Matches header height */
             padding-bottom: 100px; /* Matches footer height */
         }
 
         /* Hero Section */
         .hero-section {
-            background: linear-gradient(135deg, #6e44ff, #b5179e);
-            color: #fff;
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            color: #ffd700;
             text-align: center;
             padding: 100px 20px;
             position: relative;
             overflow: hidden;
             z-index: 10;
+            border-bottom: 2px solid #d4af37;
         }
 
         .hero-section::before {
@@ -51,8 +52,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('https://source.unsplash.com/random/1920x1080/?technology') no-repeat center center/cover;
-            opacity: 0.1;
+            background: url('https://source.unsplash.com/random/1920x1080/?gold,dark') no-repeat center center/cover;
+            opacity: 0.15;
             z-index: 0;
         }
 
@@ -62,6 +63,8 @@
             margin-bottom: 20px;
             position: relative;
             z-index: 1;
+            color: #d4af37;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
 
         .hero-section p {
@@ -71,6 +74,7 @@
             margin: 0 auto 30px;
             position: relative;
             z-index: 1;
+            color: #cccccc;
         }
 
         /* Main Container */
@@ -83,25 +87,26 @@
         .section-title {
             font-size: 36px;
             font-weight: 600;
-            color: #333;
+            color: #d4af37;
             text-align: center;
             margin-bottom: 40px;
         }
 
         .terms-content {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
-            background: #fff;
+            background: #141414;
+            border: 1px solid #333;
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             text-align: left;
         }
 
         .terms-content h1 {
             font-size: 28px;
             font-weight: 600;
-            color: #333;
+            color: #ffd700;
             margin-bottom: 20px;
             text-align: center;
         }
@@ -109,82 +114,88 @@
         .terms-content h2 {
             font-size: 20px;
             font-weight: 500;
-            color: #333;
-            margin: 20px 0 10px;
+            color: #ffd700;
+            margin: 25px 0 10px;
         }
 
         .terms-content p {
             font-size: 16px;
-            color: #666;
+            color: #aaa;
             line-height: 1.6;
             margin-bottom: 15px;
         }
 
         .terms-content p span {
-            color: #6e44ff;
-            font-weight: 500;
+            color: #ffd700;
+            font-weight: 600;
         }
 
         .terms-content a {
-            color: #6e44ff;
+            color: #ffd700;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
         }
 
         .terms-content a:hover {
-            color: #ff69b4;
+            color: #fff;
             text-decoration: underline;
         }
 
         .back-link {
             font-size: 14px;
-            color: #666;
+            color: #888;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         .back-link a {
-            color: #6e44ff;
+            color: #ffd700;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
         }
 
         .back-link a:hover {
-            color: #ff69b4;
+            color: #fff;
             text-decoration: underline;
         }
 
         /* CTA Banner */
         .cta-banner {
-            background: linear-gradient(135deg, #6e44ff, #b5179e);
+            background: linear-gradient(135deg, #1a1a1a, #000000);
+            border: 1px solid #d4af37;
             color: #fff;
             text-align: center;
             padding: 60px 20px;
             border-radius: 15px;
             margin: 40px 20px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
         }
 
         .cta-banner h2 {
             font-size: 32px;
             font-weight: 600;
+            color: #ffd700;
             margin-bottom: 20px;
         }
 
         .cta-banner .btn {
-            background-color: #fff;
-            color: #6e44ff;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
             padding: 15px 40px;
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             border-radius: 50px;
             text-decoration: none;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            display: inline-block;
         }
 
         .cta-banner .btn:hover {
-            background-color: #f0f0f0;
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
 
         /* Notice Popup */
@@ -193,9 +204,10 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #fff;
+            background: #141414;
+            border: 2px solid #d4af37;
             border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
             padding: 30px;
             max-width: 400px;
             width: 90%;
@@ -206,13 +218,13 @@
 
         .notice h2 {
             font-size: 24px;
-            color: #6e44ff;
+            color: #ffd700;
             margin-bottom: 15px;
         }
 
         .notice p {
             font-size: 16px;
-            color: #666;
+            color: #aaa;
             margin-bottom: 20px;
             text-align: center;
         }
@@ -223,27 +235,30 @@
             right: 15px;
             font-size: 24px;
             cursor: pointer;
-            color: #999;
+            color: #888;
             transition: color 0.3s ease;
         }
 
         .close-btn:hover {
-            color: #333;
+            color: #ffd700;
         }
 
         .notice .btn {
-            background-color: #6e44ff;
-            color: #fff;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
             padding: 12px 30px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 700;
             border-radius: 25px;
             text-decoration: none;
             transition: all 0.3s ease;
+            display: inline-block;
         }
 
         .notice .btn:hover {
-            background-color: #5a00b5;
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
 
         /* Responsive Design */
@@ -370,7 +385,7 @@
     <!-- Hero Section -->
     <section class="hero-section">
         <h1>Terms and Conditions</h1>
-        <p>Understand the rules and policies for using Task Tube to ensure a fair and secure experience.</p>
+        <p>Understand the rules and governance for using Illuminate Tube to ensure a secure and synchronized initiate experience.</p>
     </section>
 
     <!-- Terms Content -->
@@ -378,28 +393,28 @@
         <h2 class="section-title">Our Terms</h2>
         <div class="terms-content">
             <h1>Terms and Conditions</h1>
-            <p>Welcome to <span>Task Tube</span>. By using our website and services, you agree to comply with and be bound by the following terms and conditions. Please read them carefully.</p>
+            <p>Welcome to <span>Illuminate Tube</span>. By accessing our platform and private archives, you agree to strictly comply with and be bound by the following terms and conditions. Please review them carefully.</p>
 
             <h2>1. Acceptance of Terms</h2>
-            <p>By accessing or using Task Tube, you agree to these Terms and Conditions and our <a href="privacy.php">Privacy Policy</a>. If you do not agree, please do not use our services.</p>
+            <p>By entering or utilizing Illuminate Tube, you affirm your full acceptance of these Terms and Conditions and our <a href="privacy.php">Privacy Policy</a>. If you do not agree to these protocols, access to our platform is prohibited.</p>
 
-            <h2>2. Account Registration</h2>
-            <p>To access certain features, you must register an account with a valid email and a 5-digit passcode. You are responsible for maintaining the confidentiality of your account credentials.</p>
+            <h2>2. Initiate Registration & Security</h2>
+            <p>To access vault archives and earn rewards, initiates must register with a valid email and a 5-digit security passcode. You maintain complete responsibility for safeguarding your initiate credentials and vault key.</p>
 
-            <h2>3. Use of Services</h2>
-            <p>You agree to use Task Tube for lawful purposes only. You may not use our services to engage in any illegal activities or to violate the rights of others.</p>
+            <h2>3. Authorized Usage</h2>
+            <p>You agree to access Illuminate Tube exclusively for authorized, lawful purposes. You are strictly prohibited from utilizing our network for unauthorized exploitation, automated abuse, or violating community protocols.</p>
 
-            <h2>4. User Conduct</h2>
-            <p>Do not attempt to hack, disrupt, or misuse our platform. Any unauthorized access or activity may result in account suspension or legal action.</p>
+            <h2>4. Protocol Conduct & Vault Integrity</h2>
+            <p>Attempts to breach, manipulate, reverse-engineer, or misuse our platform systems are strictly forbidden. Any unauthorized entry or security interference will result in immediate initiate suspension and access revocation.</p>
 
-            <h2>5. Termination</h2>
-            <p>We reserve the right to suspend or terminate your account if you violate these terms or engage in prohibited activities.</p>
+            <h2>5. Access Revocation & Termination</h2>
+            <p>Illuminate Tube reserves the right to suspend or terminate initiate profiles, revoke vault access, or withhold rewards if non-compliance or prohibited actions are detected.</p>
 
-            <h2>6. Changes to Terms</h2>
-            <p>We may update these Terms and Conditions periodically. Continued use of Task Tube after changes constitutes acceptance of the new terms.</p>
+            <h2>6. Revisions & Updates</h2>
+            <p>We reserve the right to modify these Terms and Conditions at any time. Continued usage of Illuminate Tube following protocol updates signifies your implicit agreement to the updated terms.</p>
 
-            <h2>7. Contact Us</h2>
-            <p>If you have questions about these terms, please contact us via our <a href="contact.php">Contact page</a>.</p>
+            <h2>7. Contact Operations</h2>
+            <p>If you require clarification regarding these terms, please contact our elite support team via our <a href="contact.php">Contact page</a>.</p>
 
             <p class="back-link">Return to <a href="index.php">Home</a></p>
         </div>
@@ -407,15 +422,15 @@
 
     <!-- CTA Banner -->
     <section class="cta-banner">
-        <h2>Join Task Tube Today</h2>
+        <h2>Join Illuminate Tube Today</h2>
         <a href="register.php" class="btn" onclick="console.log('CTA button clicked')">Get Started</a>
     </section>
 
     <!-- Notice Popup -->
     <div class="notice" id="notice">
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
-        <h2>Welcome to Task Tube</h2>
-        <p>Review our Terms and Conditions to understand how to use our platform responsibly. Ready to start earning?</p>
+        <h2>Welcome to Illuminate Tube</h2>
+        <p>Review our Terms and Conditions to understand your initiate privileges and platform guidelines. Ready to unlock exclusive vault rewards?</p>
         <a href="register.php" class="btn" onclick="console.log('Notice button clicked')">Sign Up Now</a>
     </div>
 
