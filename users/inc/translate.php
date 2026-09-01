@@ -21,6 +21,7 @@
     background-color: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-radius: 8px !important;
+    color: #ffffff !important;
 }
 
 /* Target inner select dropdown / text wrapper to expand */
@@ -29,7 +30,17 @@
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    color: inherit !important;
+    color: #ffffff !important;
+}
+
+/* Set text color to white for all inner text spans */
+#google_translate_element .goog-te-menu-value span {
+    color: #ffffff !important;
+}
+
+/* Lighten the default arrow icon */
+#google_translate_element .goog-te-menu-value img {
+    filter: brightness(0) invert(1) !important;
 }
 
 /* Ensure clean display if regular select drop-down renders */
