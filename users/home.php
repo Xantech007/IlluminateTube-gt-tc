@@ -251,7 +251,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         .actions-sidebar {
             position: absolute;
             right: 16px;
-            bottom: 225px;
+            bottom: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -294,7 +294,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Bottom Info Overlay */
         .video-overlay-info {
             position: absolute;
-            bottom: 195px;
+            bottom: 200px;
             left: 16px;
             right: 80px;
             z-index: 10;
