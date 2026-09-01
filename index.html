@@ -544,20 +544,19 @@
             font-weight: 600;
             color: #ffd700;
             margin-bottom: 20px;
-            white-space: nowrap;
         }
 
         .cta-banner .btn {
             background: linear-gradient(45deg, #d4af37, #ffd700);
             color: #000;
-            padding: 15px 40px;
+            padding: 15px 30px;
             font-size: 18px;
             font-weight: 700;
             border-radius: 50px;
             transition: background-color 0.3s ease, transform 0.3s ease;
+            display: inline-block;
             white-space: nowrap;
             max-width: 100%;
-            display: inline-block;
         }
 
         .cta-banner .btn:hover {
@@ -1007,11 +1006,6 @@
             .step-card, .feature-card, .testimonial-card, .stat-card {
                 padding: 20px;
             }
-
-            .cta-banner .btn {
-                font-size: 16px;
-                padding: 14px 30px;
-            }
         }
 
         @media (max-width: 768px) {
@@ -1063,8 +1057,8 @@
             }
 
             .cta-banner .btn {
-                font-size: 14px;
                 padding: 12px 20px;
+                font-size: 15px;
             }
 
             .notification-popup {
@@ -1132,16 +1126,17 @@
             }
 
             .cta-banner {
-                padding: 30px 10px;
+                padding: 35px 10px;
+                margin: 30px 10px;
             }
 
             .cta-banner h2 {
-                font-size: 18px;
+                font-size: clamp(16px, 4.2vw, 20px);
             }
 
             .cta-banner .btn {
                 padding: 10px 14px;
-                font-size: 3.5vw;
+                font-size: clamp(12px, 3.2vw, 14px);
             }
 
             footer {
@@ -1154,9 +1149,17 @@
         }
 
         @media (max-width: 360px) {
+            .cta-banner {
+                padding: 25px 8px;
+            }
+
+            .cta-banner h2 {
+                font-size: 15px;
+            }
+
             .cta-banner .btn {
                 padding: 8px 10px;
-                font-size: 3.2vw;
+                font-size: 11px;
             }
         }
     </style>
@@ -1675,11 +1678,11 @@
 
         // Notice Modal Logic
         function isNoticeShown() {
-            return localStorage.getItem('noticeShownIndex');
+            return localStorage.setItem ? localStorage.getItem('noticeShownIndex') : null;
         }
 
         function setNoticeShown() {
-            localStorage.setItem('noticeShownIndex', true);
+            if (localStorage.setItem) localStorage.setItem('noticeShownIndex', true);
         }
 
         function showNotice() {
