@@ -478,7 +478,6 @@
     }
 </style>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script>
     // ========== TOAST ==========
     function showToast(msg) {
@@ -648,7 +647,7 @@
         }
     }
 
-    // ========== HAMBURGER MENU ==========
+    // ========== HAMBURGER MENU & NOTIFICATION QUEUE ==========
     document.addEventListener("DOMContentLoaded", function() {
         registerServiceWorker();
         initAthBanner();
@@ -656,15 +655,19 @@
         const button = document.getElementById('hamburger-menu');
         if (button) {
             button.addEventListener('click', function() {
-                const span = button.getElementsByTagName('span')[0];
-                span.classList.toggle('hamburger-menu-button-close');
+                const span = button.querySelector('span');
+                if (span) span.classList.toggle('hamburger-menu-button-close');
+                
                 const nav = document.getElementById('ham-navigation');
                 if (nav) nav.classList.toggle('on');
             });
         }
 
-        $('.menu li a').on('click', function() {
-            $('#hamburger-menu').click();
+        // Auto-close menu on link click (Vanilla JS implementation of former jQuery listener)
+        document.querySelectorAll('.ham-menu ul li a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (button) button.click();
+            });
         });
 
         // Notification Queue Logic
