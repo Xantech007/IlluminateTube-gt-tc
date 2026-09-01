@@ -14,29 +14,71 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Initialize session trackers for live session earnings & watched videos
-if (!isset($_SESSION['session_earnings'])) {
-    $_SESSION['session_earnings'] = 0.00;
-}
+// Initialize session trackers for watched videos
 if (!isset($_SESSION['watched_videos'])) {
     $_SESSION['watched_videos'] = [];
 }
 
-// Handle AJAX update endpoint for session balance persistence
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_session_reward') {
+// Handle AJAX reward collection & DB update directly
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'claim_reward') {
+    header('Content-Type: application/json');
     $v_id = intval($_POST['video_id']);
-    $reward = floatval($_POST['reward']);
-    
-    if (!in_array($v_id, $_SESSION['watched_videos'])) {
+    $user_id = $_SESSION['user_id'];
+
+    // Verify if already watched in DB or session
+    try {
+        $check_stmt = $pdo->prepare("SELECT id FROM activities WHERE user_id = ? AND video_id = ? AND action LIKE 'Watched%'");
+        $check_stmt->execute([$user_id, $v_id]);
+        
+        if ($check_stmt->fetch() || in_array($v_id, $_SESSION['watched_videos'])) {
+            echo json_encode(['status' => 'error', 'message' => 'Video already watched.']);
+            exit;
+        }
+
+        // Fetch reward amount to prevent manipulation from front-end
+        $vid_stmt = $pdo->prepare("SELECT reward FROM videos WHERE id = ?");
+        $vid_stmt->execute([$v_id]);
+        $video_data = $vid_stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$video_data) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid video.']);
+            exit;
+        }
+
+        $reward = floatval($video_data['reward']);
+
+        $pdo->beginTransaction();
+
+        // 1. Update user balance in Database
+        $update_balance = $pdo->prepare("UPDATE users SET balance = balance + ? WHERE id = ?");
+        $update_balance->execute([$reward, $user_id]);
+
+        // 2. Log activity to prevent double rewards on refresh
+        $log_activity = $pdo->prepare("INSERT INTO activities (user_id, video_id, action, created_at) VALUES (?, ?, ?, NOW())");
+        $log_activity->execute([$user_id, $v_id, 'Watched video #' . $v_id]);
+
+        $pdo->commit();
+
+        // 3. Update session tracking
         $_SESSION['watched_videos'][] = $v_id;
-        $_SESSION['session_earnings'] += $reward;
+
+        // Fetch new updated balance
+        $bal_stmt = $pdo->prepare("SELECT balance FROM users WHERE id = ?");
+        $bal_stmt->execute([$user_id]);
+        $new_balance = floatval($bal_stmt->fetchColumn());
+
+        echo json_encode([
+            'status' => 'success',
+            'new_balance' => number_format($new_balance, 2),
+            'reward' => number_format($reward, 2)
+        ]);
+    } catch (PDOException $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        error_log('Reward Transaction Error: ' . $e->getMessage(), 3, '../debug.log');
+        echo json_encode(['status' => 'error', 'message' => 'Database update failed.']);
     }
-    
-    echo json_encode([
-        'status' => 'success', 
-        'session_earnings' => $_SESSION['session_earnings'],
-        'watched_videos' => $_SESSION['watched_videos']
-    ]);
     exit;
 }
 
@@ -57,8 +99,7 @@ try {
     }
     $username = htmlspecialchars($user['name']);
     $db_balance = floatval($user['balance']);
-    // Total displayed balance includes database balance plus accumulated session earnings
-    $total_display_balance = number_format($db_balance + $_SESSION['session_earnings'], 2);
+    $total_display_balance = number_format($db_balance, 2);
     $verification_status = $user['verification_status'];
     $user_country = htmlspecialchars($user['country']);
     $upgrade_status = $user['upgrade_status'] ?? 'not_upgraded';
@@ -93,7 +134,7 @@ function url_exists($url) {
     return ['status' => true];
 }
 
-// Fetch up to 10 videos along with their likes count
+// Fetch up to 10 videos excluding both DB activities and current session watched videos
 $videos = [];
 $video_error = null;
 
@@ -111,6 +152,11 @@ try {
     $fetched_videos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($fetched_videos as $vid) {
+        // Exclude session watched videos as well
+        if (in_array($vid['id'], $_SESSION['watched_videos'])) {
+            continue;
+        }
+
         $full_url = 'https://tasktube.gt.tc/users/videos/' . basename($vid['url']);
         $url_check = url_exists($full_url);
         if ($url_check['status']) {
@@ -120,7 +166,7 @@ try {
     }
 
     if (empty($videos)) {
-        $video_error = 'No ads available at the moment, please check back later.';
+        $video_error = 'All videos have been watched! Check back later for new ads.';
     }
 } catch (PDOException $e) {
     error_log('Video fetch error: ' . $e->getMessage(), 3, '../debug.log');
@@ -247,6 +293,31 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             object-fit: cover;
         }
 
+        /* Countdown overlay banner */
+        .reward-countdown-banner {
+            position: absolute;
+            top: 125px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            border: 1px solid var(--accent-color);
+            backdrop-filter: blur(8px);
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reward-countdown-banner span {
+            color: #4ade80;
+            font-weight: 700;
+        }
+
         /* Sidebar Action Icons */
         .actions-sidebar {
             position: absolute;
@@ -317,23 +388,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         .video-overlay-info p span {
             color: #4ade80;
             font-weight: 700;
-        }
-
-        /* Watched Badge Style */
-        .watched-badge {
-            display: none;
-            background: rgba(34, 197, 94, 0.9);
-            color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 12px;
-            margin-top: 6px;
-            align-self: flex-start;
-        }
-
-        .video-card.is-watched .watched-badge {
-            display: inline-block;
         }
 
         /* Floating Double Tap Heart FX */
@@ -466,12 +520,15 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     <div class="tiktok-feed" id="tiktokFeed">
         <?php if (!empty($videos)): ?>
             <?php foreach ($videos as $index => $vid): ?>
-                <?php $is_already_watched = in_array($vid['id'], $_SESSION['watched_videos']); ?>
-                <div class="video-card <?php echo $is_already_watched ? 'is-watched' : ''; ?>" data-index="<?php echo $index; ?>">
+                <div class="video-card" data-index="<?php echo $index; ?>" id="video-card-<?php echo $vid['id']; ?>">
+                    <div class="reward-countdown-banner">
+                        <i class="fa-solid fa-stopwatch" style="color: #4ade80;"></i>
+                        Reward in: <span class="timer-display">--s</span>
+                    </div>
+
                     <video 
                         class="feed-video" 
                         playsinline 
-                        loop 
                         preload="<?php echo $index === 0 ? 'auto' : 'metadata'; ?>"
                         data-video-id="<?php echo $vid['id']; ?>" 
                         data-reward="<?php echo $vid['reward']; ?>">
@@ -499,17 +556,18 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     <!-- Video Details Overlay -->
                     <div class="video-overlay-info">
                         <h3><?php echo htmlspecialchars($vid['title']); ?></h3>
-                        <p>Watch full ad to earn <span>+$<?php echo number_format($vid['reward'], 2); ?></span> crypto directly to your balance.</p>
-                        <div class="watched-badge"><i class="fa-solid fa-circle-check"></i> Video Watched</div>
+                        <p>Watch full ad to earn <span>+$<?php echo number_format($vid['reward'], 2); ?></span> directly to your balance.</p>
                     </div>
                 </div>
             <?php endforeach; ?>
-        <?php else: ?>
-            <div class="no-videos-container">
-                <i class="fa-solid fa-video-slash" style="font-size: 48px; color: #6b7280; margin-bottom: 16px;"></i>
-                <p><?php echo $video_error ?: 'No ads available at the moment, please check back later.'; ?></p>
-            </div>
         <?php endif; ?>
+
+        <!-- Empty state message displayed when all videos are finished -->
+        <div class="no-videos-container" id="noVideosMsg" style="<?php echo empty($videos) ? 'display: flex;' : 'display: none;'; ?>">
+            <i class="fa-solid fa-circle-check" style="font-size: 56px; color: #22c55e; margin-bottom: 16px;"></i>
+            <h2>All Videos Watched!</h2>
+            <p style="margin-top: 8px; color: #9ca3af;"><?php echo $video_error ?: 'You have watched all available videos for today. Please check back later for new ads!'; ?></p>
+        </div>
     </div>
 
     <div id="notificationContainer"></div>
@@ -535,25 +593,25 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             span.textContent = formatLikes(rawLikes);
         });
 
-        // Current user dynamic balance state
-        let currentBalance = parseFloat(document.getElementById('balance').textContent);
         const feed = document.getElementById('tiktokFeed');
-        const cards = document.querySelectorAll('.video-card');
 
-        // Sync local storage with PHP Session Watched array
-        let watchedVideos = JSON.parse(localStorage.getItem('session_watched_ids') || '[]');
-
-        function scrollToNextVideo(card) {
-            const currentIdx = parseInt(card.getAttribute('data-index'));
-            const nextCard = document.querySelector(`.video-card[data-index="${currentIdx + 1}"]`);
-            if (nextCard) {
-                setTimeout(() => {
-                    nextCard.scrollIntoView({ behavior: 'smooth' });
-                }, 1000);
+        function checkEmptyFeed() {
+            const visibleCards = document.querySelectorAll('.video-card:not([style*="display: none"])');
+            if (visibleCards.length === 0) {
+                document.getElementById('noVideosMsg').style.display = 'flex';
             }
         }
 
-        // IntersectionObserver for video autoplay handling
+        function scrollToNextVideo(card) {
+            const remainingCards = Array.from(document.querySelectorAll('.video-card')).filter(c => c.style.display !== 'none' && c !== card);
+            if (remainingCards.length > 0) {
+                setTimeout(() => {
+                    remainingCards[0].scrollIntoView({ behavior: 'smooth' });
+                }, 800);
+            }
+        }
+
+        // IntersectionObserver for video autoplay and timer countdown
         const observerOptions = {
             root: feed,
             threshold: 0.6
@@ -568,15 +626,25 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     video.play().catch(err => console.log('Autoplay prevented:', err));
                 } else {
                     video.pause();
-                    video.currentTime = 0;
                 }
             });
         }, observerOptions);
 
-        cards.forEach(card => observer.observe(card));
+        document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
 
-        // Video interaction and completion logic
+        // Video interaction, real-time timer countdown, and completion logic
         document.querySelectorAll('.feed-video').forEach(video => {
+            const card = video.closest('.video-card');
+            const timerDisplay = card.querySelector('.timer-display');
+
+            // Dynamic live time update display
+            video.addEventListener('timeupdate', function() {
+                if (video.duration) {
+                    const remaining = Math.ceil(video.duration - video.currentTime);
+                    timerDisplay.textContent = remaining > 0 ? `${remaining}s` : 'Processing...';
+                }
+            });
+
             video.addEventListener('click', function() {
                 if (video.paused) {
                     video.play();
@@ -591,7 +659,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTap;
                 if (tapLength < 300 && tapLength > 0) {
-                    const card = video.closest('.video-card');
                     const likeBtn = card.querySelector('.like-btn');
                     triggerLike(likeBtn);
 
@@ -606,64 +673,53 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                 lastTap = currentTime;
             });
 
-            // Video completion handler
+            // Video completion reward dispatch
             video.addEventListener('ended', function() {
-                const card = video.closest('.video-card');
                 const videoId = parseInt(video.getAttribute('data-video-id'));
-                const reward = parseFloat(video.getAttribute('data-reward'));
 
-                // Handle rewatched video logic
-                if (card.classList.contains('is-watched') || watchedVideos.includes(videoId)) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Already Watched',
-                        text: 'Rewatching this video will not add to your balance.',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-
-                    scrollToNextVideo(card);
-                    return;
-                }
-
-                // First time watching completed video logic
                 $.ajax({
-                    url: 'process_video_watch.php',
+                    url: window.location.href,
                     type: 'POST',
-                    data: { video_id: videoId, reward: reward },
+                    data: { action: 'claim_reward', video_id: videoId },
                     dataType: 'json',
                     success: function(response) {
-                        if (response.success) {
-                            // Update total balance UI dynamically
-                            currentBalance += reward;
-                            document.getElementById('balance').textContent = currentBalance.toFixed(2);
+                        if (response.status === 'success') {
+                            // Update total user balance UI dynamically
+                            document.getElementById('balance').textContent = response.new_balance;
 
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Reward Earned!',
-                                text: `+$${reward.toFixed(2)} added to your balance!`,
-                                timer: 1500,
+                                text: `+$${response.reward} added to your balance!`,
+                                timer: 1800,
                                 showConfirmButton: false
                             });
 
-                            // Save reward persistently to PHP session
-                            $.ajax({
-                                url: window.location.href,
-                                type: 'POST',
-                                data: { action: 'save_session_reward', video_id: videoId, reward: reward },
-                                dataType: 'json'
+                            // Smoothly fade out and remove watched video card from view
+                            $(card).fadeOut(400, function() {
+                                card.remove();
+                                checkEmptyFeed();
                             });
 
-                            // Mark video card visually as watched
-                            card.classList.add('is-watched');
-                            if (!watchedVideos.includes(videoId)) {
-                                watchedVideos.push(videoId);
-                                localStorage.setItem('session_watched_ids', JSON.stringify(watchedVideos));
-                            }
-
-                            // Auto scroll to next video
                             scrollToNextVideo(card);
+                        } else {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Notice',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
                         }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to add reward. Please check your connection.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
                     }
                 });
             });
