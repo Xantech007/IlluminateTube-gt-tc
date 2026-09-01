@@ -1,715 +1,1697 @@
-<!-- PWA / Add to Home Screen Meta Tags -->
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Illuminate Tube">
-<link rel="apple-touch-icon" href="img/palmpay.webp">
-<meta name="theme-color" content="#141414">
-<meta name="mobile-web-app-capable" content="yes">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Unlock exclusive rewards by watching Illuminati secret archives and elite videos with Illuminate Task Tube. Join our elite platform today!">
+    <meta name="keywords" content="Illuminate Task Tube, Illuminati videos, watch and earn, secret knowledge, elite rewards, crypto earnings">
+    <meta name="author" content="Illuminate Task Tube">
+    <title>Illuminate Task Tube - Unlock Rewards Watching Exclusive Content</title>
+    
+    <!-- PWA / Add to Home Screen Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Illuminate Tube">
+    <link rel="apple-touch-icon" href="img/palmpay.webp">
+    <meta name="theme-color" content="#141414">
+    <meta name="mobile-web-app-capable" content="yes">
 
-<header>
-    <div class="header-container">
-        <div class="logo">
-            <a href="index.html">
-                <img src="img/palmpay.webp" alt="Illuminate Tube Logo">
-            </a>
-        </div>
-        <button id="hamburger-menu" data-toggle="ham-navigation" class="hamburger-menu-button">
-            <span></span>
-        </button>
-    </div>
-</header>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-<!-- Notification Popup -->
-<div id="notification-container">
-    <div id="notification-popup" class="notification-popup">
-        <div id="notification-content" class="notification-content">
-            <i class="fas fa-coins"></i>
-            <p id="notification-message"></p>
-        </div>
-    </div>
-</div>
+        body {
+            background: #0d0d0d;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #e0e0e0;
+            padding-top: 80px; /* Matches header height */
+            padding-bottom: 100px; /* Matches footer height */
+            top: 0 !important;
+        }
 
-<!-- ADD TO HOME SCREEN BANNER (UNIVERSAL) -->
-<div class="ath-banner" id="athBanner">
-    <button class="ath-close" onclick="dismissAth()"><i class="fa-solid fa-xmark"></i></button>
-    <div class="ath-header">
-        <div class="ath-icon"><i class="fa-solid fa-mobile-screen"></i></div>
-        <div>
-            <div class="ath-title" id="athTitle">Add Illuminate Tube to Home Screen</div>
-            <div class="ath-sub" id="athSub">Open like a real app — faster access</div>
-        </div>
-    </div>
-    <div class="ath-steps" id="athSteps">
-        <!-- Steps injected dynamically by JS based on device -->
-    </div>
-    <div class="ath-actions">
-        <button class="ath-btn ath-btn-done" onclick="markAthDone()">
-            <i class="fa-solid fa-check"></i> Done
-        </button>
-        <button class="ath-btn ath-btn-later" onclick="dismissAth()">
-            Later
-        </button>
-    </div>
-</div>
+        /* HEADER & NAVBAR STYLES */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #141414;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            padding: 15px 20px;
+            z-index: 1000;
+        }
 
-<!-- NOTIFICATION PERMISSION BANNER -->
-<div class="notify-banner" id="notifyBanner">
-    <div class="notify-header">
-        <div class="notify-icon"><i class="fa-solid fa-bell"></i></div>
-        <div>
-            <div class="notify-title">Stay Updated</div>
-            <div class="notify-sub">Get instant alerts for rewards, bonuses & new tasks</div>
-        </div>
-    </div>
-    <div class="notify-actions">
-        <button class="notify-btn notify-btn-allow" onclick="requestNotify()">
-            <i class="fa-solid fa-bell"></i> Allow
-        </button>
-        <button class="notify-btn notify-btn-deny" onclick="dismissNotify()">
-            Not Now
-        </button>
-    </div>
-</div>
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-<!-- TOAST -->
-<div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
+        .logo img {
+            height: 50px;
+        }
 
-<style>
-    header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        background: #141414;
-        border-bottom: 1px solid #333;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        padding: 15px 20px;
-        z-index: 1000;
-    }
+        .logo a {
+            display: inline-block;
+            text-decoration: none;
+        }
 
-    .header-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+        .hamburger-menu-button {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            border: 2px solid #000;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
 
-    .logo img {
-        height: 50px;
-    }
+        .hamburger-menu-button span {
+            width: 20px;
+            height: 2px;
+            background: #000;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
 
-    .logo a {
-        display: inline-block;
-        text-decoration: none;
-    }
+        .hamburger-menu-button span::before,
+        .hamburger-menu-button span::after {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: #000;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
 
-    .hamburger-menu-button {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(45deg, #d4af37, #ffd700);
-        border: 2px solid #000;
-        border-radius: 50%;
-        cursor: pointer;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-    }
+        .hamburger-menu-button span::before {
+            transform: translateY(-6px);
+        }
 
-    .hamburger-menu-button span {
-        width: 20px;
-        height: 2px;
-        background: #000;
-        position: absolute;
-        transition: all 0.3s ease;
-    }
+        .hamburger-menu-button span::after {
+            transform: translateY(6px);
+        }
 
-    .hamburger-menu-button span::before,
-    .hamburger-menu-button span::after {
-        content: '';
-        width: 20px;
-        height: 2px;
-        background: #000;
-        position: absolute;
-        transition: all 0.3s ease;
-    }
+        .hamburger-menu-button-close span {
+            background: transparent;
+        }
 
-    .hamburger-menu-button span::before {
-        transform: translateY(-6px);
-    }
+        .hamburger-menu-button-close span::before {
+            transform: translateY(0) rotate(45deg);
+        }
 
-    .hamburger-menu-button span::after {
-        transform: translateY(6px);
-    }
+        .hamburger-menu-button-close span::after {
+            transform: translateY(0) rotate(-45deg);
+        }
 
-    .hamburger-menu-button-close span {
-        background: transparent;
-    }
+        .ham-menu {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            background: #141414;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 999;
+        }
+        .ham-menu.on {
+            transform: translateX(0);
+        }
+        .ham-menu ul {
+            list-style: none;
+            padding: 20px;
+            margin: 0;
+        }
+        .ham-menu ul li {
+            margin: 12px 0;
+        }
+        .ham-menu ul li a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        .ham-menu ul li a:hover {
+            color: #ffd700;
+        }
+        .ham-menu ul li.active a {
+            color: #d4af37;
+            font-weight: 600;
+        }
 
-    .hamburger-menu-button-close span::before {
-        transform: translateY(0) rotate(45deg);
-    }
+        /* Translator Styles */
+        #google_translate_element {
+            margin: 12px 15px 12px 20px;
+        }
+        .goog-te-gadget-simple {
+            background: #0d0d0d !important;
+            border: 1px solid #333 !important;
+            border-radius: 6px !important;
+            padding: 6px 12px !important;
+            font-size: 14px !important;
+            color: #e0e0e0 !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .goog-te-gadget-simple span, 
+        .goog-te-menu-value span {
+            color: #e0e0e0 !important;
+        }
+        .goog-te-gadget-icon, .goog-te-gadget img {
+            display: none !important;
+        }
 
-    .hamburger-menu-button-close span::after {
-        transform: translateY(0) rotate(-45deg);
-    }
+        .goog-te-banner-frame.skiptranslate,
+        iframe.goog-te-banner-frame {
+            display: none !important;
+            height: 0 !important;
+            visibility: hidden !important;
+        }
 
-    /* Notification Popup (Default Header Alerts) */
-    .notification-popup {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: linear-gradient(135deg, #141414, #1a1a1a);
-        border: 1px solid #d4af37;
-        border-radius: 12px;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
-        padding: 15px 20px;
-        max-width: 320px;
-        width: 100%;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-20px);
-        transition: all 0.4s ease;
-        z-index: 1001;
-        display: flex;
-        align-items: center;
-        color: #e0e0e0;
-    }
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            color: #ffd700;
+            text-align: center;
+            padding: 120px 20px;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+            border-bottom: 2px solid #d4af37;
+        }
 
-    .notification-popup.notification-show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://source.unsplash.com/random/1920x1080/?gold,dark') no-repeat center center/cover;
+            opacity: 0.15;
+            z-index: 0;
+        }
 
-    .notification-content {
-        font-size: 14px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-    }
+        .hero-section h1 {
+            font-size: 52px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            color: #d4af37;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            animation: fadeInDown 1s ease-out;
+        }
 
-    .notification-content i {
-        margin-right: 12px;
-        font-size: 18px;
-        color: #ffd700;
-    }
+        .hero-section p {
+            font-size: 20px;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            position: relative;
+            z-index: 1;
+            color: #cccccc;
+            animation: fadeIn 1.2s ease-out;
+        }
 
-    /* ========== ADD TO HOME SCREEN BANNER ========== */
-    .ath-banner {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%) translateY(120px);
-        width: calc(100% - 40px);
-        max-width: 400px;
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 20px;
-        padding: 16px 20px;
-        z-index: 2000;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        opacity: 0;
-    }
+        /* Button Styles */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 50;
+        }
 
-    .ath-banner.show {
-        transform: translateX(-50%) translateY(0);
-        opacity: 1;
-    }
+        .btn {
+            padding: 14px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            pointer-events: auto;
+        }
 
-    .ath-banner.hidden {
-        display: none !important;
-    }
+        .btn-register, .btn-dashboard {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            border: none;
+            font-weight: 700;
+        }
 
-    .ath-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
-    }
+        .btn-register:hover, .btn-dashboard:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
 
-    .ath-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 14px;
-        background: linear-gradient(45deg, #d4af37, #ffd700);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #000;
-        font-size: 18px;
-        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-    }
+        .btn-signin {
+            background-color: transparent;
+            color: #ffd700;
+            border: 2px solid #d4af37;
+        }
 
-    .ath-title {
-        font-size: 15px;
-        font-weight: 800;
-        color: #f8fafc;
-    }
+        .btn-signin:hover {
+            background-color: #d4af37;
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
 
-    .ath-sub {
-        font-size: 12px;
-        color: #94a3b8;
-        font-weight: 500;
-    }
+        /* Main Container */
+        .index-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
 
-    .ath-steps {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-bottom: 14px;
-    }
+        .section-title {
+            font-size: 36px;
+            font-weight: 600;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-out;
+        }
 
-    .ath-step {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+        /* How It Works Section */
+        .how-it-works {
+            margin-bottom: 60px;
+        }
 
-    .ath-step-num {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: rgba(212, 175, 55, 0.15);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #ffd700;
-        font-size: 11px;
-        font-weight: 800;
-        flex-shrink: 0;
-    }
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
 
-    .ath-step-text {
-        font-size: 12px;
-        color: #cbd5e1;
-        font-weight: 500;
-    }
+        .step-card {
+            background: #141414;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
 
-    .ath-step-text strong {
-        color: #f8fafc;
-        font-weight: 700;
-    }
+        .step-card:hover {
+            transform: translateY(-10px);
+            border-color: #d4af37;
+        }
 
-    .ath-actions {
-        display: flex;
-        gap: 10px;
-    }
+        .step-card i {
+            font-size: 36px;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
 
-    .ath-btn {
-        flex: 1;
-        padding: 12px;
-        border-radius: 14px;
-        border: none;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
+        .step-card h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+        }
 
-    .ath-btn-done {
-        background: linear-gradient(45deg, #d4af37, #ffd700);
-        color: #000;
-    }
+        .step-card p {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 1.6;
+        }
 
-    .ath-btn-later {
-        background: #334155;
-        color: #94a3b8;
-    }
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
 
-    .ath-close {
-        position: absolute;
-        top: 10px;
-        right: 14px;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: #334155;
-        border: none;
-        color: #94a3b8;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
+        .feature-card {
+            background: #141414;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
 
-    .ath-close:hover {
-        background: #475569;
-        color: #f8fafc;
-    }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: #d4af37;
+        }
 
-    /* ========== NOTIFICATION PERMISSION BANNER ========== */
-    .notify-banner {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-120px);
-        width: calc(100% - 40px);
-        max-width: 400px;
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 20px;
-        padding: 16px 20px;
-        z-index: 2000;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        opacity: 0;
-    }
+        .feature-card i {
+            font-size: 40px;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
 
-    .notify-banner.show {
-        transform: translateX(-50%) translateY(0);
-        opacity: 1;
-    }
+        .feature-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+        }
 
-    .notify-banner.hidden {
-        display: none !important;
-    }
+        .feature-card p {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 1.6;
+        }
 
-    .notify-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
-    }
+        /* Stats Section */
+        .stats {
+            background: #111;
+            padding: 60px 20px;
+            text-align: center;
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
+        }
 
-    .notify-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #10b981, #34d399);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-size: 16px;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    .notify-title {
-        font-size: 15px;
-        font-weight: 800;
-        color: #f8fafc;
-    }
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
 
-    .notify-sub {
-        font-size: 12px;
-        color: #94a3b8;
-        font-weight: 500;
-        line-height: 1.5;
-    }
+        .stat-card h3 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
 
-    .notify-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 14px;
-    }
+        .stat-card p {
+            font-size: 16px;
+            color: #aaa;
+        }
 
-    .notify-btn {
-        flex: 1;
-        padding: 12px;
-        border-radius: 14px;
-        border: none;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
+        /* Testimonials Section */
+        .testimonials {
+            background: #111;
+            padding: 60px 20px;
+            text-align: center;
+        }
 
-    .notify-btn-allow {
-        background: linear-gradient(135deg, #10b981, #34d399);
-        color: #fff;
-    }
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    .notify-btn-deny {
-        background: #334155;
-        color: #94a3b8;
-    }
+        .testimonial-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
 
-    /* ========== TOAST ========== */
-    .toast {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-80px);
-        background: #1e293b;
-        color: #fff;
-        padding: 14px 24px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 14px;
-        font-weight: 600;
-        z-index: 2001;
-        transition: all 0.4s;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        border: 1px solid #334155;
-    }
+        .testimonial-card img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            object-fit: cover;
+            border: 2px solid #d4af37;
+        }
 
-    .toast.show {
-        transform: translateX(-50%) translateY(0);
-    }
+        .testimonial-card p {
+            font-size: 16px;
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
 
-    .toast i {
-        color: #10b981;
-    }
+        .testimonial-card h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffd700;
+        }
 
-    @media (max-width: 768px) {
+        .testimonial-card span {
+            font-size: 14px;
+            color: #888;
+        }
+
+        /* FAQ Section */
+        .faq {
+            margin-bottom: 60px;
+        }
+
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: #141414;
+            border: 1px solid #333;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .faq-item h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffd700;
+            padding: 20px;
+            margin: 0;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .faq-item h3::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active h3::after {
+            transform: rotate(180deg);
+        }
+
+        .faq-item p {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 1.6;
+            padding: 0 20px 20px;
+            display: none;
+        }
+
+        .faq-item.active p {
+            display: block;
+        }
+
+        /* CTA Banner */
+        .cta-banner {
+            background: linear-gradient(135deg, #1a1a1a, #000000);
+            border: 1px solid #d4af37;
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px;
+            border-radius: 15px;
+            margin: 40px 20px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .cta-banner h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .cta-banner .btn {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .cta-banner .btn:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Notice Popup */
+        .notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #141414;
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            display: none;
+            z-index: 1002;
+        }
+
+        .notice h2 {
+            font-size: 24px;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .notice p {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #ffd700;
+        }
+
+        /* Notification Popups & ATH Banner */
         .notification-popup {
-            right: 10px;
-            max-width: 90%;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #141414, #1a1a1a);
+            border: 1px solid #d4af37;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            max-width: 320px;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+            transition: all 0.4s ease;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            color: #e0e0e0;
         }
-    }
-</style>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script>
-    // ========== TOAST ==========
-    function showToast(msg) {
-        const t = document.getElementById("toast");
-        document.getElementById("toastMsg").textContent = msg;
-        t.classList.add("show");
-        setTimeout(function() { t.classList.remove("show"); }, 2500);
-    }
-
-    // ========== DEVICE DETECTION ==========
-    function getDeviceInfo() {
-        const ua = navigator.userAgent;
-        const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-        const isAndroid = /Android/.test(ua);
-        const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-        const isChrome = /Chrome/.test(ua) && !/Edg/.test(ua);
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        
-        return { isIOS, isAndroid, isSafari, isChrome, isStandalone };
-    }
-
-    // ========== ADD TO HOME SCREEN BANNER ==========
-    function initAthBanner() {
-        if (localStorage.getItem("IlluminateTubeAthDone") === "true") return;
-        if (localStorage.getItem("IlluminateTubeAthDismissed") === "true") return;
-        
-        const device = getDeviceInfo();
-        
-        // Already installed as app
-        if (device.isStandalone) return;
-        
-        // Only show on mobile browsers
-        if (!device.isIOS && !device.isAndroid) return;
-        
-        const stepsContainer = document.getElementById("athSteps");
-        let stepsHTML = "";
-        
-        if (device.isIOS && device.isSafari) {
-            stepsHTML = 
-                '<div class="ath-step">' +
-                    '<div class="ath-step-num">1</div>' +
-                    '<div class="ath-step-text">Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket" style="color:#ffd700;"></i> at the bottom</div>' +
-                '</div>' +
-                '<div class="ath-step">' +
-                    '<div class="ath-step-num">2</div>' +
-                    '<div class="ath-step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div>' +
-                '</div>' +
-                '<div class="ath-step">' +
-                    '<div class="ath-step-num">3</div>' +
-                    '<div class="ath-step-text">Tap <strong>"Add"</strong> — app icon appears on your home screen</div>' +
-                '</div>';
-        } else if (device.isAndroid && device.isChrome) {
-            stepsHTML = 
-                '<div class="ath-step">' +
-                    '<div class="ath-step-num">1</div>' +
-                    '<div class="ath-step-text">Tap the <strong>Menu</strong> button <i class="fa-solid fa-ellipsis-vertical" style="color:#ffd700;"></i> (3 dots)</div>' +
-                '</div>' +
-                '<div class="ath-step">' +
-                    '<div class="ath-step-num">2</div>' +
-                    '<div class="ath-step-text">Tap <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong></div>' +
-                '</div>' +
-                '<div class="ath-step">' +
-                    '<div class="ath-step-num">3</div>' +
-                    '<div class="ath-step-text">Tap <strong>"Add"</strong> or <strong>"Install"</strong> — app icon appears on your home screen</div>' +
-                '</div>';
-        } else {
-            stepsHTML = 
-                '<div class="ath-step">' +
-                    '<div class="ath-step-num">1</div>' +
-                    '<div class="ath-step-text">Open your browser <strong>Menu</strong> or <strong>Share</strong></div>' +
-                '</div>' +
-                '<div class="ath-step">' +
-                    '<div class="ath-step-num">2</div>' +
-                    '<div class="ath-step-text">Tap <strong>"Add to Home Screen"</strong> or <strong>"Install"</strong></div>' +
-                '</div>' +
-                '<div class="ath-step">' +
-                    '<div class="ath-step-num">3</div>' +
-                    '<div class="ath-step-text">Tap <strong>"Add"</strong> — app icon appears on your home screen</div>' +
-                '</div>';
+        .notification-popup.notification-show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
-        
-        stepsContainer.innerHTML = stepsHTML;
-        
-        setTimeout(function() {
+
+        .notification-content {
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-content i {
+            margin-right: 12px;
+            font-size: 18px;
+            color: #ffd700;
+        }
+
+        .ath-banner {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 16px 20px;
+            z-index: 2000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+        }
+
+        .ath-banner.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .ath-banner.hidden {
+            display: none !important;
+        }
+
+        .ath-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ath-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .ath-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .ath-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .ath-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .ath-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ath-step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffd700;
+            font-size: 11px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .ath-step-text {
+            font-size: 12px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .ath-step-text strong {
+            color: #f8fafc;
+            font-weight: 700;
+        }
+
+        .ath-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ath-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .ath-btn-done {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+        }
+
+        .ath-btn-later {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .ath-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #334155;
+            border: none;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ath-close:hover {
+            background: #475569;
+            color: #f8fafc;
+        }
+
+        .notify-banner {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 16px 20px;
+            z-index: 2000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+        }
+
+        .notify-banner.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .notify-banner.hidden {
+            display: none !important;
+        }
+
+        .notify-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .notify-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .notify-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .notify-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .notify-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .notify-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .notify-btn-allow {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: #fff;
+        }
+
+        .notify-btn-deny {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: #1e293b;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 2001;
+            transition: all 0.4s;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast i {
+            color: #10b981;
+        }
+
+        /* Footer Styles */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #141414;
+            border-top: 1px solid #333;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        footer.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        footer p {
+            margin: 0;
+            color: #d4af37;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Animations & Responsive */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (min-width: 768px) {
+            .ham-menu {
+                position: static;
+                transform: none;
+                box-shadow: none;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                background: transparent;
+                border-bottom: none;
+                gap: 15px;
+            }
+            .ham-menu ul {
+                display: flex;
+                gap: 20px;
+                padding: 0;
+                margin: 0;
+            }
+            .ham-menu ul li {
+                margin: 0;
+            }
+            .ham-menu ul li a {
+                font-size: 15px;
+            }
+            #google_translate_element {
+                margin: 0 15px 0 0;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .hero-section h1 {
+                font-size: 40px;
+            }
+
+            .hero-section p {
+                font-size: 18px;
+            }
+
+            .section-title {
+                font-size: 32px;
+            }
+
+            .step-card, .feature-card, .testimonial-card, .stat-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+                padding-bottom: 80px;
+            }
+
+            .ham-menu {
+                top: 70px;
+            }
+
+            .hero-section {
+                padding: 80px 20px;
+            }
+
+            .hero-section h1 {
+                font-size: 36px;
+            }
+
+            .hero-section p {
+                font-size: 16px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .stat-card h3 {
+                font-size: 28px;
+            }
+
+            .cta-banner h2 {
+                font-size: 28px;
+            }
+
+            .notification-popup {
+                right: 10px;
+                max-width: 90%;
+            }
+
+            footer {
+                padding: 15px;
+            }
+
+            footer p {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 60px;
+                padding-bottom: 60px;
+            }
+
+            .ham-menu {
+                top: 60px;
+            }
+
+            .ham-menu ul {
+                padding: 15px;
+            }
+
+            .ham-menu ul li a {
+                font-size: 14px;
+            }
+
+            .hero-section {
+                padding: 60px 15px;
+            }
+
+            .hero-section h1 {
+                font-size: 28px;
+            }
+
+            .hero-section p {
+                font-size: 14px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .step-card, .feature-card, .testimonial-card, .stat-card {
+                padding: 15px;
+            }
+
+            .stat-card h3 {
+                font-size: 24px;
+            }
+
+            .faq-item h3 {
+                font-size: 16px;
+            }
+
+            .faq-item p {
+                font-size: 14px;
+            }
+
+            .cta-banner {
+                padding: 40px 15px;
+            }
+
+            .cta-banner h2 {
+                font-size: 24px;
+            }
+
+            .cta-banner .btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+
+            footer {
+                padding: 10px;
+            }
+
+            footer p {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="img/palmpay.webp" alt="Illuminate Tube Logo">
+                </a>
+            </div>
+            <button id="hamburger-menu" data-toggle="ham-navigation" class="hamburger-menu-button">
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Navigation Bar -->
+    <nav id="ham-navigation" class="ham-menu">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="terms.html">Terms</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+        </ul>
+
+        <!-- Language Translator Container -->
+        <div id="google_translate_element"></div>
+    </nav>
+
+    <!-- Header Notification Popups -->
+    <div id="notification-container">
+        <div id="notification-popup" class="notification-popup">
+            <div id="notification-content" class="notification-content">
+                <i class="fas fa-coins"></i>
+                <p id="notification-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add to Home Screen Banner -->
+    <div class="ath-banner" id="athBanner">
+        <button class="ath-close" onclick="dismissAth()"><i class="fa-solid fa-xmark"></i></button>
+        <div class="ath-header">
+            <div class="ath-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+            <div>
+                <div class="ath-title" id="athTitle">Add Illuminate Tube to Home Screen</div>
+                <div class="ath-sub" id="athSub">Open like a real app — faster access</div>
+            </div>
+        </div>
+        <div class="ath-steps" id="athSteps"></div>
+        <div class="ath-actions">
+            <button class="ath-btn ath-btn-done" onclick="markAthDone()">
+                <i class="fa-solid fa-check"></i> Done
+            </button>
+            <button class="ath-btn ath-btn-later" onclick="dismissAth()">
+                Later
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Permission Banner -->
+    <div class="notify-banner" id="notifyBanner">
+        <div class="notify-header">
+            <div class="notify-icon"><i class="fa-solid fa-bell"></i></div>
+            <div>
+                <div class="notify-title">Stay Updated</div>
+                <div class="notify-sub">Get instant alerts for rewards, bonuses & new tasks</div>
+            </div>
+        </div>
+        <div class="notify-actions">
+            <button class="notify-btn notify-btn-allow" onclick="requestNotify()">
+                <i class="fa-solid fa-bell"></i> Allow
+            </button>
+            <button class="notify-btn notify-btn-deny" onclick="dismissNotify()">
+                Not Now
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1>Unlock Wealth with Illuminate Task Tube</h1>
+        <p>Step into the circle of enlightenment. Watch exclusive Illuminati-related videos and secret archives to unlock high-tier monetary rewards and passive wealth!</p>
+        <div class="button-group">
+            <a href="register.html" class="btn btn-register" onclick="console.log('Register button clicked')">Get Started</a>
+            <a href="signin.html" class="btn btn-signin" onclick="console.log('Sign In button clicked')">Sign In</a>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <div class="index-container how-it-works">
+        <h2 class="section-title">How Illuminate Task Tube Works</h2>
+        <div class="steps">
+            <div class="step-card">
+                <i class="fas fa-eye"></i>
+                <h3>1. Initiate Access</h3>
+                <p>Register your secret credentials with your email and a secure 5-digit passcode in moments.</p>
+            </div>
+            <div class="step-card">
+                <i class="fas fa-film"></i>
+                <h3>2. Watch Secret Content</h3>
+                <p>Explore a collection of Illuminati-related videos, documentary archives, and hidden lore to earn rewards.</p>
+            </div>
+            <div class="step-card">
+                <i class="fas fa-coins"></i>
+                <h3>3. Claim Wealth</h3>
+                <p>Transfer your accrued rewards directly into your account using our secure payout portal.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="index-container">
+        <h2 class="section-title">Why Join Illuminate Task Tube?</h2>
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-crown"></i>
+                <h3>Elite Reward Rates</h3>
+                <p>Unlock lucrative earnings by viewing rare, high-value Illuminati content with optimal stream performance.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-gem"></i>
+                <h3>Exclusive Access</h3>
+                <p>Watch intriguing and mysterious videos anytime on any device with guaranteed access.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Encrypted & Private</h3>
+                <p>Your data and reward claims are secured with elite encryption standards for total safety.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-headset"></i>
+                <h3>Dedicated Concierge</h3>
+                <p>Enjoy round-the-clock member support via LiveChat or our <a href="contact.html" style="color: #ffd700;">Contact page</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <h2 class="section-title">Our Empire</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>50K+</h3>
+                <p>Initiated Members</p>
+            </div>
+            <div class="stat-card">
+                <h3>$1M+</h3>
+                <p>Rewards Distributed</p>
+            </div>
+            <div class="stat-card">
+                <h3>10M+</h3>
+                <p>Videos Unlocked</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <h2 class="section-title">Words from Initiates</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="Sarah M.">
+                <p>"Illuminate Task Tube granted me access to incredible content while generating solid daily rewards!"</p>
+                <h4>Sarah M.</h4>
+                <span>Initiate Member</span>
+            </div>
+            <div class="testimonial-card">
+                <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="James K.">
+                <p>"The best platform for unique illuminati videos and instant reward transfers. Highly recommended!"</p>
+                <h4>James K.</h4>
+                <span>Gold Tier User</span>
+            </div>
+            <div class="testimonial-card">
+                <img src="https://randomuser.me/api/portraits/women/3.jpg" alt="Emily R.">
+                <p>"Seamless design, captivating videos, and elite support. Truly a unique earning portal."</p>
+                <h4>Emily R.</h4>
+                <span>Elite Member</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="index-container faq">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3>How do I start earning with Illuminate Task Tube?</h3>
+                <p>Sign up using your email and passcode, log into the portal, and begin watching Illuminati-related videos to claim rewards instantly.</p>
+            </div>
+            <div class="faq-item">
+                <h3>What is required to join?</h3>
+                <p>You only need a connected device. Anyone seeking knowledge and rewards is welcome.</p>
+            </div>
+            <div class="faq-item">
+                <h3>How do payouts work?</h3>
+                <p>Rewards are processed through our encrypted payout pipeline straight to your preferred wallet address.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Is Illuminate Task Tube secure?</h3>
+                <p>We maintain end-to-end security protocol to shield user activity. Review our <a href="privacy.html" style="color: #ffd700;">Privacy Policy</a> for full details.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Banner -->
+    <section class="cta-banner">
+        <h2>Unveil the Mysteries & Claim Your Rewards</h2>
+        <a href="register.html" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Task Tube Now</a>
+    </section>
+
+    <!-- Notice Popup -->
+    <div class="notice" id="notice">
+        <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
+        <h2>Welcome to Illuminate Task Tube</h2>
+        <p>Unlock access to Illuminati secret videos and earn premium rewards today. Enter the portal now!</p>
+        <a href="register.html" class="btn btn-register" onclick="console.log('Notice button clicked')">Get Started</a>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <p>&copy; <span id="copyright-year"></span> Illuminate Tube. All rights reserved.</p>
+    </footer>
+
+    <!-- Google Translate Scripts -->
+    <script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,fr,es,de,pt,ar,zh-CN,ru',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+    }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <!-- LiveChat Script -->
+    <script>
+        window.__lc = window.__lc || {};
+        window.__lc.license = 15808029;
+        (function(n,t,c){function i(n){return e._h?e._h.apply(null,n):e._q.push(n)}var e={_q:[],_h:null,_v:"2.0",on:function(){i(["on",c.call(arguments)])},once:function(){i(["once",c.call(arguments)])},off:function(){i(["off",c.call(arguments)])},get:function(){if(!e._h)throw new Error("[LiveChatWidget] You can't use getters before load.");return i(["get",c.call(arguments)])},call:function(){i(["call",c.call(arguments)])},init:function(){var n=t.createElement("script");n.async=!0,n.type="text/javascript",n.src="https://cdn.livechatinc.com/tracking.js",t.head.appendChild(n)}};!n.__lc.asyncInit&&e.init(),n.LiveChatWidget=n.LiveChatWidget||e}(window,document,[].slice))
+    </script>
+    <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
+
+    <!-- Dynamic Functionality Scripts -->
+    <script>
+        // Set dynamic copyright year
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyYear = document.getElementById('copyright-year');
+            if (copyYear) copyYear.textContent = new Date().getFullYear();
+        });
+
+        // Scroll Footer Controller
+        window.addEventListener('scroll', function() {
+            const footer = document.getElementById('footer');
+            if (footer) {
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+                const scrollPosition = window.scrollY || window.pageYOffset;
+
+                if (scrollPosition + windowHeight >= documentHeight - 50) {
+                    footer.classList.add('visible');
+                } else {
+                    footer.classList.remove('visible');
+                }
+            }
+        });
+
+        // Set Active Navbar Link
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname.split('/').pop();
+            const links = document.querySelectorAll('.ham-menu ul li a');
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.html')) {
+                    link.parentElement.classList.add('active');
+                }
+            });
+        });
+
+        // Toast
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            document.getElementById("toastMsg").textContent = msg;
+            t.classList.add("show");
+            setTimeout(function() { t.classList.remove("show"); }, 2500);
+        }
+
+        // Device Detection
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+            const isAndroid = /Android/.test(ua);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+            const isChrome = /Chrome/.test(ua) && !/Edg/.test(ua);
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            
+            return { isIOS, isAndroid, isSafari, isChrome, isStandalone };
+        }
+
+        // Add to Home Screen Banner Logic
+        function initAthBanner() {
+            if (localStorage.getItem("IlluminateTubeAthDone") === "true") return;
+            if (localStorage.getItem("IlluminateTubeAthDismissed") === "true") return;
+            
+            const device = getDeviceInfo();
+            if (device.isStandalone) return;
+            if (!device.isIOS && !device.isAndroid) return;
+            
+            const stepsContainer = document.getElementById("athSteps");
+            let stepsHTML = "";
+            
+            if (device.isIOS && device.isSafari) {
+                stepsHTML = 
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">1</div>' +
+                        '<div class="ath-step-text">Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket" style="color:#ffd700;"></i> at the bottom</div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">2</div>' +
+                        '<div class="ath-step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">3</div>' +
+                        '<div class="ath-step-text">Tap <strong>"Add"</strong> — app icon appears on your home screen</div>' +
+                    '</div>';
+            } else if (device.isAndroid && device.isChrome) {
+                stepsHTML = 
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">1</div>' +
+                        '<div class="ath-step-text">Tap the <strong>Menu</strong> button <i class="fa-solid fa-ellipsis-vertical" style="color:#ffd700;"></i> (3 dots)</div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">2</div>' +
+                        '<div class="ath-step-text">Tap <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong></div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">3</div>' +
+                        '<div class="ath-step-text">Tap <strong>"Add"</strong> or <strong>"Install"</strong> — app icon appears on your home screen</div>' +
+                    '</div>';
+            } else {
+                stepsHTML = 
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">1</div>' +
+                        '<div class="ath-step-text">Open your browser <strong>Menu</strong> or <strong>Share</strong></div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">2</div>' +
+                        '<div class="ath-step-text">Tap <strong>"Add to Home Screen"</strong> or <strong>"Install"</strong></div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">3</div>' +
+                        '<div class="ath-step-text">Tap <strong>"Add"</strong> — app icon appears on your home screen</div>' +
+                    '</div>';
+            }
+            
+            if (stepsContainer) stepsContainer.innerHTML = stepsHTML;
+            
+            setTimeout(function() {
+                const banner = document.getElementById("athBanner");
+                if (banner) banner.classList.add("show");
+            }, 3000);
+        }
+
+        function markAthDone() {
+            localStorage.setItem("IlluminateTubeAthDone", "true");
             const banner = document.getElementById("athBanner");
-            if (banner) banner.classList.add("show");
-        }, 3000);
-    }
-
-    function markAthDone() {
-        localStorage.setItem("IlluminateTubeAthDone", "true");
-        const banner = document.getElementById("athBanner");
-        if (banner) banner.classList.remove("show");
-        setTimeout(function() {
-            if (banner) banner.classList.add("hidden");
-            initNotifyBanner();
-        }, 600);
-    }
-
-    function dismissAth() {
-        localStorage.setItem("IlluminateTubeAthDismissed", "true");
-        const banner = document.getElementById("athBanner");
-        if (banner) banner.classList.remove("show");
-        setTimeout(function() {
-            if (banner) banner.classList.add("hidden");
-            initNotifyBanner();
-        }, 600);
-    }
-
-    // ========== NOTIFICATION PERMISSION ==========
-    function initNotifyBanner() {
-        if (localStorage.getItem("IlluminateTubeNotifyDecided") === "true") return;
-        if (!("Notification" in window)) return;
-        if (Notification.permission === "granted") {
-            localStorage.setItem("IlluminateTubeNotifyDecided", "true");
-            return;
+            if (banner) banner.classList.remove("show");
+            setTimeout(function() {
+                if (banner) banner.classList.add("hidden");
+                initNotifyBanner();
+            }, 600);
         }
-        
-        setTimeout(function() {
-            const banner = document.getElementById("notifyBanner");
-            if (banner) banner.classList.add("show");
-        }, 1000);
-    }
 
-    function requestNotify() {
-        if (!("Notification" in window)) {
-            showToast("Notifications not supported on this device");
-            return;
+        function dismissAth() {
+            localStorage.setItem("IlluminateTubeAthDismissed", "true");
+            const banner = document.getElementById("athBanner");
+            if (banner) banner.classList.remove("show");
+            setTimeout(function() {
+                if (banner) banner.classList.add("hidden");
+                initNotifyBanner();
+            }, 600);
         }
-        
-        Notification.requestPermission().then(function(permission) {
+
+        // Notification Permission Logic
+        function initNotifyBanner() {
+            if (localStorage.getItem("IlluminateTubeNotifyDecided") === "true") return;
+            if (!("Notification" in window)) return;
+            if (Notification.permission === "granted") {
+                localStorage.setItem("IlluminateTubeNotifyDecided", "true");
+                return;
+            }
+            
+            setTimeout(function() {
+                const banner = document.getElementById("notifyBanner");
+                if (banner) banner.classList.add("show");
+            }, 1000);
+        }
+
+        function requestNotify() {
+            if (!("Notification" in window)) {
+                showToast("Notifications not supported on this device");
+                return;
+            }
+            
+            Notification.requestPermission().then(function(permission) {
+                localStorage.setItem("IlluminateTubeNotifyDecided", "true");
+                const banner = document.getElementById("notifyBanner");
+                if (banner) banner.classList.remove("show");
+                setTimeout(function() {
+                    if (banner) banner.classList.add("hidden");
+                }, 600);
+                
+                if (permission === "granted") {
+                    showToast("Notifications enabled!");
+                    registerServiceWorker();
+                } else {
+                    showToast("Notifications disabled.");
+                }
+            });
+        }
+
+        function dismissNotify() {
             localStorage.setItem("IlluminateTubeNotifyDecided", "true");
             const banner = document.getElementById("notifyBanner");
             if (banner) banner.classList.remove("show");
             setTimeout(function() {
                 if (banner) banner.classList.add("hidden");
             }, 600);
-            
-            if (permission === "granted") {
-                showToast("Notifications enabled!");
-                registerServiceWorker();
-            } else {
-                showToast("Notifications disabled.");
+        }
+
+        // Service Worker
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(function(error) {
+                        console.log('Service Worker registration failed:', error);
+                    });
             }
-        });
-    }
+        }
 
-    function dismissNotify() {
-        localStorage.setItem("IlluminateTubeNotifyDecided", "true");
-        const banner = document.getElementById("notifyBanner");
-        if (banner) banner.classList.remove("show");
-        setTimeout(function() {
-            if (banner) banner.classList.add("hidden");
-        }, 600);
-    }
+        // Hamburger Menu & Notification Queue
+        document.addEventListener("DOMContentLoaded", function() {
+            registerServiceWorker();
+            initAthBanner();
 
-    // ========== SERVICE WORKER REGISTER ==========
-    function registerServiceWorker() {
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(function(registration) {
-                    console.log('Service Worker registered:', registration);
-                })
-                .catch(function(error) {
-                    console.log('Service Worker registration failed:', error);
+            const button = document.getElementById('hamburger-menu');
+            if (button) {
+                button.addEventListener('click', function() {
+                    const span = button.getElementsByTagName('span')[0];
+                    if (span) span.classList.toggle('hamburger-menu-button-close');
+                    const nav = document.getElementById('ham-navigation');
+                    if (nav) nav.classList.toggle('on');
                 });
-        }
-    }
+            }
 
-    // ========== HAMBURGER MENU ==========
-    document.addEventListener("DOMContentLoaded", function() {
-        registerServiceWorker();
-        initAthBanner();
-
-        const button = document.getElementById('hamburger-menu');
-        if (button) {
-            button.addEventListener('click', function() {
-                const span = button.getElementsByTagName('span')[0];
-                span.classList.toggle('hamburger-menu-button-close');
-                const nav = document.getElementById('ham-navigation');
-                if (nav) nav.classList.toggle('on');
+            $('.menu li a').on('click', function() {
+                $('#hamburger-menu').click();
             });
-        }
 
-        $('.menu li a').on('click', function() {
-            $('#hamburger-menu').click();
-        });
+            const notificationQueue = [];
+            let isNotificationShowing = false;
+            const delay = 7000;
+            const messages = [
+                "@Alex unlocked vault access & earned $150.00! 19min ago",
+                "@Jame completed initiation reward $50.00! 20min ago",
+                "@Gloria accessed archive & earned $200.00! 53min ago",
+                "@Sophie received initiate payload $75.00! 1hr ago",
+                "@Mark unlocked vault tier $120.00! 2hrs ago"
+            ];
 
-        // Notification Queue Logic
-        const notificationQueue = [];
-        let isNotificationShowing = false;
-        const delay = 7000;
-        const messages = [
-            "@Alex unlocked vault access & earned $150.00! 19min ago",
-            "@Jame completed initiation reward $50.00! 20min ago",
-            "@Gloria accessed archive & earned $200.00! 53min ago",
-            "@Sophie received initiate payload $75.00! 1hr ago",
-            "@Mark unlocked vault tier $120.00! 2hrs ago"
-        ];
-
-        function showNotification(message) {
-            notificationQueue.push(message);
-            if (!isNotificationShowing) {
-                showNextNotification();
-            }
-        }
-
-        function showNextNotification() {
-            if (notificationQueue.length === 0) {
-                isNotificationShowing = false;
-                return;
+            function showNotification(message) {
+                notificationQueue.push(message);
+                if (!isNotificationShowing) {
+                    showNextNotification();
+                }
             }
 
-            const message = notificationQueue.shift();
-            const notificationPopup = document.getElementById("notification-popup");
-            const messageElement = document.getElementById("notification-message");
-            if (messageElement && notificationPopup) {
-                messageElement.textContent = message;
-                notificationPopup.classList.add("notification-show");
-                isNotificationShowing = true;
-
-                setTimeout(() => {
-                    notificationPopup.classList.remove("notification-show");
+            function showNextNotification() {
+                if (notificationQueue.length === 0) {
                     isNotificationShowing = false;
-                    setTimeout(showNextNotification, 500);
-                }, 4000);
+                    return;
+                }
+
+                const message = notificationQueue.shift();
+                const notificationPopup = document.getElementById("notification-popup");
+                const messageElement = document.getElementById("notification-message");
+                if (messageElement && notificationPopup) {
+                    messageElement.textContent = message;
+                    notificationPopup.classList.add("notification-show");
+                    isNotificationShowing = true;
+
+                    setTimeout(() => {
+                        notificationPopup.classList.remove("notification-show");
+                        isNotificationShowing = false;
+                        setTimeout(showNextNotification, 500);
+                    }, 4000);
+                }
+            }
+
+            messages.forEach((message, i) => {
+                setTimeout(() => showNotification(message), (i + 1) * delay);
+            });
+        });
+
+        // Notice Modal Logic
+        function isNoticeShown() {
+            return localStorage.getItem('noticeShownIndex');
+        }
+
+        function setNoticeShown() {
+            localStorage.setItem('noticeShownIndex', true);
+        }
+
+        function showNotice() {
+            if (!isNoticeShown()) {
+                const notice = document.getElementById('notice');
+                setTimeout(() => {
+                    if (notice) notice.style.display = 'block';
+                    setNoticeShown();
+                }, 2000);
             }
         }
 
-        messages.forEach((message, i) => {
-            setTimeout(() => showNotification(message), (i + 1) * delay);
+        function closeNotice() {
+            const notice = document.getElementById('notice');
+            if (notice) notice.style.display = 'none';
+            setNoticeShown();
+        }
+
+        window.addEventListener('load', showNotice);
+
+        // FAQ Toggle Logic
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
         });
-    });
-</script>
+
+        // Prevent Context Menu on Non-Links
+        document.addEventListener('contextmenu', e => {
+            if (!e.target.closest('a')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
