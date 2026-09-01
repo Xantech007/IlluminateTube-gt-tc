@@ -164,7 +164,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Fixed Header Overlay */
         .top-header {
             position: fixed;
-            top: 0;
+            top: 62;
             left: 0;
             width: 100%;
             z-index: 100;
