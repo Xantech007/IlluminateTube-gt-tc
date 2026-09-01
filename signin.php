@@ -14,10 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
     $password = trim($_POST['password']);
    
     if (empty($email) || empty($password)) {
-        $response['error'] = "Email and password are required.";
-        file_put_contents('debug.log', 'Missing email or password' . "\n", FILE_APPEND);
+        $response['error'] = "Email and passcode are required.";
+        file_put_contents('debug.log', 'Missing email or passcode' . "\n", FILE_APPEND);
     }
-    // REMOVED 8-char check → now allows passwords of 1+ character
+    // Allows passcodes of 1+ character
     else {
         try {
             $stmt = $pdo->prepare("SELECT id, email, passcode FROM users WHERE email = ?");
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
                 $_SESSION['passcode'] = $user['passcode'];
                 file_put_contents('debug.log', 'Sign-in successful: ' . $email . "\n", FILE_APPEND);
             } else {
-                $response['error'] = "Invalid email or password.";
+                $response['error'] = "Invalid email or passcode.";
                 file_put_contents('debug.log', 'Failed login: ' . $email . "\n", FILE_APPEND);
             }
         } catch (PDOException $e) {
@@ -50,10 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sign in to Task Tube with your email and password to start earning by watching video ads.">
-    <meta name="keywords" content="Task Tube, sign in, earn money, watch ads, password">
-    <meta name="author" content="Task Tube">
-    <title>Task Tube - Sign In</title>
+    <meta name="description" content="Sign in to Illuminate Tube with your email and passcode to access your vault archives and start earning rewards.">
+    <meta name="keywords" content="Illuminate Tube, sign in, initiate login, earn rewards, vault access, passcode">
+    <meta name="author" content="Illuminate Tube">
+    <title>Illuminate Tube - Sign In</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -66,22 +66,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
             font-family: 'Inter', sans-serif;
         }
         body {
-            background: #f5f7fa;
+            background: #0d0d0d;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            color: #333;
+            color: #e0e0e0;
             padding-top: 80px;
             padding-bottom: 100px;
         }
         .hero-section {
-            background: linear-gradient(135deg, #6e44ff, #b5179e);
-            color: #fff;
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            color: #ffd700;
             text-align: center;
             padding: 100px 20px;
             position: relative;
             overflow: hidden;
             z-index: 10;
+            border-bottom: 2px solid #d4af37;
         }
         .hero-section::before {
             content: '';
@@ -90,8 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('https://source.unsplash.com/random/1920x1080/?technology') no-repeat center center/cover;
-            opacity: 0.1;
+            background: url('https://source.unsplash.com/random/1920x1080/?gold,dark') no-repeat center center/cover;
+            opacity: 0.15;
             z-index: 0;
         }
         .hero-section h1 {
@@ -100,6 +101,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
             margin-bottom: 20px;
             position: relative;
             z-index: 1;
+            color: #d4af37;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
         .hero-section p {
             font-size: 18px;
@@ -108,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
             margin: 0 auto 30px;
             position: relative;
             z-index: 1;
+            color: #cccccc;
         }
         .index-container {
             max-width: 1200px;
@@ -117,48 +121,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
         .section-title {
             font-size: 36px;
             font-weight: 600;
-            color: #333;
+            color: #d4af37;
             text-align: center;
             margin-bottom: 40px;
         }
         .signin-content {
             max-width: 500px;
             margin: 0 auto;
-            background: #fff;
+            background: #141414;
+            border: 1px solid #333;
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
         .signin-content h1 {
             font-size: 28px;
             font-weight: 600;
-            color: #333;
+            color: #ffd700;
             margin-bottom: 10px;
         }
         .signin-content p {
             font-size: 16px;
-            color: #666;
+            color: #aaa;
             margin-bottom: 20px;
         }
         .signin-content p span {
-            color: #6e44ff;
-            font-weight: 500;
+            color: #ffd700;
+            font-weight: 600;
         }
         .input-field {
             width: 100%;
             height: 50px;
             font-size: 16px;
             padding: 10px 15px;
-            border: 2px solid #e0e0e0;
+            background: #0d0d0d;
+            color: #fff;
+            border: 2px solid #333;
             border-radius: 10px;
             margin-bottom: 20px;
             outline: none;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .input-field:focus {
-            border-color: #6e44ff;
-            box-shadow: 0 0 5px rgba(110, 68, 255, 0.3);
+            border-color: #d4af37;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
         }
         .btn {
             padding: 12px 30px;
@@ -171,69 +178,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
             display: inline-block;
         }
         .submit-btn {
-            background: #6e44ff;
-            color: #fff;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
             border: none;
             border-radius: 25px;
             padding: 15px;
             font-size: 18px;
-            font-weight: 500;
+            font-weight: 700;
             cursor: pointer;
             width: 100%;
-            transition: background 0.3s ease, transform 0.2s ease;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
         }
         .submit-btn:hover {
-            background: #5a00b5;
+            background: linear-gradient(45deg, #ffd700, #b8860b);
             transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
         }
         .signin-link {
             font-size: 14px;
-            color: #666;
+            color: #888;
             margin-top: 20px;
         }
         .signin-link a {
-            color: #6e44ff;
+            color: #ffd700;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
         }
         .signin-link a:hover {
-            color: #ff69b4;
+            color: #fff;
             text-decoration: underline;
         }
         .cta-banner {
-            background: linear-gradient(135deg, #6e44ff, #b5179e);
+            background: linear-gradient(135deg, #1a1a1a, #000000);
+            border: 1px solid #d4af37;
             color: #fff;
             text-align: center;
             padding: 60px 20px;
             border-radius: 15px;
             margin: 40px 20px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
         }
         .cta-banner h2 {
             font-size: 32px;
             font-weight: 600;
+            color: #ffd700;
             margin-bottom: 20px;
         }
         .cta-banner .btn {
-            background-color: #fff;
-            color: #6e44ff;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
             padding: 15px 40px;
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             border-radius: 50px;
-            transition: background-color 0.3s ease;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
         }
         .cta-banner .btn:hover {
-            background-color: #f0f0f0;
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
         .notice {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #fff;
+            background: #141414;
+            border: 2px solid #d4af37;
             border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
             padding: 30px;
             max-width: 400px;
             width: 90%;
@@ -243,12 +259,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
         }
         .notice h2 {
             font-size: 24px;
-            color: #6e44ff;
+            color: #ffd700;
             margin-bottom: 15px;
         }
         .notice p {
             font-size: 16px;
-            color: #666;
+            color: #aaa;
             margin-bottom: 20px;
             text-align: center;
         }
@@ -258,23 +274,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
             right: 15px;
             font-size: 24px;
             cursor: pointer;
-            color: #999;
+            color: #888;
             transition: color 0.3s ease;
         }
         .close-btn:hover {
-            color: #333;
+            color: #ffd700;
         }
         .notice .btn {
-            background-color: #6e44ff;
-            color: #fff;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
             padding: 12px 30px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 700;
             border-radius: 25px;
+            text-decoration: none;
             transition: all 0.3s ease;
+            display: inline-block;
         }
         .notice .btn:hover {
-            background-color: #5a00b5;
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
         @media (max-width: 1024px) {
             .hero-section h1 { font-size: 36px; }
@@ -312,31 +332,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
     <?php include 'inc/header.php'; ?>
     <?php include 'inc/navbar.php'; ?>
     <section class="hero-section">
-        <h1>Sign In to Task Tube</h1>
-        <p>Enter your email and password to access your account and start earning by watching video ads.</p>
+        <h1>Sign In to Illuminate Tube</h1>
+        <p>Enter your email and passcode to access your initiate account and start exploring vault archives.</p>
     </section>
     <div class="index-container">
-        <h2 class="section-title">Sign In</h2>
+        <h2 class="section-title">Initiate Sign In</h2>
         <div class="signin-content">
-            <h1>Welcome to <span>Task Tube</span></h1>
-            <p>Enter your email and password</p>
+            <h1>Welcome to <span>Illuminate Tube</span></h1>
+            <p>Enter your credentials to continue</p>
             <form id="signin-form" method="POST">
                 <input type="email" id="email" name="email" class="input-field" placeholder="Enter your email" required aria-label="Email input">
-                <input type="password" id="password" name="password" class="input-field" placeholder="Enter your password" required aria-label="Password input">
+                <input type="password" id="password" name="password" class="input-field" placeholder="Enter your passcode" required aria-label="Passcode input">
                 <button type="submit" class="submit-btn btn">Sign In</button>
             </form>
-            <p class="signin-link">Don't have an account? <a href="register.php">Sign Up</a></p>
+            <p class="signin-link">Not yet an initiate? <a href="register.php">Register Now</a></p>
         </div>
     </div>
     <section class="cta-banner">
-        <h2>Not Yet a Member?</h2>
-        <a href="register.php" class="btn" onclick="console.log('CTA button clicked')">Join Task Tube Now</a>
+        <h2>Not Yet an Initiate?</h2>
+        <a href="register.php" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Tube Now</a>
     </section>
     <div class="notice" id="notice">
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
-        <h2>Sign In to Task Tube</h2>
-        <p>Use your email and password to access your account. Don’t have one? Sign up today!</p>
-        <a href="register.php" class="btn" onclick="console.log('Notice button clicked')">Sign Up Now</a>
+        <h2>Access Illuminate Tube</h2>
+        <p>Use your email and passcode to access your initiate portal. Need an account? Register today!</p>
+        <a href="register.php" class="btn" onclick="console.log('Notice button clicked')">Register Now</a>
     </div>
     <?php include 'inc/footer.php'; ?>
     <script>
@@ -377,7 +397,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
         }
         window.addEventListener('load', showNotice);
 
-        // UPDATED: No more 8-character password requirement
         document.getElementById('signin-form').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -389,10 +408,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
                 return;
             }
             if (!password) {
-                Swal.fire({icon: 'error', title: 'Oops...', text: 'Please enter your password.'});
+                Swal.fire({icon: 'error', title: 'Oops...', text: 'Please enter your passcode.'});
                 return;
             }
-            // REMOVED: password.length < 8 check
 
             $.ajax({
                 url: './signin.php',
@@ -414,9 +432,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Login Failed',
-                            text: response.error || 'Invalid email or password',
-                            footer: '<a href="register.php">Need an account? Sign Up</a>'
+                            title: 'Access Denied',
+                            text: response.error || 'Invalid email or passcode',
+                            footer: '<a href="register.php">Need an account? Register here</a>'
                         });
                         document.getElementById('password').value = '';
                     }
