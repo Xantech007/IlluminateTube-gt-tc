@@ -1,6 +1,16 @@
 <?php
-session_start();
-require_once '../database/conn.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+ob_start();
+session_start([
+    'cookie_path' => '/',
+    'cookie_lifetime' => 86400,
+    'cookie_secure' => isset($_SERVER['HTTPS']),
+    'cookie_httponly' => true,
+]);
+error_log('Session ID in history.php: ' . session_id() . ', User ID: ' . ($_SESSION['user_id'] ?? 'not set'), 3, '../debug.log');
 
 // Set time zone to UTC
 date_default_timezone_set('UTC');
@@ -9,6 +19,17 @@ date_default_timezone_set('UTC');
 if (!isset($_SESSION['user_id'])) {
     error_log('No user_id in session, redirecting to signin', 3, '../debug.log');
     header('Location: ../signin.php');
+    ob_end_flush();
+    exit;
+}
+
+// Include database connection
+try {
+    require_once '../database/conn.php';
+} catch (Exception $e) {
+    error_log('Failed to include conn.php: ' . $e->getMessage(), 3, '../debug.log');
+    echo 'Failed to connect to database. Check logs for details.';
+    ob_end_flush();
     exit;
 }
 
@@ -21,15 +42,20 @@ try {
         error_log('User not found for ID: ' . $_SESSION['user_id'], 3, '../debug.log');
         session_destroy();
         header('Location: ../signin.php?error=user_not_found');
+        ob_end_flush();
         exit;
     }
     $username = htmlspecialchars($user['name']);
     $balance = number_format($user['balance'], 2);
     $user_country = htmlspecialchars($user['country']);
 } catch (PDOException $e) {
-    error_log('Database error: ' . $e->getMessage(), 3, '../debug.log');
-    session_destroy();
-    header('Location: ../signin.php?error=database');
+    error_log('Database error in history.php: ' . $e->getMessage(), 3, '../debug.log');
+    if (file_exists('../error.php')) {
+        include '../error.php';
+    } else {
+        echo 'Database error occurred: ' . htmlspecialchars($e->getMessage());
+    }
+    ob_end_flush();
     exit;
 }
 
@@ -56,7 +82,7 @@ try {
         error_log('No region settings found for country: ' . $user_country, 3, '../debug.log');
     }
 } catch (PDOException $e) {
-    error_log('Region settings fetch error for user ID: ' . $_SESSION['user_id'] . ': ' . $e->getMessage(), 3, '../debug.log');
+    error_log('Region settings fetch error in history.php: ' . $e->getMessage(), 3, '../debug.log');
     $ch_name = 'Bank Name';
     $ch_value = 'Bank Account';
     $channel_label = 'Bank';
@@ -80,7 +106,7 @@ try {
     $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
     error_log('Fetched ' . count($history) . ' history records for user ID: ' . $_SESSION['user_id'], 3, '../debug.log');
 } catch (PDOException $e) {
-    error_log('History fetch error: ' . $e->getMessage(), 3, '../debug.log');
+    error_log('History fetch error in history.php: ' . $e->getMessage(), 3, '../debug.log');
     $history = [];
 }
 ?>
@@ -91,48 +117,24 @@ try {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="View your activity and withdrawal history on Task Tube, including video watches and withdrawals." />
-    <meta name="keywords" content="Task Tube, history, activity log, withdrawals, earnings" />
-    <meta name="author" content="Task Tube" />
-    <title>History | Task Tube</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="View your activity and withdrawal history, including video watches and withdrawals." />
+    <title>History | Cash Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --bg-color: #f7f9fc;
-            --gradient-bg: linear-gradient(135deg, #f7f9fc, #e5e7eb);
-            --card-bg: #ffffff;
-            --text-color: #1a1a1a;
-            --subtext-color: #6b7280;
-            --border-color: #d1d5db;
-            --shadow-color: rgba(0, 0, 0, 0.1);
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --subtext-color: #9ca3af;
             --accent-color: #22c55e;
-            --accent-hover: #16a34a;
-            --menu-bg: #1a1a1a;
+            --menu-bg: rgba(17, 24, 39, 0.85);
             --menu-text: #ffffff;
             --status-completed: #22c55e;
             --status-pending: #eab308;
             --status-rejected: #ef4444;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #1f2937;
-            --gradient-bg: linear-gradient(135deg, #1f2937, #374151);
-            --card-bg: #2d3748;
-            --text-color: #e5e7eb;
-            --subtext-color: #9ca3af;
-            --border-color: #4b5563;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --accent-color: #34d399;
-            --accent-hover: #22c55e;
-            --menu-bg: #111827;
-            --menu-text: #e5e7eb;
-            --status-completed: #34d399;
-            --status-pending: #facc15;
-            --status-rejected: #f87171;
         }
 
         * {
@@ -142,98 +144,147 @@ try {
             font-family: 'Inter', sans-serif;
         }
 
-        body {
-            background: var(--bg-color);
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
             color: var(--text-color);
-            min-height: 100vh;
-            padding-bottom: 100px;
-            transition: all 0.3s ease;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px;
-            position: relative;
-        }
-
-        .header {
+        /* Fixed Header Overlay */
+        .top-header {
+            position: fixed;
+            top: 62px;
+            left: 0;
+            width: 100%;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 24px 0;
-            animation: slideIn 0.5s ease-out;
+            padding: 12px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+            pointer-events: none;
         }
 
-        .header img {
-            width: 64px;
-            height: 64px;
-            margin-right: 16px;
-            border-radius: 8px;
+        .top-header * {
+            pointer-events: auto;
         }
 
-        .header-text h1 {
-            font-size: 26px;
-            font-weight: 700;
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        .header-text p {
-            font-size: 16px;
-            color: var(--subtext-color);
-            margin-top: 4px;
+        .user-badge img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
         }
 
-        .theme-toggle {
-            background: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
+        .balance-badge {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid var(--accent-color);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 20px;
             font-size: 14px;
-            font-weight: 500;
-            transition: background 0.3s ease, transform 0.2s ease;
+            font-weight: 700;
+            color: #4ade80;
         }
 
-        .theme-toggle:hover {
-            background: var(--accent-hover);
-            transform: scale(1.02);
+        /* TikTok Style Fullscreen Feed Wrapper */
+        .tiktok-feed {
+            width: 100%;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .history-section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 6px 16px var(--shadow-color);
-            margin: 24px 0;
-            animation: slideIn 0.5s ease-out 0.6s backwards;
+        .tiktok-feed::-webkit-scrollbar {
+            display: none;
         }
 
-        .history-section h2 {
-            font-size: 24px;
-            font-weight: 600;
+        /* Individual Snap Slide Card */
+        .profile-card-slide {
+            width: 100%;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px 210px 20px;
+            background: radial-gradient(circle at center, #111827 0%, #000000 100%);
+        }
+
+        /* Card Container styling */
+        .card-inner {
+            width: 100%;
+            max-width: 550px;
+            max-height: calc(100vh - 290px);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-inner h2 {
+            font-size: 20px;
+            font-weight: 700;
             margin-bottom: 20px;
-            color: var(--accent-color);
+            text-align: center;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-shrink: 0;
         }
 
         .table-container {
-            max-width: 100%;
+            width: 100%;
             overflow-x: auto;
-            margin-top: 10px;
+            overflow-y: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .table-container::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
         }
 
         .history-table {
             width: 100%;
-            min-width: 1000px;
+            min-width: 480px;
             border-collapse: collapse;
-            font-size: 16px;
+            font-size: 13px;
         }
 
         .history-table th,
         .history-table td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .history-table th {
@@ -241,123 +292,114 @@ try {
             color: var(--subtext-color);
             position: sticky;
             top: 0;
-            background: var(--card-bg);
+            background: #111827;
             z-index: 1;
         }
 
         .history-table td {
-            font-weight: 500;
-            color: var(--text-color);
+            font-weight: 400;
+            color: #ffffff;
         }
 
         .history-table .amount {
             font-weight: 700;
-            color: var(--accent-color);
+            color: #4ade80;
         }
 
         .status-box {
             display: inline-block;
             padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 500;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
             color: #fff;
             text-align: center;
-            min-width: 80px;
         }
 
         .status-completed {
-            background-color: var(--status-completed);
+            background-color: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 1px solid #22c55e;
         }
 
         .status-pending {
-            background-color: var(--status-pending);
+            background-color: rgba(234, 179, 8, 0.2);
+            color: #facc15;
+            border: 1px solid #eab308;
         }
 
         .status-rejected {
-            background-color: var(--status-rejected);
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid #ef4444;
         }
 
+        .no-data {
+            text-align: center;
+            color: var(--subtext-color);
+            padding: 30px 10px;
+            font-size: 14px;
+        }
+
+        /* Notifications Toast */
         .notification {
             position: fixed;
-            top: 20px;
+            top: 70px;
             right: 20px;
-            background: var(--card-bg);
-            color: var(--text-color);
-            padding: 16px 24px;
+            background: rgba(17, 24, 39, 0.9);
+            color: #fff;
+            padding: 12px 20px;
             border-radius: 12px;
-            border: 2px solid var(--accent-color);
-            box-shadow: 0 4px 12px var(--shadow-color), 0 0 8px var(--accent-color);
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             z-index: 1000;
+            font-size: 13px;
             display: flex;
             align-items: center;
+            gap: 10px;
             animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-out 3s forwards;
-            max-width: 300px;
-            transition: transform 0.2s ease;
-        }
-
-        .notification:hover {
-            transform: scale(1.05);
-        }
-
-        .notification::before {
-            content: '🔒';
-            font-size: 1.2rem;
-            margin-right: 12px;
-            color: var(--accent-color);
-        }
-
-        .notification.error::before {
-            content: '⚠️';
-        }
-
-        .notification span {
-            font-size: 14px;
-            font-weight: 500;
         }
 
         @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
+            to { opacity: 0; transform: translateY(-20px); }
         }
 
+        /* Fixed Bottom Navigation */
         .bottom-menu {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             background: var(--menu-bg);
+            backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 14px 0;
-            box-shadow: 0 -2px 8px var(--shadow-color);
+            padding: 12px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
         }
 
         .bottom-menu a,
         .bottom-menu button {
             color: var(--menu-text);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            padding: 10px 18px;
+            padding: 6px 14px;
             transition: color 0.3s ease;
             background: none;
             border: none;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
         }
 
         .bottom-menu a.active,
@@ -365,184 +407,101 @@ try {
         .bottom-menu button:hover {
             color: var(--accent-color);
         }
-
-        #gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: var(--gradient-bg);
-            transition: all 0.3s ease;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-            }
-
-            .header-text h1 {
-                font-size: 22px;
-            }
-
-            .history-section {
-                padding: 20px;
-            }
-
-            .history-table {
-                font-size: 14px;
-            }
-
-            .status-box {
-                font-size: 12px;
-                padding: 3px 6px;
-                min-width: 70px;
-            }
-
-            .notification {
-                max-width: 250px;
-                right: 10px;
-                top: 10px;
-            }
-        }
     </style>
 </head>
 <body>
-    <div id="gradient"></div>
-    <div class="container" role="main">
-        <div class="header">
-            <div style="display: flex; align-items: center;">
-                <img src="img/top.png" alt="Task Tube Logo" aria-label="Task Tube Logo">
-                <div class="header-text">
-                    <h1>Activity History, <?php echo htmlspecialchars($username); ?>!</h1>
-                    <p>View your past actions and withdrawals.</p>
-                </div>
-            </div>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Toggle Dark Mode</button>
-        </div>
 
-        <div class="history-section">
-            <h2>Your Activity & Withdrawal History</h2>
-            <?php if ($history): ?>
-                <div class="table-container">
-                    <table class="history-table">
-                        <thead>
-                            <tr>
-                                <th>Action</th>
-                                <th>Details</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($history as $item): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($item['action']); ?></td>
-                                    <td>
-                                        <?php if ($item['source'] === 'withdrawal'): ?>
-                                            <?php echo htmlspecialchars($channel_label); ?>: <?php echo htmlspecialchars($item['channel']); ?><br>
-                                            <?php echo htmlspecialchars($ch_name); ?>: <?php echo htmlspecialchars($item['bank_name']); ?><br>
-                                            <?php echo htmlspecialchars($ch_value); ?>: <?php echo htmlspecialchars($item['bank_account']); ?><br>
-                                            Ref: <?php echo htmlspecialchars($item['ref_number']); ?>
-                                        <?php else: ?>
-                                            -
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="amount">
-                                        <?php
-                                        $currency = $item['source'] === 'withdrawal' && !empty($item['currency']) ? htmlspecialchars($item['currency']) : '$';
-                                        echo $currency . number_format($item['amount'], 2);
-                                        ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($item['source'] === 'withdrawal'): ?>
-                                            <?php
-                                            $status = $item['status'];
-                                            $display_status = $status === 'approved' ? 'Completed' : ($status === 'rejected' ? 'Rejected' : 'Pending');
-                                            $status_class = $status === 'approved' ? 'status-completed' : ($status === 'rejected' ? 'status-rejected' : 'status-pending');
-                                            error_log("Displaying withdrawal ID {$item['id']} with status: $display_status (raw: $status)", 3, '../debug.log');
-                                            ?>
-                                            <span class="status-box <?php echo $status_class; ?>">
-                                                <?php echo htmlspecialchars($display_status); ?>
-                                            </span>
-                                        <?php else: ?>
-                                            -
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?php echo gmdate('F j, Y, g:i A', strtotime($item['created_at'])) . ' UTC'; ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php else: ?>
-                <p>No activity or withdrawal history available.</p>
-            <?php endif; ?>
+    <!-- Header Overlay -->
+    <div class="top-header">
+        <div class="user-badge">
+            <img src="img/top.png" alt="Logo">
+            <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
         </div>
-
-        <div id="notificationContainer"></div>
+        <div class="balance-badge">
+            $<span id="balance"><?php echo $balance; ?></span>
+        </div>
     </div>
 
+    <!-- Scrollable TikTok Snap Feed -->
+    <div class="tiktok-feed" id="tiktokFeed">
+        
+        <!-- Slide 1: Activity & Withdrawal History -->
+        <div class="profile-card-slide">
+            <div class="card-inner">
+                <h2><i class="fa-solid fa-clock-rotate-left"></i> History Log</h2>
+                <?php if ($history): ?>
+                    <div class="table-container">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($history as $item): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($item['action']); ?></td>
+                                        <td>
+                                            <?php if ($item['source'] === 'withdrawal'): ?>
+                                                <strong><?php echo htmlspecialchars($channel_label); ?>:</strong> <?php echo htmlspecialchars($item['channel']); ?><br>
+                                                <strong><?php echo htmlspecialchars($ch_name); ?>:</strong> <?php echo htmlspecialchars($item['bank_name']); ?><br>
+                                                <strong><?php echo htmlspecialchars($ch_value); ?>:</strong> <?php echo htmlspecialchars($item['bank_account']); ?><br>
+                                                <small style="color: var(--subtext-color);">Ref: <?php echo htmlspecialchars($item['ref_number']); ?></small>
+                                            <?php else: ?>
+                                                -
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="amount">
+                                            <?php
+                                            $currency = $item['source'] === 'withdrawal' && !empty($item['currency']) ? htmlspecialchars($item['currency']) : '$';
+                                            echo $currency . number_format($item['amount'], 2);
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($item['source'] === 'withdrawal'): ?>
+                                                <?php
+                                                $status = $item['status'];
+                                                $display_status = $status === 'approved' ? 'Completed' : ($status === 'rejected' ? 'Rejected' : 'Pending');
+                                                $status_class = $status === 'approved' ? 'status-completed' : ($status === 'rejected' ? 'status-rejected' : 'status-pending');
+                                                ?>
+                                                <span class="status-box <?php echo $status_class; ?>">
+                                                    <?php echo htmlspecialchars($display_status); ?>
+                                                </span>
+                                            <?php else: ?>
+                                                -
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><small><?php echo gmdate('M j, Y H:i', strtotime($item['created_at'])) . ' UTC'; ?></small></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <p class="no-data"><i class="fa-solid fa-box-open" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>No activity or withdrawal history available.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="notificationContainer"></div>
+
+    <!-- Fixed Bottom Menu -->
     <div class="bottom-menu" role="navigation">
-        <a href="home.php">Home</a>
-        <a href="profile.php">Profile</a>
-        <a href="history.php" class="active">History</a>
-        <a href="support.php">Support</a>
-        <button id="logoutBtn" aria-label="Log out">Logout</button>
+        <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="profile.php"><i class="fa-solid fa-user"></i>Profile</a>
+        <a href="history.php" class="active"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
+        <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
+        <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
     </div>
 
     <script>
-        window.__lc = window.__lc || {};
-        window.__lc.license = 15808029;
-        (function(n, t, c) {
-            function i(n) { return e._h ? e._h.apply(null, n) : e._q.push(n) }
-            var e = {
-                _q: [], _h: null, _v: "2.0",
-                on: function() { i(["on", c.call(arguments)]) },
-                once: function() { i(["once", c.call(arguments)]) },
-                off: function() { i(["off", c.call(arguments)]) },
-                get: function() { if (!e._h) throw new Error("[LiveChatWidget] You can't use getters before load."); return i(["get", c.call(arguments)]) },
-                call: function() { i(["call", c.call(arguments)]) },
-                init: function() {
-                    var n = t.createElement("script");
-                    n.async = true;
-                    n.type = "text/javascript";
-                    n.src = "https://cdn.livechatinc.com/tracking.js";
-                    t.head.appendChild(n);
-                }
-            };
-            !n.__lc.asyncInit && e.init();
-            n.LiveChatWidget = n.LiveChatWidget || e;
-        })(window, document, [].slice);
-
-        // Dark Mode Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            body.setAttribute('data-theme', 'dark');
-            themeToggle.textContent = 'Toggle Light Mode';
-        }
-
-        themeToggle.addEventListener('click', () => {
-            const isDark = body.getAttribute('data-theme') === 'dark';
-            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            themeToggle.textContent = isDark ? 'Toggle Dark Mode' : 'Toggle Light Mode';
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        });
-
-        // Menu Interactions
-        const menuItems = document.querySelectorAll('.bottom-menu a');
-        menuItems.forEach((item) => {
-            item.addEventListener('click', () => {
-                menuItems.forEach((menuItem) => menuItem.classList.remove('active'));
-                item.classList.add('active');
-            });
-        });
-
-        // Logout Button
+        // Logout handling
         document.getElementById('logoutBtn').addEventListener('click', () => {
             Swal.fire({
                 title: 'Log out?',
@@ -561,27 +520,14 @@ try {
                         success: function(response) {
                             if (response.success) {
                                 window.location.href = '../signin.php';
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: 'Failed to log out. Please try again.'
-                                });
                             }
-                        },
-                        error: function() {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Server Error',
-                                text: 'An error occurred while logging out.'
-                            });
                         }
                     });
                 }
             });
         });
 
-        // Notification Handling
+        // Fetch Notifications
         const notificationContainer = document.getElementById('notificationContainer');
         function fetchNotifications() {
             $.ajax({
@@ -592,69 +538,23 @@ try {
                     notificationContainer.innerHTML = '';
                     notifications.forEach((message, index) => {
                         const notification = document.createElement('div');
-                        notification.className = `notification ${message.type || 'success'}`;
-                        notification.setAttribute('role', 'alert');
+                        notification.className = 'notification';
                         notification.innerHTML = `<span>${message.text}</span>`;
                         notificationContainer.appendChild(notification);
-                        notification.style.top = `${20 + index * 80}px`;
+                        notification.style.top = `${70 + index * 60}px`;
                         setTimeout(() => notification.remove(), 3500);
                     });
-                },
-                error: function() {
-                    console.error('Failed to fetch notifications');
                 }
             });
         }
-
         fetchNotifications();
         setInterval(fetchNotifications, 20000);
 
-        // Gradient Animation
-        var colors = [
-            [62, 35, 255],
-            [60, 255, 60],
-            [255, 35, 98],
-            [45, 175, 230],
-            [255, 0, 255],
-            [255, 128, 0]
-        ];
-        var step = 0;
-        var colorIndices = [0, 1, 2, 3];
-        var gradientSpeed = 0.002;
-        const gradientElement = document.getElementById('gradient');
-
-        function updateGradient() {
-            var c0_0 = colors[colorIndices[0]];
-            var c0_1 = colors[colorIndices[1]];
-            var c1_0 = colors[colorIndices[2]];
-            var c1_1 = colors[colorIndices[3]];
-            var istep = 1 - step;
-            var r1 = Math.round(istep * c0_0[0] + step * c0_1[0]);
-            var g1 = Math.round(istep * c0_0[1] + step * c0_1[1]);
-            var b1 = Math.round(istep * c0_0[2] + step * c0_1[2]);
-            var color1 = `rgb(${r1},${g1},${b1})`;
-            var r2 = Math.round(istep * c1_0[0] + step * c1_1[0]);
-            var g2 = Math.round(istep * c1_0[1] + step * c1_1[1]);
-            var b2 = Math.round(istep * c1_0[2] + step * c1_1[2]);
-            var color2 = `rgb(${r2},${g2},${b2})`;
-            gradientElement.style.background = `linear-gradient(135deg, ${color1}, ${color2})`;
-            step += gradientSpeed;
-            if (step >= 1) {
-                step %= 1;
-                colorIndices[0] = colorIndices[1];
-                colorIndices[2] = colorIndices[3];
-                colorIndices[1] = (colorIndices[1] + Math.floor(1 + Math.random() * (colors.length - 1))) % colors.length;
-                colorIndices[3] = (colorIndices[3] + Math.floor(1 + Math.random() * (colors.length - 1))) % colors.length;
-            }
-            requestAnimationFrame(updateGradient);
-        }
-
-        requestAnimationFrame(updateGradient);
-
-        // Context Menu Disable
+        // Disable Context Menu
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
         });
     </script>
 </body>
 </html>
+<?php ob_end_flush(); ?>
