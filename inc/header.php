@@ -6,7 +6,7 @@
     <div class="header-container">
         <div class="logo">
             <a href="index.php">
-                <img src="img/palmpay.webp" alt="Task Tube Logo">
+                <img src="img/palmpay.webp" alt="Illuminate Tube Logo">
             </a>
         </div>
         <button id="hamburger-menu" data-toggle="ham-navigation" class="hamburger-menu-button">
@@ -19,7 +19,7 @@
 <div id="notification-container">
     <div id="notification-popup" class="notification-popup">
         <div id="notification-content" class="notification-content">
-            <i class="fas fa-dollar-sign"></i>
+            <i class="fas fa-coins"></i>
             <p id="notification-message"></p>
         </div>
     </div>
@@ -32,8 +32,9 @@
         left: 0;
         right: 0;
         width: 100%;
-        background: #fff;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background: #141414;
+        border-bottom: 1px solid #333;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         padding: 15px 20px;
         z-index: 1000;
     }
@@ -58,20 +59,21 @@
     .hamburger-menu-button {
         width: 40px;
         height: 40px;
-        background: #6e44ff;
-        border: 3px solid #fff;
+        background: linear-gradient(45deg, #d4af37, #ffd700);
+        border: 2px solid #000;
         border-radius: 50%;
         cursor: pointer;
         position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
     }
 
     .hamburger-menu-button span {
         width: 20px;
         height: 2px;
-        background: #fff;
+        background: #000;
         position: absolute;
         transition: all 0.3s ease;
     }
@@ -81,7 +83,7 @@
         content: '';
         width: 20px;
         height: 2px;
-        background: #fff;
+        background: #000;
         position: absolute;
         transition: all 0.3s ease;
     }
@@ -110,9 +112,10 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        background: linear-gradient(135deg, #28a745, #20c997);
+        background: linear-gradient(135deg, #141414, #1a1a1a);
+        border: 1px solid #d4af37;
         border-radius: 12px;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
         padding: 15px 20px;
         max-width: 320px;
         width: 100%;
@@ -123,7 +126,7 @@
         z-index: 1001;
         display: flex;
         align-items: center;
-        color: #fff;
+        color: #e0e0e0;
     }
 
     .notification-popup.notification-show {
@@ -133,15 +136,16 @@
     }
 
     .notification-content {
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 500;
         display: flex;
         align-items: center;
     }
 
     .notification-content i {
-        margin-right: 10px;
-        font-size: 20px;
+        margin-right: 12px;
+        font-size: 18px;
+        color: #ffd700;
     }
 
     @media (max-width: 768px) {
@@ -171,18 +175,14 @@
     let isNotificationShowing = false;
     const delay = 7000;
     const messages = [
-        "@Alex earned $150.00 from video ads! 19min ago",
-        "@Jame earned $50.00 from video ads! 20min ago",
-        "@Gloria earned $200.00 from video ads! 53min ago",
-        "@Sophie earned $75.00 from video ads! 1hr ago",
-        "@Mark earned $120.00 from video ads! 2hrs ago"
+        "@Alex unlocked vault access & earned $150.00! 19min ago",
+        "@Jame completed initiation reward $50.00! 20min ago",
+        "@Gloria accessed archive & earned $200.00! 53min ago",
+        "@Sophie received initiate payload $75.00! 1hr ago",
+        "@Mark unlocked vault tier $120.00! 2hrs ago"
     ];
 
     function showNotification(message) {
-        const notificationPopup = document.getElementById("notification-popup");
-        const messageElement = document.getElementById("notification-message");
-        messageElement.textContent = message;
-
         notificationQueue.push(message);
         if (!isNotificationShowing) {
             showNextNotification();
