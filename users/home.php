@@ -142,7 +142,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Fixed Top Floating Header (Positioned below translate bar) */
         .top-header {
             position: fixed;
-            top: 55px;
+            top: 60px;
             left: 0;
             width: 100%;
             z-index: 100;
