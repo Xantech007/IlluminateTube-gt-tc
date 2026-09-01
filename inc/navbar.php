@@ -1,3 +1,6 @@
+<?php
+// navbar.php
+?>
 <style>
     .ham-menu {
         position: fixed;
@@ -121,26 +124,14 @@
 
 <nav id="ham-navigation" class="ham-menu">
     <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="terms.html">Terms</a></li>
-        <li><a href="privacy.html">Privacy</a></li>
+        <li><a href="index.php">Home</a></li>
+        <li><a href="about.php">About</a></li>
+        <li><a href="contact.php">Contact</a></li>
+        <li><a href="terms.php">Terms</a></li>
+        <li><a href="privacy.php">Privacy</a></li>
     </ul>
 
-    <!-- Language Translator Container -->
-    <div id="translate-container"></div>
-</nav>
+    <!-- Language Translator -->
+    <?php include('translate.php'); ?>
 
-<script>
-    // Fetch translate.html component dynamically
-    fetch('inc/translate.html')
-        .then(response => {
-            if (response.ok) return response.text();
-            throw new Error('Failed to load translate component');
-        })
-        .then(html => {
-            document.getElementById('translate-container').innerHTML = html;
-        })
-        .catch(error => console.error(error));
-</script>
+</nav>
