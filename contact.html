@@ -1,40 +1,12 @@
-<?php
-// contact.php
-require_once 'database/conn.php';
-
-// Fetch Telegram username from c_support table
-$telegram_raw = '';
-$telegram_clean = '';
-try {
-    $stmt = $pdo->prepare("SELECT telegram FROM c_support LIMIT 1");
-    $stmt->execute();
-    $support_data = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($support_data && !empty($support_data['telegram'])) {
-        $telegram_raw = trim($support_data['telegram']);
-        // Strip out '@' or URL protocol prefixes if present for valid t.me link
-        $telegram_clean = ltrim($telegram_raw, '@');
-        $telegram_clean = str_replace(['https://t.me/', 'http://t.me/'], '', $telegram_clean);
-    }
-} catch (PDOException $e) {
-    error_log('Telegram support username fetch error in contact.php: ' . $e->getMessage(), 3, 'debug.log');
-}
-
-// Fallback in case table/record is not set yet
-if (empty($telegram_raw)) {
-    $telegram_raw = '@IlluminateTubeSupport';
-    $telegram_clean = 'IlluminateTubeSupport';
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Contact Illuminate Tube's elite support team 24/7 via Telegram for assistance with your account, login, or secret archive inquiries.">
-    <meta name="keywords" content="Illuminate Tube, contact support, Illuminati videos, elite rewards, crypto payouts, customer service">
-    <meta name="author" content="Illuminate Tube">
-    <title>Illuminate Tube - Contact Us</title>
+    <meta name="description" content="Contact Illuminate Task Tube's elite support team 24/7 via Telegram for assistance with your account, login, or secret archive inquiries.">
+    <meta name="keywords" content="Illuminate Task Tube, contact support, Illuminati videos, elite rewards, crypto payouts, customer service">
+    <meta name="author" content="Illuminate Task Tube">
+    <title>Illuminate Task Tube - Contact Us</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -54,6 +26,86 @@ if (empty($telegram_raw)) {
             color: #e0e0e0;
             padding-top: 80px; /* Matches header height */
             padding-bottom: 100px; /* Matches footer height */
+        }
+
+        /* Header Component */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: #141414;
+            border-bottom: 1px solid #d4af37;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .site-header .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #ffd700;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .site-header .logo i {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        /* Google Translate Element Wrapper */
+        #google_translate_element {
+            margin-left: auto;
+            margin-right: 15px;
+        }
+
+        /* Navbar / Bottom Navigation Component */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: #141414;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav .ham-menu ul {
+            display: flex;
+            list-style: none;
+            width: 100vw;
+            justify-content: space-around;
+            padding: 0;
+            margin: 0;
+        }
+
+        .bottom-nav .ham-menu ul li a {
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .bottom-nav .ham-menu ul li a i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .bottom-nav .ham-menu ul li.active a,
+        .bottom-nav .ham-menu ul li a:hover {
+            color: #ffd700;
         }
 
         /* Hero Section */
@@ -299,6 +351,22 @@ if (empty($telegram_raw)) {
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
 
+        /* Site Footer Component */
+        .site-footer {
+            background-color: #080808;
+            border-top: 1px solid #222;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        .site-footer a {
+            color: #d4af37;
+            text-decoration: none;
+        }
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .hero-section h1 {
@@ -387,12 +455,61 @@ if (empty($telegram_raw)) {
     </style>
 </head>
 <body>
-    <?php include 'inc/header.php'; ?>
-    <?php include 'inc/navbar.php'; ?>
+
+    <!-- Hardcoded header.html & translate.html -->
+    <header class="site-header">
+        <a href="index.html" class="logo">
+            <i class="fa-solid fa-eye"></i> Illuminate Tube
+        </a>
+        
+        <!-- Translate Component -->
+        <div id="google_translate_element"></div>
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en',
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                }, 'google_translate_element');
+            }
+        </script>
+        <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    </header>
+
+    <!-- Hardcoded navbar.html -->
+    <nav class="bottom-nav">
+        <div class="ham-menu">
+            <ul>
+                <li>
+                    <a href="index.html">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="about.html">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>About</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="tasks.html">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Tasks</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="register.html">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Register</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <h1>Contact Illuminate Tube</h1>
+        <h1>Contact Illuminate Task Tube</h1>
         <p>Reach out to our 24/7 elite support team via Telegram for help with your account, vault access, or general inquiries!</p>
     </section>
 
@@ -401,7 +518,7 @@ if (empty($telegram_raw)) {
         <h2 class="section-title">Get in Touch</h2>
         <div class="contact-content">
             <p>
-                We're here to assist you with any questions or issues you may have! At Illuminate Tube, our dedicated support team is available 24/7. Whether you need help with your initiate account, access code issues, or reward payout inquiries, feel free to reach out.
+                We're here to assist you with any questions or issues you may have! At Illuminate Task Tube, our dedicated support team is available 24/7. Whether you need help with your initiate account, access code issues, or reward payout inquiries, feel free to reach out.
             </p>
 
             <div class="contact-info">
@@ -409,8 +526,8 @@ if (empty($telegram_raw)) {
                 <p>
                     <i class="fab fa-telegram"></i> Telegram Contact: 
                     <strong>
-                        <a href="https://t.me/<?php echo $telegram_clean; ?>" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
-                            <?php echo htmlspecialchars($telegram_raw); ?>
+                        <a href="https://t.me/IlluminateTubeSupport" onclick="openTelegram(event, 'https://t.me/IlluminateTubeSupport')">
+                            @IlluminateTubeSupport
                         </a>
                     </strong>
                 </p>
@@ -428,7 +545,7 @@ if (empty($telegram_raw)) {
             </div>
 
             <p class="signup-link">
-                Not yet a member? <a href="register.php" class="btn">Sign Up Now</a>
+                Not yet a member? <a href="register.html" class="btn">Sign Up Now</a>
             </p>
         </div>
     </div>
@@ -436,7 +553,7 @@ if (empty($telegram_raw)) {
     <!-- CTA Banner -->
     <section class="cta-banner">
         <h2>Need Assistance? Contact Us Now!</h2>
-        <a href="https://t.me/<?php echo $telegram_clean; ?>" class="btn" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
+        <a href="https://t.me/IlluminateTubeSupport" class="btn" onclick="openTelegram(event, 'https://t.me/IlluminateTubeSupport')">
             Message Us on Telegram
         </a>
     </section>
@@ -444,14 +561,17 @@ if (empty($telegram_raw)) {
     <!-- Notice Popup -->
     <div class="notice" id="notice">
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
-        <h2>Contact Illuminate Tube</h2>
+        <h2>Contact Illuminate Task Tube</h2>
         <p>Need assistance? Our support team is here to help you 24/7 via Telegram. Reach out today to get started or resolve any issues!</p>
-        <a href="https://t.me/<?php echo $telegram_clean; ?>" class="btn" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
+        <a href="https://t.me/IlluminateTubeSupport" class="btn" onclick="openTelegram(event, 'https://t.me/IlluminateTubeSupport')">
             Message Us
         </a>
     </div>
 
-    <?php include 'inc/footer.php'; ?>
+    <!-- Hardcoded footer.html -->
+    <footer class="site-footer">
+        <p>&copy; 2026 Illuminate Task Tube. All Rights Reserved.</p>
+    </footer>
 
     <!-- LiveChat Script -->
     <script>
@@ -487,7 +607,7 @@ if (empty($telegram_raw)) {
             const currentPath = window.location.pathname.split('/').pop();
             const links = document.querySelectorAll('.ham-menu ul li a');
             links.forEach(link => {
-                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.php')) {
+                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.html')) {
                     link.parentElement.classList.add('active');
                 }
             });
@@ -508,7 +628,7 @@ if (empty($telegram_raw)) {
                 setTimeout(() => {
                     notice.style.display = 'block';
                     setNoticeShown();
-                }, 2000); // Match index.php timing
+                }, 2000);
             }
         }
 
