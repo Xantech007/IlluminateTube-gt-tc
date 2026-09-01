@@ -139,17 +139,17 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             color: var(--text-color);
         }
 
-        /* Fixed Top Floating Header (Increased distance from top) */
+        /* Fixed Top Floating Header (Positioned below translate bar) */
         .top-header {
             position: fixed;
-            top: 20px;
+            top: 55px;
             left: 0;
             width: 100%;
             z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 20px;
+            padding: 12px 20px;
             background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
             pointer-events: none;
         }
@@ -218,7 +218,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             object-fit: cover;
         }
 
-        /* Sidebar Action Icons (Further increased bottom spacing) */
+        /* Sidebar Action Icons */
         .actions-sidebar {
             position: absolute;
             right: 16px;
@@ -262,7 +262,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             font-weight: 600;
         }
 
-        /* Bottom Info Overlay (Further increased bottom height) */
+        /* Bottom Info Overlay */
         .video-overlay-info {
             position: absolute;
             bottom: 170px;
@@ -312,10 +312,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             100% { opacity: 0; transform: translate(-50%, -80%) scale(1); }
         }
 
-        /* Notification Toast (Adjusted top position to match header) */
+        /* Notification Toast (Adjusted top position) */
         .notification {
             position: fixed;
-            top: 90px;
+            top: 125px;
             right: 20px;
             background: rgba(17, 24, 39, 0.9);
             color: #fff;
@@ -392,7 +392,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 </head>
 <body>
 
-    <!-- Fixed Header -->
+    <!-- Fixed Header (Positioned below translate bar) -->
     <div class="top-header">
         <div class="user-badge">
             <img src="img/top.png" alt="Logo">
@@ -712,7 +712,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                         notification.className = 'notification';
                         notification.innerHTML = `<span>${message.text}</span>`;
                         notificationContainer.appendChild(notification);
-                        notification.style.top = `${90 + index * 60}px`;
+                        notification.style.top = `${125 + index * 60}px`;
                         setTimeout(() => notification.remove(), 3500);
                     });
                 }
