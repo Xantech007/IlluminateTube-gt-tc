@@ -2,6 +2,12 @@
 // inc/header.php
 ?>
 
+<!-- PWA Manifest & Meta Tags -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#141414">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 <header>
     <div class="header-container">
         <div class="logo">
@@ -9,9 +15,16 @@
                 <img src="img/palmpay.webp" alt="Illuminate Tube Logo">
             </a>
         </div>
-        <button id="hamburger-menu" data-toggle="ham-navigation" class="hamburger-menu-button">
-            <span></span>
-        </button>
+        
+        <div class="header-actions">
+            <!-- PWA Install Button (Hidden by default) -->
+            <button id="pwa-install-btn" class="pwa-install-btn" style="display: none;">
+                <i class="fas fa-download"></i> Install App
+            </button>
+            <button id="hamburger-menu" data-toggle="ham-navigation" class="hamburger-menu-button">
+                <span></span>
+            </button>
+        </div>
     </div>
 </header>
 
@@ -45,6 +58,34 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* PWA Install Button Styles */
+    .pwa-install-btn {
+        background: linear-gradient(45deg, #d4af37, #ffd700);
+        color: #000;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .pwa-install-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
     }
 
     .logo img {
@@ -158,6 +199,40 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch((err) => {
+                console.log('Service Worker registration failed:', err);
+            });
+        });
+    }
+
+    // PWA Install Prompt Logic
+    let deferredPrompt;
+    const installBtn = document.getElementById('pwa-install-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = 'flex';
+    });
+
+    installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            installBtn.style.display = 'none';
+        }
+        deferredPrompt = null;
+    });
+
+    window.addEventListener('appinstalled', () => {
+        installBtn.style.display = 'none';
+        deferredPrompt = null;
+    });
+
     // Hamburger Menu
     const button = document.getElementById('hamburger-menu');
     button.addEventListener('click', function() {
