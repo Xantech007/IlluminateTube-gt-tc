@@ -575,12 +575,15 @@
     </style>
 </head>
 <body>
+    <!-- Dynamically loaded header and navbar components -->
+    <div id="header-container"></div>
+    <div id="navbar-container"></div>
 
     <!-- Hero Section -->
     <section class="hero-section">
         <h1>Unlock Wealth with Illuminate Tube</h1>
         <p>Step into the circle of enlightenment. Watch exclusive Illuminati-related videos and secret archives to unlock high-tier monetary rewards and passive wealth!</p>
-        <div class="button-group">
+        <div class="button-group" id="hero-button-group">
             <a href="register.html" class="btn btn-register" onclick="console.log('Register button clicked')">Get Started</a>
             <a href="signin.html" class="btn btn-signin" onclick="console.log('Sign In button clicked')">Sign In</a>
         </div>
@@ -705,7 +708,9 @@
     <!-- CTA Banner -->
     <section class="cta-banner">
         <h2>Unveil the Mysteries & Claim Your Rewards</h2>
-        <a href="register.html" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Tube Now</a>
+        <div id="cta-button-container">
+            <a href="register.html" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Tube Now</a>
+        </div>
     </section>
 
     <!-- Notice Popup -->
@@ -713,8 +718,13 @@
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
         <h2>Welcome to Illuminate Tube</h2>
         <p>Unlock access to Illuminati secret videos and earn premium rewards today. Enter the portal now!</p>
-        <a href="register.html" class="btn btn-register" onclick="console.log('Notice button clicked')">Get Started</a>
+        <div id="notice-button-container">
+            <a href="register.html" class="btn btn-register" onclick="console.log('Notice button clicked')">Get Started</a>
+        </div>
     </div>
+
+    <!-- Dynamically loaded footer component -->
+    <div id="footer-container"></div>
 
     <!-- LiveChat Script -->
     <script>
@@ -725,15 +735,56 @@
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
     <script>
+        // Fetch external HTML templates into containers
+        async function loadIncludes() {
+            try {
+                const [headerRes, navbarRes, footerRes] = await Promise.all([
+                    fetch('inc/header.html'),
+                    fetch('inc/navbar.html'),
+                    fetch('inc/footer.html')
+                ]);
+
+                if (headerRes.ok) {
+                    document.getElementById('header-container').innerHTML = await headerRes.text();
+                }
+                if (navbarRes.ok) {
+                    document.getElementById('navbar-container').innerHTML = await navbarRes.text();
+                }
+                if (footerRes.ok) {
+                    document.getElementById('footer-container').innerHTML = await footerRes.text();
+                }
+
+                setActiveNavLink();
+            } catch (error) {
+                console.error('Error fetching include files:', error);
+            }
+        }
+
         // Set Active Navbar Link
-        document.addEventListener('DOMContentLoaded', function() {
+        function setActiveNavLink() {
             const currentPath = window.location.pathname.split('/').pop();
             const links = document.querySelectorAll('.ham-menu ul li a');
             links.forEach(link => {
-                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.html')) {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (currentPath === '' && href === 'index.html')) {
                     link.parentElement.classList.add('active');
                 }
             });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadIncludes();
+
+            // Client-side Session Handling simulation using localStorage/cookies
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (isLoggedIn) {
+                document.getElementById('hero-button-group').innerHTML = 
+                    '<a href="users/home.html" class="btn btn-dashboard" onclick="console.log(\'Dashboard button clicked\')">Dashboard</a>';
+                document.getElementById('cta-button-container').innerHTML = 
+                    '<a href="users/home.html" class="btn" onclick="console.log(\'Dashboard CTA clicked\')">Go to Dashboard</a>';
+                document.getElementById('notice-button-container').innerHTML = 
+                    '<a href="users/home.html" class="btn btn-dashboard" onclick="console.log(\'Notice dashboard clicked\')">Go to Dashboard</a>';
+            }
         });
 
         // Notice Popup
