@@ -265,7 +265,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Bottom Info Overlay */
         .video-overlay-info {
             position: absolute;
-            bottom: 170px;
+            bottom: 200px;
             left: 16px;
             right: 80px;
             z-index: 10;
