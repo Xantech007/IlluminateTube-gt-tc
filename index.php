@@ -8,10 +8,10 @@ session_start(); // Start session to check user login status
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Unlock exclusive rewards by watching Illuminati secret archives and elite videos with Illuminate Tube. Join our elite platform today!">
-    <meta name="keywords" content="Illuminate Tube, Illuminati videos, watch and earn, secret knowledge, elite rewards, crypto earnings">
-    <meta name="author" content="Illuminate Tube">
-    <title>Illuminate Tube - Unlock Rewards Watching Exclusive Content</title>
+    <meta name="description" content="Unlock exclusive rewards by watching Illuminati secret archives and elite videos with Illuminate Task Tube. Join our elite platform today!">
+    <meta name="keywords" content="Illuminate Task Tube, Illuminati videos, watch and earn, secret knowledge, elite rewards, crypto earnings">
+    <meta name="author" content="Illuminate Task Tube">
+    <title>Illuminate Task Tube - Unlock Rewards Watching Exclusive Content</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -585,7 +585,7 @@ session_start(); // Start session to check user login status
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <h1>Unlock Wealth with Illuminate Tube</h1>
+        <h1>Unlock Wealth with Illuminate Task Tube</h1>
         <p>Step into the circle of enlightenment. Watch exclusive Illuminati-related videos and secret archives to unlock high-tier monetary rewards and passive wealth!</p>
         <div class="button-group">
             <?php if (isset($_SESSION['user_id'])): ?>
@@ -599,7 +599,7 @@ session_start(); // Start session to check user login status
 
     <!-- How It Works Section -->
     <div class="index-container how-it-works">
-        <h2 class="section-title">How Illuminate Tube Works</h2>
+        <h2 class="section-title">How Illuminate Task Tube Works</h2>
         <div class="steps">
             <div class="step-card">
                 <i class="fas fa-eye"></i>
@@ -621,7 +621,7 @@ session_start(); // Start session to check user login status
 
     <!-- Features Section -->
     <div class="index-container">
-        <h2 class="section-title">Why Join Illuminate Tube?</h2>
+        <h2 class="section-title">Why Join Illuminate Task Tube?</h2>
         <div class="features">
             <div class="feature-card">
                 <i class="fas fa-crown"></i>
@@ -671,7 +671,7 @@ session_start(); // Start session to check user login status
         <div class="testimonial-grid">
             <div class="testimonial-card">
                 <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="Sarah M.">
-                <p>"Illuminate Tube granted me access to incredible content while generating solid daily rewards!"</p>
+                <p>"Illuminate Task Tube granted me access to incredible content while generating solid daily rewards!"</p>
                 <h4>Sarah M.</h4>
                 <span>Initiate Member</span>
             </div>
@@ -695,7 +695,7 @@ session_start(); // Start session to check user login status
         <h2 class="section-title">Frequently Asked Questions</h2>
         <div class="faq-grid">
             <div class="faq-item">
-                <h3>How do I start earning with Illuminate Tube?</h3>
+                <h3>How do I start earning with Illuminate Task Tube?</h3>
                 <p>Sign up using your email and passcode, log into the portal, and begin watching Illuminati-related videos to claim rewards instantly.</p>
             </div>
             <div class="faq-item">
@@ -707,7 +707,7 @@ session_start(); // Start session to check user login status
                 <p>Rewards are processed through our encrypted payout pipeline straight to your preferred wallet address.</p>
             </div>
             <div class="faq-item">
-                <h3>Is Illuminate Tube secure?</h3>
+                <h3>Is Illuminate Task Tube secure?</h3>
                 <p>We maintain end-to-end security protocol to shield user activity. Review our <a href="privacy.php" style="color: #ffd700;">Privacy Policy</a> for full details.</p>
             </div>
         </div>
@@ -719,14 +719,14 @@ session_start(); // Start session to check user login status
         <?php if (isset($_SESSION['user_id'])): ?>
             <a href="users/home.php" class="btn" onclick="console.log('Dashboard CTA clicked')">Go to Dashboard</a>
         <?php else: ?>
-            <a href="register.php" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Tube Now</a>
+            <a href="register.php" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Task Tube Now</a>
         <?php endif; ?>
     </section>
 
     <!-- Notice Popup -->
     <div class="notice" id="notice">
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
-        <h2>Welcome to Illuminate Tube</h2>
+        <h2>Welcome to Illuminate Task Tube</h2>
         <p>Unlock access to Illuminati secret videos and earn premium rewards today. Enter the portal now!</p>
         <?php if (isset($_SESSION['user_id'])): ?>
             <a href="users/home.php" class="btn btn-dashboard" onclick="console.log('Notice dashboard clicked')">Go to Dashboard</a>
