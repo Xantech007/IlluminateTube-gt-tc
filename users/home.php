@@ -14,6 +14,32 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Initialize session trackers for live session earnings & watched videos
+if (!isset($_SESSION['session_earnings'])) {
+    $_SESSION['session_earnings'] = 0.00;
+}
+if (!isset($_SESSION['watched_videos'])) {
+    $_SESSION['watched_videos'] = [];
+}
+
+// Handle AJAX update endpoint for session balance persistence
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_session_reward') {
+    $v_id = intval($_POST['video_id']);
+    $reward = floatval($_POST['reward']);
+    
+    if (!in_array($v_id, $_SESSION['watched_videos'])) {
+        $_SESSION['watched_videos'][] = $v_id;
+        $_SESSION['session_earnings'] += $reward;
+    }
+    
+    echo json_encode([
+        'status' => 'success', 
+        'session_earnings' => $_SESSION['session_earnings'],
+        'watched_videos' => $_SESSION['watched_videos']
+    ]);
+    exit;
+}
+
 // Fetch user data
 try {
     $stmt = $pdo->prepare("
@@ -30,7 +56,9 @@ try {
         exit;
     }
     $username = htmlspecialchars($user['name']);
-    $balance = number_format($user['balance'], 2);
+    $db_balance = floatval($user['balance']);
+    // Total displayed balance includes database balance plus accumulated session earnings
+    $total_display_balance = number_format($db_balance + $_SESSION['session_earnings'], 2);
     $verification_status = $user['verification_status'];
     $user_country = htmlspecialchars($user['country']);
     $upgrade_status = $user['upgrade_status'] ?? 'not_upgraded';
@@ -65,7 +93,7 @@ function url_exists($url) {
     return ['status' => true];
 }
 
-// Fetch up to 10 unwatched videos along with their likes count
+// Fetch up to 10 videos along with their likes count
 $videos = [];
 $video_error = null;
 
@@ -139,7 +167,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             color: var(--text-color);
         }
 
-        /* Fixed Top Floating Header (Positioned below translate bar) */
+        /* Fixed Top Floating Header */
         .top-header {
             position: fixed;
             top: 62px;
@@ -192,6 +220,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             height: 100vh;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
         }
 
@@ -222,7 +251,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         .actions-sidebar {
             position: absolute;
             right: 16px;
-            bottom: 200px;
+            bottom: 225px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -265,7 +294,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Bottom Info Overlay */
         .video-overlay-info {
             position: absolute;
-            bottom: 200px;
+            bottom: 195px;
             left: 16px;
             right: 80px;
             z-index: 10;
@@ -290,6 +319,23 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             font-weight: 700;
         }
 
+        /* Watched Badge Style */
+        .watched-badge {
+            display: none;
+            background: rgba(34, 197, 94, 0.9);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-top: 6px;
+            align-self: flex-start;
+        }
+
+        .video-card.is-watched .watched-badge {
+            display: inline-block;
+        }
+
         /* Floating Double Tap Heart FX */
         .heart-animation {
             position: absolute;
@@ -312,7 +358,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             100% { opacity: 0; transform: translate(-50%, -80%) scale(1); }
         }
 
-        /* Notification Toast (Adjusted top position) */
+        /* Notification Toast */
         .notification {
             position: fixed;
             top: 125px;
@@ -392,14 +438,14 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 </head>
 <body>
 
-    <!-- Fixed Header (Positioned below translate bar) -->
+    <!-- Fixed Header -->
     <div class="top-header">
         <div class="user-badge">
             <img src="img/top.png" alt="Logo">
             <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
         </div>
         <div class="balance-badge">
-            $<span id="balance"><?php echo $balance; ?></span>
+            $<span id="balance"><?php echo $total_display_balance; ?></span>
         </div>
     </div>
 
@@ -420,7 +466,8 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     <div class="tiktok-feed" id="tiktokFeed">
         <?php if (!empty($videos)): ?>
             <?php foreach ($videos as $index => $vid): ?>
-                <div class="video-card" data-index="<?php echo $index; ?>">
+                <?php $is_already_watched = in_array($vid['id'], $_SESSION['watched_videos']); ?>
+                <div class="video-card <?php echo $is_already_watched ? 'is-watched' : ''; ?>" data-index="<?php echo $index; ?>">
                     <video 
                         class="feed-video" 
                         playsinline 
@@ -431,7 +478,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                         <source src="<?php echo htmlspecialchars($vid['url']); ?>" type="video/mp4">
                     </video>
 
-                    <!-- Side Action Buttons (Like, Earn, Share) -->
+                    <!-- Side Action Buttons -->
                     <div class="actions-sidebar">
                         <button class="action-btn like-btn" aria-label="Like video">
                             <i class="fa-solid fa-heart"></i>
@@ -449,10 +496,11 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                         </button>
                     </div>
 
-                    <!-- Video Details overlay -->
+                    <!-- Video Details Overlay -->
                     <div class="video-overlay-info">
                         <h3><?php echo htmlspecialchars($vid['title']); ?></h3>
                         <p>Watch full ad to earn <span>+$<?php echo number_format($vid['reward'], 2); ?></span> crypto directly to your balance.</p>
+                        <div class="watched-badge"><i class="fa-solid fa-circle-check"></i> Video Watched</div>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -476,47 +524,33 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     </div>
 
     <script>
-        // Helper function to format numbers into compact strings (e.g. 1000 => 1k, 2400 => 2.4k)
         function formatLikes(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-            }
-            if (num >= 1000) {
-                return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-            }
+            if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
             return num.toString();
         }
 
-        // Initialize display of shortened likes
         document.querySelectorAll('.like-count').forEach(span => {
             const rawLikes = parseInt(span.getAttribute('data-likes')) || 0;
             span.textContent = formatLikes(rawLikes);
         });
 
-        const initialBalance = parseFloat(document.getElementById('balance').textContent);
+        // Parse initial persistent base total rendered from PHP backend
+        const initialDisplayBalance = parseFloat(document.getElementById('balance').textContent);
         const feed = document.getElementById('tiktokFeed');
         const cards = document.querySelectorAll('.video-card');
-        let currentVideo = null;
         let watchTimer = null;
         let currentVideoProgress = 0;
 
-        // Local Storage for storing earned rewards by video ID
-        let storedEarnings = JSON.parse(localStorage.getItem('earned_rewards') || '{}');
+        // Sync local storage with PHP Session Watched array
+        let watchedVideos = JSON.parse(localStorage.getItem('session_watched_ids') || '[]');
 
-        // Function to compute total stored earnings and update total balance display
         function updateDisplayBalance() {
-            let totalStored = 0;
-            for (let id in storedEarnings) {
-                totalStored += parseFloat(storedEarnings[id] || 0);
-            }
-            const grandTotal = initialBalance + totalStored + currentVideoProgress;
+            const grandTotal = initialDisplayBalance + currentVideoProgress;
             document.getElementById('balance').textContent = grandTotal.toFixed(2);
         }
 
-        // Initialize balance with existing locally saved earnings
-        updateDisplayBalance();
-
-        // IntersectionObserver to auto-play active video and pause non-visible ones
+        // IntersectionObserver for video playback and reward tracking
         const observerOptions = {
             root: feed,
             threshold: 0.6
@@ -528,7 +562,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                 if (!video) return;
 
                 if (entry.isIntersecting) {
-                    currentVideo = video;
                     video.play().catch(err => console.log('Autoplay prevented:', err));
                     startRewardTracking(video);
                 } else {
@@ -541,7 +574,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
         cards.forEach(card => observer.observe(card));
 
-        // Click on video canvas to toggle Play / Pause
+        // Video interact, tap, and completed event handlers
         document.querySelectorAll('.feed-video').forEach(video => {
             video.addEventListener('click', function() {
                 if (video.paused) {
@@ -551,7 +584,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                 }
             });
 
-            // Handle double-tap like gesture
+            // Double tap heart gesture
             let lastTap = 0;
             video.addEventListener('touchend', function(e) {
                 const currentTime = new Date().getTime();
@@ -561,7 +594,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     const likeBtn = card.querySelector('.like-btn');
                     triggerLike(likeBtn);
 
-                    // Render animated floating heart at touch target
                     const touch = e.changedTouches[0];
                     const heart = document.createElement('i');
                     heart.className = 'fa-solid fa-heart heart-animation';
@@ -575,9 +607,11 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
             // Video watched completion handler
             video.addEventListener('ended', function() {
-                const videoId = video.getAttribute('data-video-id');
+                const card = video.closest('.video-card');
+                const videoId = parseInt(video.getAttribute('data-video-id'));
                 const reward = parseFloat(video.getAttribute('data-reward'));
 
+                // Perform watch activity insertion into database
                 $.ajax({
                     url: 'process_video_watch.php',
                     type: 'POST',
@@ -588,22 +622,41 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Reward Earned!',
-                                text: `You earned $${response.reward.toFixed(2)}!`,
+                                text: `You earned $${reward.toFixed(2)}!`,
                                 timer: 1500,
                                 showConfirmButton: false
                             });
-                            // Store reward persistently for this video ID
-                            storedEarnings[videoId] = reward;
-                            localStorage.setItem('earned_rewards', JSON.stringify(storedEarnings));
-                            currentVideoProgress = 0;
-                            updateDisplayBalance();
+
+                            // Save reward persistently to PHP Session state
+                            $.ajax({
+                                url: window.location.href,
+                                type: 'POST',
+                                data: { action: 'save_session_reward', video_id: videoId, reward: reward },
+                                dataType: 'json'
+                            });
+
+                            // Mark video card visually as watched
+                            card.classList.add('is-watched');
+                            if (!watchedVideos.includes(videoId)) {
+                                watchedVideos.push(videoId);
+                                localStorage.setItem('session_watched_ids', JSON.stringify(watchedVideos));
+                            }
+
+                            // Auto scroll smoothly to the next video
+                            const currentIdx = parseInt(card.getAttribute('data-index'));
+                            const nextCard = document.querySelector(`.video-card[data-index="${currentIdx + 1}"]`);
+                            if (nextCard) {
+                                setTimeout(() => {
+                                    nextCard.scrollIntoView({ behavior: 'smooth' });
+                                }, 1000);
+                            }
                         }
                     }
                 });
             });
         });
 
-        // Like Button click handler
+        // Like button toggle
         document.querySelectorAll('.like-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -621,14 +674,15 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             countSpan.textContent = formatLikes(rawCount);
         }
 
-        // Real-time incremental earnings tracking during watch
+        // Live progressive earnings tracking while video plays
         function startRewardTracking(video) {
             stopRewardTracking();
-            const videoId = video.getAttribute('data-video-id');
+            const card = video.closest('.video-card');
+            const videoId = parseInt(video.getAttribute('data-video-id'));
             const totalReward = parseFloat(video.getAttribute('data-reward'));
 
-            // If already fully earned, skip temporary calculation
-            if (storedEarnings[videoId]) {
+            // If already marked watched, skip dynamic balance animation
+            if (card.classList.contains('is-watched') || watchedVideos.includes(videoId)) {
                 currentVideoProgress = 0;
                 updateDisplayBalance();
                 return;
