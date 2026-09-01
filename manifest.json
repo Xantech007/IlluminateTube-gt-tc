@@ -1,7 +1,9 @@
 {
   "name": "Illuminate Tube",
   "short_name": "Illuminate",
+  "id": "/",
   "start_url": "/index.php",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#141414",
   "theme_color": "#141414",
@@ -9,12 +11,14 @@
     {
       "src": "img/palmpay.webp",
       "sizes": "192x192",
-      "type": "image/webp"
+      "type": "image/webp",
+      "purpose": "any maskable"
     },
     {
       "src": "img/palmpay.webp",
       "sizes": "512x512",
-      "type": "image/webp"
+      "type": "image/webp",
+      "purpose": "any maskable"
     }
   ]
 }
