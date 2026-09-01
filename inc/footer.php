@@ -1,5 +1,8 @@
+<?php
+// footer.php
+?>
 <footer id="footer">
-    <p>&copy; <span id="current-year"></span> Illuminate Tube. All rights reserved.</p>
+    <p>&copy; <?php echo date("Y"); ?> Illuminate Tube. All rights reserved.</p>
 </footer>
 
 <style>
@@ -56,14 +59,8 @@
 </style>
 
 <script>
-    // Set dynamic current year
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-
-    // Scroll visibility toggle
     window.addEventListener('scroll', function() {
         const footer = document.getElementById('footer');
-        if (!footer) return;
-
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
         const scrollPosition = window.scrollY || window.pageYOffset;
