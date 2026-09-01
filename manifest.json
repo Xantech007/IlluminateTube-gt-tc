@@ -2,7 +2,7 @@
   "name": "Illuminate Tube",
   "short_name": "Illuminate",
   "id": "/",
-  "start_url": "/index.php",
+  "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#141414",
