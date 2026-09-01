@@ -1,3 +1,7 @@
+<?php
+// inc/header.php
+?>
+
 <!-- PWA / Add to Home Screen Meta Tags -->
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,7 +14,7 @@
 <header>
     <div class="header-container">
         <div class="logo">
-            <a href="index.html">
+            <a href="index.php">
                 <img src="img/palmpay.webp" alt="Illuminate Tube Logo">
             </a>
         </div>
@@ -478,6 +482,7 @@
     }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script>
     // ========== TOAST ==========
     function showToast(msg) {
@@ -647,7 +652,7 @@
         }
     }
 
-    // ========== HAMBURGER MENU & NOTIFICATION QUEUE ==========
+    // ========== HAMBURGER MENU ==========
     document.addEventListener("DOMContentLoaded", function() {
         registerServiceWorker();
         initAthBanner();
@@ -655,19 +660,15 @@
         const button = document.getElementById('hamburger-menu');
         if (button) {
             button.addEventListener('click', function() {
-                const span = button.querySelector('span');
-                if (span) span.classList.toggle('hamburger-menu-button-close');
-                
+                const span = button.getElementsByTagName('span')[0];
+                span.classList.toggle('hamburger-menu-button-close');
                 const nav = document.getElementById('ham-navigation');
                 if (nav) nav.classList.toggle('on');
             });
         }
 
-        // Auto-close menu on link click (Vanilla JS implementation of former jQuery listener)
-        document.querySelectorAll('.ham-menu ul li a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (button) button.click();
-            });
+        $('.menu li a').on('click', function() {
+            $('#hamburger-menu').click();
         });
 
         // Notification Queue Logic
