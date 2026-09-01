@@ -296,7 +296,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Countdown overlay banner */
         .reward-countdown-banner {
             position: absolute;
-            top: 90px;
+            top: 75px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.75);
