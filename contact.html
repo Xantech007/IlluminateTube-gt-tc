@@ -7,7 +7,7 @@
     <meta name="keywords" content="Illuminate Task Tube, contact support, Illuminati videos, elite rewards, crypto payouts, customer service">
     <meta name="author" content="Illuminate Task Tube">
     <title>Illuminate Task Tube - Contact Us</title>
-
+    
     <!-- PWA / Add to Home Screen Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    
     <style>
         * {
             margin: 0;
@@ -136,21 +136,17 @@
             transition: transform 0.3s ease-in-out;
             z-index: 999;
         }
-
         .ham-menu.on {
             transform: translateX(0);
         }
-
         .ham-menu ul {
             list-style: none;
             padding: 20px;
             margin: 0;
         }
-
         .ham-menu ul li {
             margin: 12px 0;
         }
-
         .ham-menu ul li a {
             color: #e0e0e0;
             text-decoration: none;
@@ -158,11 +154,9 @@
             font-size: 16px;
             transition: color 0.3s ease;
         }
-
         .ham-menu ul li a:hover {
             color: #ffd700;
         }
-
         .ham-menu ul li.active a {
             color: #d4af37;
             font-weight: 600;
@@ -172,7 +166,6 @@
         #google_translate_element {
             margin: 12px 15px 12px 20px;
         }
-
         .goog-te-gadget-simple {
             background: #0d0d0d !important;
             border: 1px solid #333 !important;
@@ -182,12 +175,10 @@
             color: #e0e0e0 !important;
             box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-
         .goog-te-gadget-simple span, 
         .goog-te-menu-value span {
             color: #e0e0e0 !important;
         }
-
         .goog-te-gadget-icon, .goog-te-gadget img {
             display: none !important;
         }
@@ -446,46 +437,6 @@
         }
 
         /* Notification Popups & ATH Banner */
-        .notification-popup {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #141414, #1a1a1a);
-            border: 1px solid #d4af37;
-            border-radius: 12px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
-            padding: 15px 20px;
-            max-width: 320px;
-            width: 100%;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-20px);
-            transition: all 0.4s ease;
-            z-index: 1001;
-            display: flex;
-            align-items: center;
-            color: #e0e0e0;
-        }
-
-        .notification-popup.notification-show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .notification-content {
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-        }
-
-        .notification-content i {
-            margin-right: 12px;
-            font-size: 18px;
-            color: #ffd700;
-        }
-
         .ath-banner {
             position: fixed;
             bottom: 30px;
@@ -644,7 +595,7 @@
             width: calc(100% - 40px);
             max-width: 400px;
             background: #1e293b;
-            border: 1px solid #334155;
+            border: 1px solid #333155;
             border-radius: 20px;
             padding: 16px 20px;
             z-index: 2000;
@@ -873,11 +824,6 @@
                 font-size: 28px;
             }
 
-            .notification-popup {
-                right: 10px;
-                max-width: 90%;
-            }
-
             footer {
                 padding: 15px;
             }
@@ -977,16 +923,6 @@
         <!-- Language Translator Container -->
         <div id="google_translate_element"></div>
     </nav>
-
-    <!-- Header Notification Popups -->
-    <div id="notification-container">
-        <div id="notification-popup" class="notification-popup">
-            <div id="notification-content" class="notification-content">
-                <i class="fas fa-coins"></i>
-                <p id="notification-message"></p>
-            </div>
-        </div>
-    </div>
 
     <!-- Add to Home Screen Banner -->
     <div class="ath-banner" id="athBanner">
@@ -1120,23 +1056,18 @@
 
     <!-- Dynamic Functionality Scripts -->
     <script>
+        // Hamburger Menu Drawer
+        $(document).ready(function() {
+            $('#hamburger-menu').click(function() {
+                $(this).toggleClass('hamburger-menu-button-close');
+                $('#ham-navigation').toggleClass('on');
+            });
+        });
+
         // Set dynamic copyright year
         document.addEventListener('DOMContentLoaded', function() {
             const copyYear = document.getElementById('copyright-year');
             if (copyYear) copyYear.textContent = new Date().getFullYear();
-        });
-
-        // Hamburger Menu Toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuBtn = document.getElementById('hamburger-menu');
-            const nav = document.getElementById('ham-navigation');
-
-            if (menuBtn && nav) {
-                menuBtn.addEventListener('click', function() {
-                    nav.classList.toggle('on');
-                    menuBtn.classList.toggle('hamburger-menu-button-close');
-                });
-            }
         });
 
         // Scroll Footer Controller
@@ -1169,7 +1100,6 @@
         // Telegram Deep Link Handling for WebViews
         function openTelegram(event, url) {
             event.preventDefault();
-            
             const isWebView = /wv|AndroidWebView|iPhone.*Mobile/i.test(navigator.userAgent) || window.Android || (window.webkit && window.webkit.messageHandlers);
             
             if (isWebView) {
@@ -1181,32 +1111,6 @@
                 window.open(url, '_blank', 'noopener,noreferrer');
             }
         }
-
-        // Notice Popup Logic
-        function isNoticeShown() {
-            return localStorage.getItem('noticeShownContact');
-        }
-
-        function setNoticeShown() {
-            localStorage.setItem('noticeShownContact', true);
-        }
-
-        function showNotice() {
-            if (!isNoticeShown()) {
-                const notice = document.getElementById('notice');
-                setTimeout(() => {
-                    notice.style.display = 'block';
-                    setNoticeShown();
-                }, 2000);
-            }
-        }
-
-        function closeNotice() {
-            document.getElementById('notice').style.display = 'none';
-            setNoticeShown();
-        }
-
-        window.addEventListener('load', showNotice);
 
         // Toast
         function showToast(msg) {
@@ -1337,9 +1241,7 @@
                 localStorage.setItem("IlluminateTubeNotifyDecided", "true");
                 const banner = document.getElementById("notifyBanner");
                 if (banner) banner.classList.remove("show");
-                setTimeout(function() {
-                    if (banner) banner.classList.add("hidden");
-                }, 600);
+                setTimeout(function() { if (banner) banner.classList.add("hidden"); }, 600);
                 
                 if (permission === "granted") {
                     showToast("Notifications enabled!");
@@ -1351,16 +1253,39 @@
             localStorage.setItem("IlluminateTubeNotifyDecided", "true");
             const banner = document.getElementById("notifyBanner");
             if (banner) banner.classList.remove("show");
-            setTimeout(function() {
-                if (banner) banner.classList.add("hidden");
-            }, 600);
+            setTimeout(function() { if (banner) banner.classList.add("hidden"); }, 600);
         }
 
-        window.addEventListener("load", function() {
+        // Notice Popup
+        function isNoticeShown() {
+            return localStorage.getItem('noticeShownContact');
+        }
+
+        function setNoticeShown() {
+            localStorage.setItem('noticeShownContact', true);
+        }
+
+        function showNotice() {
+            if (!isNoticeShown()) {
+                const notice = document.getElementById('notice');
+                setTimeout(() => {
+                    notice.style.display = 'block';
+                    setNoticeShown();
+                }, 2000);
+            }
+        }
+
+        function closeNotice() {
+            document.getElementById('notice').style.display = 'none';
+            setNoticeShown();
+        }
+
+        window.addEventListener('load', function() {
+            showNotice();
             initAthBanner();
         });
 
-        // Context Menu Control
+        // Prevent right-click only on non-link elements
         document.addEventListener('contextmenu', e => {
             if (!e.target.closest('a')) {
                 e.preventDefault();
