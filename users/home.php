@@ -65,13 +65,13 @@ function url_exists($url) {
     return ['status' => true];
 }
 
-// Fetch up to 10 unwatched videos for smooth continuous vertical scrolling
+// Fetch up to 10 unwatched videos along with their likes count
 $videos = [];
 $video_error = null;
 
 try {
     $stmt = $pdo->prepare("
-        SELECT v.id, v.title, v.url, v.reward 
+        SELECT v.id, v.title, v.url, v.reward, COALESCE(v.likes, 0) AS likes 
         FROM videos v 
         WHERE v.id NOT IN (
             SELECT video_id FROM activities 
@@ -122,8 +122,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             --accent-color: #22c55e;
             --menu-bg: rgba(17, 24, 39, 0.85);
             --menu-text: #ffffff;
-            --footer-height: 65px;
-            --header-height: 60px;
         }
 
         * {
@@ -147,13 +145,12 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             top: 0;
             left: 0;
             width: 100%;
-            height: var(--header-height);
             z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
             pointer-events: none;
         }
 
@@ -189,11 +186,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             color: #4ade80;
         }
 
-        /* TikTok Style Vertical Feed Container adjusted to fit within header/footer bounds */
+        /* TikTok Style Vertical Feed Container */
         .tiktok-feed {
             width: 100%;
-            height: calc(100vh - var(--footer-height));
-            margin-top: 0;
+            height: 100vh;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             -webkit-overflow-scrolling: touch;
@@ -203,10 +199,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             display: none;
         }
 
-        /* Individual Video Section Slide constrained above footer */
+        /* Individual Video Section Slide */
         .video-card {
             width: 100%;
-            height: calc(100vh - var(--footer-height));
+            height: 100vh;
             scroll-snap-align: start;
             scroll-snap-stop: always;
             position: relative;
@@ -214,20 +210,19 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-top: var(--header-height);
         }
 
         .video-card video {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
         }
 
-        /* Sidebar Action Icons (Like, Reward, Share, etc.) */
+        /* Sidebar Action Icons (Increased bottom spacing) */
         .actions-sidebar {
             position: absolute;
             right: 16px;
-            bottom: 30px;
+            bottom: 160px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -267,10 +262,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             font-weight: 600;
         }
 
-        /* Bottom Info Overlay inside Video adjusted for spacing */
+        /* Bottom Info Overlay (Adjusted bottom height) */
         .video-overlay-info {
             position: absolute;
-            bottom: 20px;
+            bottom: 130px;
             left: 16px;
             right: 80px;
             z-index: 10;
@@ -351,13 +346,12 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             bottom: 0;
             left: 0;
             width: 100%;
-            height: var(--footer-height);
             background: var(--menu-bg);
             backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 8px 0;
+            padding: 12px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 100;
         }
@@ -368,7 +362,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             text-decoration: none;
             font-size: 13px;
             font-weight: 500;
-            padding: 4px 14px;
+            padding: 6px 14px;
             transition: color 0.3s ease;
             background: none;
             border: none;
@@ -386,7 +380,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         }
 
         .no-videos-container {
-            height: calc(100vh - var(--footer-height));
+            height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -441,7 +435,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     <div class="actions-sidebar">
                         <button class="action-btn like-btn" aria-label="Like video">
                             <i class="fa-solid fa-heart"></i>
-                            <span class="like-count">0</span>
+                            <span class="like-count"><?php echo (int)$vid['likes']; ?></span>
                         </button>
 
                         <div class="action-btn">
@@ -482,12 +476,28 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     </div>
 
     <script>
-        let initialBalance = parseFloat(document.getElementById('balance').textContent);
+        const initialBalance = parseFloat(document.getElementById('balance').textContent);
         const feed = document.getElementById('tiktokFeed');
         const cards = document.querySelectorAll('.video-card');
         let currentVideo = null;
         let watchTimer = null;
-        let accumulatedReward = 0;
+        let currentVideoProgress = 0;
+
+        // Local Storage for storing earned rewards by video ID
+        let storedEarnings = JSON.parse(localStorage.getItem('earned_rewards') || '{}');
+
+        // Function to compute total stored earnings and update total balance display
+        function updateDisplayBalance() {
+            let totalStored = 0;
+            for (let id in storedEarnings) {
+                totalStored += parseFloat(storedEarnings[id] || 0);
+            }
+            const grandTotal = initialBalance + totalStored + currentVideoProgress;
+            document.getElementById('balance').textContent = grandTotal.toFixed(2);
+        }
+
+        // Initialize balance with existing locally saved earnings
+        updateDisplayBalance();
 
         // IntersectionObserver to auto-play active video and pause non-visible ones
         const observerOptions = {
@@ -565,8 +575,11 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                                 timer: 1500,
                                 showConfirmButton: false
                             });
-                            initialBalance += reward;
-                            document.getElementById('balance').textContent = initialBalance.toFixed(2);
+                            // Store reward persistently for this video ID
+                            storedEarnings[videoId] = reward;
+                            localStorage.setItem('earned_rewards', JSON.stringify(storedEarnings));
+                            currentVideoProgress = 0;
+                            updateDisplayBalance();
                         }
                     }
                 });
@@ -584,21 +597,29 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         function triggerLike(btn) {
             const isLiked = btn.classList.toggle('liked');
             const countSpan = btn.querySelector('.like-count');
-            let count = parseInt(countSpan.textContent);
-            countSpan.textContent = isLiked ? count + 1 : count - 1;
+            let count = parseInt(countSpan.textContent) || 0;
+            countSpan.textContent = isLiked ? count + 1 : Math.max(0, count - 1);
         }
 
         // Real-time incremental earnings tracking during watch
         function startRewardTracking(video) {
             stopRewardTracking();
+            const videoId = video.getAttribute('data-video-id');
             const totalReward = parseFloat(video.getAttribute('data-reward'));
-            
+
+            // If already fully earned, skip temporary calculation
+            if (storedEarnings[videoId]) {
+                currentVideoProgress = 0;
+                updateDisplayBalance();
+                return;
+            }
+
             watchTimer = setInterval(() => {
                 if (!video.paused && video.duration) {
                     const rewardPerSec = totalReward / video.duration;
-                    accumulatedReward += rewardPerSec;
-                    if (accumulatedReward > totalReward) accumulatedReward = totalReward;
-                    document.getElementById('balance').textContent = (initialBalance + accumulatedReward).toFixed(2);
+                    currentVideoProgress += rewardPerSec;
+                    if (currentVideoProgress > totalReward) currentVideoProgress = totalReward;
+                    updateDisplayBalance();
                 }
             }, 1000);
         }
@@ -608,8 +629,8 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                 clearInterval(watchTimer);
                 watchTimer = null;
             }
-            accumulatedReward = 0;
-            document.getElementById('balance').textContent = initialBalance.toFixed(2);
+            currentVideoProgress = 0;
+            updateDisplayBalance();
         }
 
         // Native share functionality
