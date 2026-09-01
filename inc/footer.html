@@ -1,8 +1,5 @@
-<?php
-// footer.php
-?>
 <footer id="footer">
-    <p>&copy; <?php echo date("Y"); ?> Illuminate Tube. All rights reserved.</p>
+    <p>&copy; <span id="copyright-year"></span> Illuminate Tube. All rights reserved.</p>
 </footer>
 
 <style>
@@ -59,6 +56,11 @@
 </style>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set dynamic copyright year
+        document.getElementById('copyright-year').textContent = new Date().getFullYear();
+    });
+
     window.addEventListener('scroll', function() {
         const footer = document.getElementById('footer');
         const windowHeight = window.innerHeight;
