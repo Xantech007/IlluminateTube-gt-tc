@@ -218,11 +218,11 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             object-fit: cover;
         }
 
-        /* Sidebar Action Icons (Increased bottom spacing) */
+        /* Sidebar Action Icons (Further increased bottom spacing) */
         .actions-sidebar {
             position: absolute;
             right: 16px;
-            bottom: 160px;
+            bottom: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -262,10 +262,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             font-weight: 600;
         }
 
-        /* Bottom Info Overlay (Adjusted bottom height) */
+        /* Bottom Info Overlay (Further increased bottom height) */
         .video-overlay-info {
             position: absolute;
-            bottom: 130px;
+            bottom: 170px;
             left: 16px;
             right: 80px;
             z-index: 10;
@@ -435,7 +435,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     <div class="actions-sidebar">
                         <button class="action-btn like-btn" aria-label="Like video">
                             <i class="fa-solid fa-heart"></i>
-                            <span class="like-count"><?php echo (int)$vid['likes']; ?></span>
+                            <span class="like-count" data-likes="<?php echo (int)$vid['likes']; ?>">0</span>
                         </button>
 
                         <div class="action-btn">
@@ -476,6 +476,23 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     </div>
 
     <script>
+        // Helper function to format numbers into compact strings (e.g. 1000 => 1k, 2400 => 2.4k)
+        function formatLikes(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+            }
+            return num.toString();
+        }
+
+        // Initialize display of shortened likes
+        document.querySelectorAll('.like-count').forEach(span => {
+            const rawLikes = parseInt(span.getAttribute('data-likes')) || 0;
+            span.textContent = formatLikes(rawLikes);
+        });
+
         const initialBalance = parseFloat(document.getElementById('balance').textContent);
         const feed = document.getElementById('tiktokFeed');
         const cards = document.querySelectorAll('.video-card');
@@ -597,8 +614,11 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         function triggerLike(btn) {
             const isLiked = btn.classList.toggle('liked');
             const countSpan = btn.querySelector('.like-count');
-            let count = parseInt(countSpan.textContent) || 0;
-            countSpan.textContent = isLiked ? count + 1 : Math.max(0, count - 1);
+            let rawCount = parseInt(countSpan.getAttribute('data-likes')) || 0;
+            rawCount = isLiked ? rawCount + 1 : Math.max(0, rawCount - 1);
+            
+            countSpan.setAttribute('data-likes', rawCount);
+            countSpan.textContent = formatLikes(rawCount);
         }
 
         // Real-time incremental earnings tracking during watch
