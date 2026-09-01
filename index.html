@@ -544,16 +544,20 @@
             font-weight: 600;
             color: #ffd700;
             margin-bottom: 20px;
+            white-space: nowrap;
         }
 
         .cta-banner .btn {
             background: linear-gradient(45deg, #d4af37, #ffd700);
             color: #000;
-            padding: 12px 30px;
-            font-size: 14px;
+            padding: 15px 40px;
+            font-size: 18px;
             font-weight: 700;
             border-radius: 50px;
             transition: background-color 0.3s ease, transform 0.3s ease;
+            white-space: nowrap;
+            max-width: 100%;
+            display: inline-block;
         }
 
         .cta-banner .btn:hover {
@@ -1003,6 +1007,11 @@
             .step-card, .feature-card, .testimonial-card, .stat-card {
                 padding: 20px;
             }
+
+            .cta-banner .btn {
+                font-size: 16px;
+                padding: 14px 30px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1050,7 +1059,12 @@
             }
 
             .cta-banner h2 {
-                font-size: 28px;
+                font-size: 24px;
+            }
+
+            .cta-banner .btn {
+                font-size: 14px;
+                padding: 12px 20px;
             }
 
             .notification-popup {
@@ -1118,16 +1132,16 @@
             }
 
             .cta-banner {
-                padding: 40px 15px;
+                padding: 30px 10px;
             }
 
             .cta-banner h2 {
-                font-size: 24px;
+                font-size: 18px;
             }
 
             .cta-banner .btn {
-                padding: 12px 30px;
-                font-size: 16px;
+                padding: 10px 14px;
+                font-size: 3.5vw;
             }
 
             footer {
@@ -1136,6 +1150,13 @@
 
             footer p {
                 font-size: 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .cta-banner .btn {
+                padding: 8px 10px;
+                font-size: 3.2vw;
             }
         }
     </style>
