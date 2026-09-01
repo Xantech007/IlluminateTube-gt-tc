@@ -140,18 +140,17 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         }
 
         /* Fixed Top Floating Header (Positioned below translate bar) */
-        /* Fixed Top Floating Header */
         .top-header {
             position: fixed;
-            top: 0;
+            top: 55px;
             left: 0;
             width: 100%;
             z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 67px 20px 12px 20px; /* Top padding pushes content down while keeping background gradient at top */
-            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0) 100%);
+            padding: 12px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
             pointer-events: none;
         }
 
