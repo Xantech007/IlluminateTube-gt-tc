@@ -231,7 +231,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 80px 20px 90px 20px;
+            padding: 80px 20px 140px 20px; /* Increased bottom padding to push cards up by 50px */
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
