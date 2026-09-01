@@ -1,27 +1,21 @@
+<?php
+// index.php
+session_start(); // Start session to check user login status
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Unlock exclusive rewards by watching Illuminati secret archives and elite videos with Illuminate Tube. Join our elite platform today!">
-    <meta name="keywords" content="Illuminate Tube, Illuminati videos, watch and earn, secret knowledge, elite rewards, crypto earnings">
-    <meta name="author" content="Illuminate Tube">
-    <title>Illuminate Tube - Unlock Rewards Watching Exclusive Content</title>
-
-    <!-- PWA / Add to Home Screen Meta Tags (from header.html) -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Illuminate Tube">
-    <link rel="apple-touch-icon" href="img/palmpay.webp">
-    <meta name="theme-color" content="#141414">
-    <meta name="mobile-web-app-capable" content="yes">
-
+    <meta name="description" content="Unlock exclusive rewards by watching Illuminati secret archives and elite videos with Illuminate Task Tube. Join our elite platform today!">
+    <meta name="keywords" content="Illuminate Task Tube, Illuminati videos, watch and earn, secret knowledge, elite rewards, crypto earnings">
+    <meta name="author" content="Illuminate Task Tube">
+    <title>Illuminate Task Tube - Unlock Rewards Watching Exclusive Content</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <style>
         * {
             margin: 0;
@@ -36,501 +30,8 @@
             display: flex;
             flex-direction: column;
             color: #e0e0e0;
-            padding-top: 80px;
-            padding-bottom: 100px;
-            top: 0 !important;
-        }
-
-        /* --- Header & Notification Styles --- */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            background: #141414;
-            border-bottom: 1px solid #333;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            padding: 15px 20px;
-            z-index: 1000;
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo img {
-            height: 50px;
-        }
-
-        .logo a {
-            display: inline-block;
-            text-decoration: none;
-        }
-
-        .hamburger-menu-button {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(45deg, #d4af37, #ffd700);
-            border: 2px solid #000;
-            border-radius: 50%;
-            cursor: pointer;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-        }
-
-        .hamburger-menu-button span {
-            width: 20px;
-            height: 2px;
-            background: #000;
-            position: absolute;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger-menu-button span::before,
-        .hamburger-menu-button span::after {
-            content: '';
-            width: 20px;
-            height: 2px;
-            background: #000;
-            position: absolute;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger-menu-button span::before {
-            transform: translateY(-6px);
-        }
-
-        .hamburger-menu-button span::after {
-            transform: translateY(6px);
-        }
-
-        .hamburger-menu-button-close span {
-            background: transparent;
-        }
-
-        .hamburger-menu-button-close span::before {
-            transform: translateY(0) rotate(45deg);
-        }
-
-        .hamburger-menu-button-close span::after {
-            transform: translateY(0) rotate(-45deg);
-        }
-
-        .notification-popup {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #141414, #1a1a1a);
-            border: 1px solid #d4af37;
-            border-radius: 12px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
-            padding: 15px 20px;
-            max-width: 320px;
-            width: 100%;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-20px);
-            transition: all 0.4s ease;
-            z-index: 1001;
-            display: flex;
-            align-items: center;
-            color: #e0e0e0;
-        }
-
-        .notification-popup.notification-show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .notification-content {
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-        }
-
-        .notification-content i {
-            margin-right: 12px;
-            font-size: 18px;
-            color: #ffd700;
-        }
-
-        /* Add to Home Screen Banner */
-        .ath-banner {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(120px);
-            width: calc(100% - 40px);
-            max-width: 400px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 16px 20px;
-            z-index: 2000;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0;
-        }
-
-        .ath-banner.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .ath-banner.hidden {
-            display: none !important;
-        }
-
-        .ath-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .ath-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            background: linear-gradient(45deg, #d4af37, #ffd700);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-size: 18px;
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-        }
-
-        .ath-title {
-            font-size: 15px;
-            font-weight: 800;
-            color: #f8fafc;
-        }
-
-        .ath-sub {
-            font-size: 12px;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        .ath-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-
-        .ath-step {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .ath-step-num {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: rgba(212, 175, 55, 0.15);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffd700;
-            font-size: 11px;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-
-        .ath-step-text {
-            font-size: 12px;
-            color: #cbd5e1;
-            font-weight: 500;
-        }
-
-        .ath-step-text strong {
-            color: #f8fafc;
-            font-weight: 700;
-        }
-
-        .ath-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .ath-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 14px;
-            border: none;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .ath-btn-done {
-            background: linear-gradient(45deg, #d4af37, #ffd700);
-            color: #000;
-        }
-
-        .ath-btn-later {
-            background: #334155;
-            color: #94a3b8;
-        }
-
-        .ath-close {
-            position: absolute;
-            top: 10px;
-            right: 14px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #334155;
-            border: none;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .ath-close:hover {
-            background: #475569;
-            color: #f8fafc;
-        }
-
-        /* Notification Permission Banner */
-        .notify-banner {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-120px);
-            width: calc(100% - 40px);
-            max-width: 400px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 16px 20px;
-            z-index: 2000;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0;
-        }
-
-        .notify-banner.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .notify-banner.hidden {
-            display: none !important;
-        }
-
-        .notify-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .notify-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #10b981, #34d399);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 16px;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .notify-title {
-            font-size: 15px;
-            font-weight: 800;
-            color: #f8fafc;
-        }
-
-        .notify-sub {
-            font-size: 12px;
-            color: #94a3b8;
-            font-weight: 500;
-            line-height: 1.5;
-        }
-
-        .notify-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 14px;
-        }
-
-        .notify-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 14px;
-            border: none;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .notify-btn-allow {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: #fff;
-        }
-
-        .notify-btn-deny {
-            background: #334155;
-            color: #94a3b8;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-80px);
-            background: #1e293b;
-            color: #fff;
-            padding: 14px 24px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            z-index: 2001;
-            transition: all 0.4s;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border: 1px solid #334155;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .toast i {
-            color: #10b981;
-        }
-
-        /* --- Navbar Styles --- */
-        .ham-menu {
-            position: fixed;
-            top: 80px;
-            left: 0;
-            width: 100%;
-            background: #141414;
-            border-bottom: 1px solid #333;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
-            transform: translateX(-100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 999;
-        }
-        .ham-menu.on {
-            transform: translateX(0);
-        }
-        .ham-menu ul {
-            list-style: none;
-            padding: 20px;
-            margin: 0;
-        }
-        .ham-menu ul li {
-            margin: 12px 0;
-        }
-        .ham-menu ul li a {
-            color: #e0e0e0;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 16px;
-            transition: color 0.3s ease;
-        }
-        .ham-menu ul li a:hover {
-            color: #ffd700;
-        }
-        .ham-menu ul li.active a {
-            color: #d4af37;
-            font-weight: 600;
-        }
-
-        /* --- Translator Styles --- */
-        #google_translate_element {
-            margin: 12px 15px 12px 20px;
-        }
-        .goog-te-gadget-simple {
-            background: #0d0d0d !important;
-            border: 1px solid #333 !important;
-            border-radius: 6px !important;
-            padding: 6px 12px !important;
-            font-size: 14px !important;
-            color: #e0e0e0 !important;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        .goog-te-gadget-simple span, 
-        .goog-te-menu-value span {
-            color: #e0e0e0 !important;
-        }
-        .goog-te-gadget-icon, .goog-te-gadget img {
-            display: none !important;
-        }
-
-        .goog-te-banner-frame.skiptranslate,
-        iframe.goog-te-banner-frame {
-            display: none !important;
-            height: 0 !important;
-            visibility: hidden !important;
-        }
-
-        /* --- Footer Styles --- */
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            background: #141414;
-            border-top: 1px solid #333;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        footer.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        footer p {
-            margin: 0;
-            color: #d4af37;
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            padding-top: 80px; /* Matches header height */
+            padding-bottom: 100px; /* Matches footer height */
         }
 
         /* Hero Section */
@@ -846,7 +347,7 @@
         }
 
         .faq-item h3::after {
-            content: '\f078';
+            content: '\f078'; /* Font Awesome chevron-down */
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             position: absolute;
@@ -962,41 +463,22 @@
         }
 
         /* Responsive Design */
-        @media (min-width: 768px) {
-            .ham-menu {
-                position: static;
-                transform: none;
-                box-shadow: none;
-                display: flex;
-                justify-content: flex-end;
-                align-items: center;
-                background: transparent;
-                border-bottom: none;
-                gap: 15px;
-            }
-            .ham-menu ul {
-                display: flex;
-                gap: 20px;
-                padding: 0;
-                margin: 0;
-            }
-            .ham-menu ul li {
-                margin: 0;
-            }
-            .ham-menu ul li a {
-                font-size: 15px;
-            }
-
-            #google_translate_element {
-                margin: 0 15px 0 0;
-            }
-        }
-
         @media (max-width: 1024px) {
-            .hero-section h1 { font-size: 40px; }
-            .hero-section p { font-size: 18px; }
-            .section-title { font-size: 32px; }
-            .step-card, .feature-card, .testimonial-card, .stat-card { padding: 20px; }
+            .hero-section h1 {
+                font-size: 40px;
+            }
+
+            .hero-section p {
+                font-size: 18px;
+            }
+
+            .section-title {
+                font-size: 32px;
+            }
+
+            .step-card, .feature-card, .testimonial-card, .stat-card {
+                padding: 20px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1005,25 +487,43 @@
                 padding-bottom: 80px;
             }
 
-            .hero-section { padding: 80px 20px; }
-            .hero-section h1 { font-size: 36px; }
-            .hero-section p { font-size: 16px; }
-            .section-title { font-size: 28px; }
-            .button-group { flex-direction: column; gap: 15px; }
-            .btn { padding: 12px 30px; font-size: 16px; }
-            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
-            .stat-card h3 { font-size: 28px; }
-            .cta-banner h2 { font-size: 28px; }
-            
-            .notification-popup {
-                right: 10px;
-                max-width: 90%;
+            .hero-section {
+                padding: 80px 20px;
             }
 
-            footer { padding: 15px; }
-            footer p { font-size: 13px; }
+            .hero-section h1 {
+                font-size: 36px;
+            }
 
-            .ham-menu { top: 70px; }
+            .hero-section p {
+                font-size: 16px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .stat-card h3 {
+                font-size: 28px;
+            }
+
+            .cta-banner h2 {
+                font-size: 28px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1032,125 +532,74 @@
                 padding-bottom: 60px;
             }
 
-            .hero-section { padding: 60px 15px; }
-            .hero-section h1 { font-size: 28px; }
-            .hero-section p { font-size: 14px; }
-            .section-title { font-size: 24px; }
-            .step-card, .feature-card, .testimonial-card, .stat-card { padding: 15px; }
-            .stat-card h3 { font-size: 24px; }
-            .faq-item h3 { font-size: 16px; }
-            .faq-item p { font-size: 14px; }
-            .cta-banner { padding: 40px 15px; }
-            .cta-banner h2 { font-size: 24px; }
-            .cta-banner .btn { padding: 12px 30px; font-size: 16px; }
+            .hero-section {
+                padding: 60px 15px;
+            }
 
-            footer { padding: 10px; }
-            footer p { font-size: 12px; }
+            .hero-section h1 {
+                font-size: 28px;
+            }
 
-            .ham-menu { top: 60px; }
-            .ham-menu ul { padding: 15px; }
-            .ham-menu ul li a { font-size: 14px; }
+            .hero-section p {
+                font-size: 14px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .step-card, .feature-card, .testimonial-card, .stat-card {
+                padding: 15px;
+            }
+
+            .stat-card h3 {
+                font-size: 24px;
+            }
+
+            .faq-item h3 {
+                font-size: 16px;
+            }
+
+            .faq-item p {
+                font-size: 14px;
+            }
+
+            .cta-banner {
+                padding: 40px 15px;
+            }
+
+            .cta-banner h2 {
+                font-size: 24px;
+            }
+
+            .cta-banner .btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
-
-    <!-- HARDCODED HEADER -->
-    <header>
-        <div class="header-container">
-            <div class="logo">
-                <a href="index.html">
-                    <img src="img/palmpay.webp" alt="Illuminate Tube Logo">
-                </a>
-            </div>
-            <button id="hamburger-menu" data-toggle="ham-navigation" class="hamburger-menu-button">
-                <span></span>
-            </button>
-        </div>
-    </header>
-
-    <!-- Notification Popup -->
-    <div id="notification-container">
-        <div id="notification-popup" class="notification-popup">
-            <div id="notification-content" class="notification-content">
-                <i class="fas fa-coins"></i>
-                <p id="notification-message"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ADD TO HOME SCREEN BANNER (UNIVERSAL) -->
-    <div class="ath-banner" id="athBanner">
-        <button class="ath-close" onclick="dismissAth()"><i class="fa-solid fa-xmark"></i></button>
-        <div class="ath-header">
-            <div class="ath-icon"><i class="fa-solid fa-mobile-screen"></i></div>
-            <div>
-                <div class="ath-title" id="athTitle">Add Illuminate Tube to Home Screen</div>
-                <div class="ath-sub" id="athSub">Open like a real app — faster access</div>
-            </div>
-        </div>
-        <div class="ath-steps" id="athSteps">
-            <!-- Steps injected dynamically by JS based on device -->
-        </div>
-        <div class="ath-actions">
-            <button class="ath-btn ath-btn-done" onclick="markAthDone()">
-                <i class="fa-solid fa-check"></i> Done
-            </button>
-            <button class="ath-btn ath-btn-later" onclick="dismissAth()">
-                Later
-            </button>
-        </div>
-    </div>
-
-    <!-- NOTIFICATION PERMISSION BANNER -->
-    <div class="notify-banner" id="notifyBanner">
-        <div class="notify-header">
-            <div class="notify-icon"><i class="fa-solid fa-bell"></i></div>
-            <div>
-                <div class="notify-title">Stay Updated</div>
-                <div class="notify-sub">Get instant alerts for rewards, bonuses & new tasks</div>
-            </div>
-        </div>
-        <div class="notify-actions">
-            <button class="notify-btn notify-btn-allow" onclick="requestNotify()">
-                <i class="fa-solid fa-bell"></i> Allow
-            </button>
-            <button class="notify-btn notify-btn-deny" onclick="dismissNotify()">
-                Not Now
-            </button>
-        </div>
-    </div>
-
-    <!-- TOAST -->
-    <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
-
-    <!-- HARDCODED NAVBAR & GOOGLE TRANSLATE -->
-    <nav id="ham-navigation" class="ham-menu">
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="terms.html">Terms</a></li>
-            <li><a href="privacy.html">Privacy</a></li>
-        </ul>
-
-        <!-- Language Translator Container (hardcoded from translate.html) -->
-        <div id="google_translate_element"></div>
-    </nav>
+    <?php include 'inc/header.php'; ?>
+    <?php include 'inc/navbar.php'; ?>
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <h1>Unlock Wealth with Illuminate Tube</h1>
+        <h1>Unlock Wealth with Illuminate Task Tube</h1>
         <p>Step into the circle of enlightenment. Watch exclusive Illuminati-related videos and secret archives to unlock high-tier monetary rewards and passive wealth!</p>
         <div class="button-group">
-            <a href="register.html" class="btn btn-register">Get Started</a>
-            <a href="signin.html" class="btn btn-signin">Sign In</a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="users/home.php" class="btn btn-dashboard" onclick="console.log('Dashboard button clicked')">Dashboard</a>
+            <?php else: ?>
+                <a href="register.php" class="btn btn-register" onclick="console.log('Register button clicked')">Get Started</a>
+                <a href="signin.php" class="btn btn-signin" onclick="console.log('Sign In button clicked')">Sign In</a>
+            <?php endif; ?>
         </div>
     </section>
 
     <!-- How It Works Section -->
     <div class="index-container how-it-works">
-        <h2 class="section-title">How Illuminate Tube Works</h2>
+        <h2 class="section-title">How Illuminate Task Tube Works</h2>
         <div class="steps">
             <div class="step-card">
                 <i class="fas fa-eye"></i>
@@ -1172,7 +621,7 @@
 
     <!-- Features Section -->
     <div class="index-container">
-        <h2 class="section-title">Why Join Illuminate Tube?</h2>
+        <h2 class="section-title">Why Join Illuminate Task Tube?</h2>
         <div class="features">
             <div class="feature-card">
                 <i class="fas fa-crown"></i>
@@ -1192,7 +641,7 @@
             <div class="feature-card">
                 <i class="fas fa-headset"></i>
                 <h3>Dedicated Concierge</h3>
-                <p>Enjoy round-the-clock member support via LiveChat or our <a href="contact.html" style="color: #ffd700;">Contact page</a>.</p>
+                <p>Enjoy round-the-clock member support via LiveChat or our <a href="contact.php" style="color: #ffd700;">Contact page</a>.</p>
             </div>
         </div>
     </div>
@@ -1222,7 +671,7 @@
         <div class="testimonial-grid">
             <div class="testimonial-card">
                 <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="Sarah M.">
-                <p>"Illuminate Tube granted me access to incredible content while generating solid daily rewards!"</p>
+                <p>"Illuminate Task Tube granted me access to incredible content while generating solid daily rewards!"</p>
                 <h4>Sarah M.</h4>
                 <span>Initiate Member</span>
             </div>
@@ -1246,7 +695,7 @@
         <h2 class="section-title">Frequently Asked Questions</h2>
         <div class="faq-grid">
             <div class="faq-item">
-                <h3>How do I start earning with Illuminate Tube?</h3>
+                <h3>How do I start earning with Illuminate Task Tube?</h3>
                 <p>Sign up using your email and passcode, log into the portal, and begin watching Illuminati-related videos to claim rewards instantly.</p>
             </div>
             <div class="faq-item">
@@ -1258,8 +707,8 @@
                 <p>Rewards are processed through our encrypted payout pipeline straight to your preferred wallet address.</p>
             </div>
             <div class="faq-item">
-                <h3>Is Illuminate Tube secure?</h3>
-                <p>We maintain end-to-end security protocol to shield user activity. Review our <a href="privacy.html" style="color: #ffd700;">Privacy Policy</a> for full details.</p>
+                <h3>Is Illuminate Task Tube secure?</h3>
+                <p>We maintain end-to-end security protocol to shield user activity. Review our <a href="privacy.php" style="color: #ffd700;">Privacy Policy</a> for full details.</p>
             </div>
         </div>
     </div>
@@ -1267,34 +716,26 @@
     <!-- CTA Banner -->
     <section class="cta-banner">
         <h2>Unveil the Mysteries & Claim Your Rewards</h2>
-        <a href="register.html" class="btn">Join Illuminate Tube Now</a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <a href="users/home.php" class="btn" onclick="console.log('Dashboard CTA clicked')">Go to Dashboard</a>
+        <?php else: ?>
+            <a href="register.php" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Task Tube Now</a>
+        <?php endif; ?>
     </section>
 
     <!-- Notice Popup -->
     <div class="notice" id="notice">
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
-        <h2>Welcome to Illuminate Tube</h2>
+        <h2>Welcome to Illuminate Task Tube</h2>
         <p>Unlock access to Illuminati secret videos and earn premium rewards today. Enter the portal now!</p>
-        <a href="register.html" class="btn btn-register">Get Started</a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <a href="users/home.php" class="btn btn-dashboard" onclick="console.log('Notice dashboard clicked')">Go to Dashboard</a>
+        <?php else: ?>
+            <a href="register.php" class="btn btn-register" onclick="console.log('Notice button clicked')">Get Started</a>
+        <?php endif; ?>
     </div>
 
-    <!-- HARDCODED FOOTER -->
-    <footer id="footer">
-        <p>&copy; <span id="copyright-year"></span> Illuminate Tube. All rights reserved.</p>
-    </footer>
-
-    <!-- Google Translate Script Initialization -->
-    <script type="text/javascript">
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'en,fr,es,de,pt,ar,zh-CN,ru',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                autoDisplay: false
-            }, 'google_translate_element');
-        }
-    </script>
-    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <?php include 'inc/footer.php'; ?>
 
     <!-- LiveChat Script -->
     <script>
@@ -1304,310 +745,52 @@
     </script>
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
-    <!-- Application & Header Scripts -->
     <script>
-        // Set dynamic copyright year
+        // Set Active Navbar Link
         document.addEventListener('DOMContentLoaded', function() {
-            const copyrightElem = document.getElementById('copyright-year');
-            if (copyrightElem) {
-                copyrightElem.textContent = new Date().getFullYear();
-            }
-            setActiveNavLink();
-        });
-
-        // Highlight Active Link in Navbar
-        function setActiveNavLink() {
             const currentPath = window.location.pathname.split('/').pop();
             const links = document.querySelectorAll('.ham-menu ul li a');
             links.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPath || (currentPath === '' && href === 'index.html')) {
+                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.php')) {
                     link.parentElement.classList.add('active');
                 }
             });
-        }
-
-        // Footer Visibility on Scroll
-        window.addEventListener('scroll', function() {
-            const footer = document.getElementById('footer');
-            if (!footer) return;
-            const windowHeight = window.innerHeight;
-            const documentHeight = document.documentElement.scrollHeight;
-            const scrollPosition = window.scrollY || window.pageYOffset;
-
-            if (scrollPosition + windowHeight >= documentHeight - 50) {
-                footer.classList.add('visible');
-            } else {
-                footer.classList.remove('visible');
-            }
         });
 
-        // Toast logic
-        function showToast(msg) {
-            const t = document.getElementById("toast");
-            document.getElementById("toastMsg").textContent = msg;
-            t.classList.add("show");
-            setTimeout(function() { t.classList.remove("show"); }, 2500);
-        }
-
-        // Device Detection
-        function getDeviceInfo() {
-            const ua = navigator.userAgent;
-            const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-            const isAndroid = /Android/.test(ua);
-            const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-            const isChrome = /Chrome/.test(ua) && !/Edg/.test(ua);
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-            
-            return { isIOS, isAndroid, isSafari, isChrome, isStandalone };
-        }
-
-        // Add to Home Screen Banner Logic
-        function initAthBanner() {
-            if (localStorage.getItem("IlluminateTubeAthDone") === "true") return;
-            if (localStorage.getItem("IlluminateTubeAthDismissed") === "true") return;
-            
-            const device = getDeviceInfo();
-            if (device.isStandalone) return;
-            if (!device.isIOS && !device.isAndroid) return;
-            
-            const stepsContainer = document.getElementById("athSteps");
-            let stepsHTML = "";
-            
-            if (device.isIOS && device.isSafari) {
-                stepsHTML = 
-                    '<div class="ath-step">' +
-                        '<div class="ath-step-num">1</div>' +
-                        '<div class="ath-step-text">Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket" style="color:#ffd700;"></i> at the bottom</div>' +
-                    '</div>' +
-                    '<div class="ath-step">' +
-                        '<div class="ath-step-num">2</div>' +
-                        '<div class="ath-step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div>' +
-                    '</div>' +
-                    '<div class="ath-step">' +
-                        '<div class="ath-step-num">3</div>' +
-                        '<div class="ath-step-text">Tap <strong>"Add"</strong> — app icon appears on your home screen</div>' +
-                    '</div>';
-            } else if (device.isAndroid && device.isChrome) {
-                stepsHTML = 
-                    '<div class="ath-step">' +
-                        '<div class="ath-step-num">1</div>' +
-                        '<div class="ath-step-text">Tap the <strong>Menu</strong> button <i class="fa-solid fa-ellipsis-vertical" style="color:#ffd700;"></i> (3 dots)</div>' +
-                    '</div>' +
-                    '<div class="ath-step">' +
-                        '<div class="ath-step-num">2</div>' +
-                        '<div class="ath-step-text">Tap <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong></div>' +
-                    '</div>' +
-                    '<div class="ath-step">' +
-                        '<div class="ath-step-num">3</div>' +
-                        '<div class="ath-step-text">Tap <strong>"Add"</strong> or <strong>"Install"</strong> — app icon appears on your home screen</div>' +
-                    '</div>';
-            } else {
-                stepsHTML = 
-                    '<div class="ath-step">' +
-                        '<div class="ath-step-num">1</div>' +
-                        '<div class="ath-step-text">Open your browser <strong>Menu</strong> or <strong>Share</strong></div>' +
-                    '</div>' +
-                    '<div class="ath-step">' +
-                        '<div class="ath-step-num">2</div>' +
-                        '<div class="ath-step-text">Tap <strong>"Add to Home Screen"</strong> or <strong>"Install"</strong></div>' +
-                    '</div>' +
-                    '<div class="ath-step">' +
-                        '<div class="ath-step-num">3</div>' +
-                        '<div class="ath-step-text">Tap <strong>"Add"</strong> — app icon appears on your home screen</div>' +
-                    '</div>';
-            }
-            
-            stepsContainer.innerHTML = stepsHTML;
-            
-            setTimeout(function() {
-                const banner = document.getElementById("athBanner");
-                if (banner) banner.classList.add("show");
-            }, 3000);
-        }
-
-        function markAthDone() {
-            localStorage.setItem("IlluminateTubeAthDone", "true");
-            const banner = document.getElementById("athBanner");
-            if (banner) banner.classList.remove("show");
-            setTimeout(function() {
-                if (banner) banner.classList.add("hidden");
-                initNotifyBanner();
-            }, 600);
-        }
-
-        function dismissAth() {
-            localStorage.setItem("IlluminateTubeAthDismissed", "true");
-            const banner = document.getElementById("athBanner");
-            if (banner) banner.classList.remove("show");
-            setTimeout(function() {
-                if (banner) banner.classList.add("hidden");
-                initNotifyBanner();
-            }, 600);
-        }
-
-        // Notification Permission Logic
-        function initNotifyBanner() {
-            if (localStorage.getItem("IlluminateTubeNotifyDecided") === "true") return;
-            if (!("Notification" in window)) return;
-            if (Notification.permission === "granted") {
-                localStorage.setItem("IlluminateTubeNotifyDecided", "true");
-                return;
-            }
-            
-            setTimeout(function() {
-                const banner = document.getElementById("notifyBanner");
-                if (banner) banner.classList.add("show");
-            }, 1000);
-        }
-
-        function requestNotify() {
-            if (!("Notification" in window)) {
-                showToast("Notifications not supported on this device");
-                return;
-            }
-            
-            Notification.requestPermission().then(function(permission) {
-                localStorage.setItem("IlluminateTubeNotifyDecided", "true");
-                const banner = document.getElementById("notifyBanner");
-                if (banner) banner.classList.remove("show");
-                setTimeout(function() {
-                    if (banner) banner.classList.add("hidden");
-                }, 600);
-                
-                if (permission === "granted") {
-                    showToast("Notifications enabled!");
-                    registerServiceWorker();
-                } else {
-                    showToast("Notifications disabled.");
-                }
-            });
-        }
-
-        function dismissNotify() {
-            localStorage.setItem("IlluminateTubeNotifyDecided", "true");
-            const banner = document.getElementById("notifyBanner");
-            if (banner) banner.classList.remove("show");
-            setTimeout(function() {
-                if (banner) banner.classList.add("hidden");
-            }, 600);
-        }
-
-        // Service Worker Registration
-        function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('Service Worker registered:', registration);
-                    })
-                    .catch(function(error) {
-                        console.log('Service Worker registration failed:', error);
-                    });
-            }
-        }
-
-        // Hamburger Menu & Load Handlers
-        document.addEventListener("DOMContentLoaded", function() {
-            registerServiceWorker();
-            initAthBanner();
-
-            const button = document.getElementById('hamburger-menu');
-            if (button) {
-                button.addEventListener('click', function() {
-                    const span = button.getElementsByTagName('span')[0];
-                    if (span) span.classList.toggle('hamburger-menu-button-close');
-                    const nav = document.getElementById('ham-navigation');
-                    if (nav) nav.classList.toggle('on');
-                });
-            }
-
-            $('.menu li a').on('click', function() {
-                $('#hamburger-menu').click();
-            });
-
-            // Notification Queue Logic
-            const notificationQueue = [];
-            let isNotificationShowing = false;
-            const delay = 7000;
-            const messages = [
-                "@Alex unlocked vault access & earned $150.00! 19min ago",
-                "@Jame completed initiation reward $50.00! 20min ago",
-                "@Gloria accessed archive & earned $200.00! 53min ago",
-                "@Sophie received initiate payload $75.00! 1hr ago",
-                "@Mark unlocked vault tier $120.00! 2hrs ago"
-            ];
-
-            function showNotification(message) {
-                notificationQueue.push(message);
-                if (!isNotificationShowing) {
-                    showNextNotification();
-                }
-            }
-
-            function showNextNotification() {
-                if (notificationQueue.length === 0) {
-                    isNotificationShowing = false;
-                    return;
-                }
-
-                const message = notificationQueue.shift();
-                const notificationPopup = document.getElementById("notification-popup");
-                const messageElement = document.getElementById("notification-message");
-                if (messageElement && notificationPopup) {
-                    messageElement.textContent = message;
-                    notificationPopup.classList.add("notification-show");
-                    isNotificationShowing = true;
-
-                    setTimeout(() => {
-                        notificationPopup.classList.remove("notification-show");
-                        isNotificationShowing = false;
-                        setTimeout(showNextNotification, 500);
-                    }, 4000);
-                }
-            }
-
-            messages.forEach((message, i) => {
-                setTimeout(() => showNotification(message), (i + 1) * delay);
-            });
-        });
-
-        // Notice Popup Logic
+        // Notice Popup
         function isNoticeShown() {
             return localStorage.getItem('noticeShownIndex');
         }
 
         function setNoticeShown() {
-            localStorage.setItem('noticeShownIndex', 'true');
+            localStorage.setItem('noticeShownIndex', true);
         }
 
         function showNotice() {
             if (!isNoticeShown()) {
                 const notice = document.getElementById('notice');
                 setTimeout(() => {
-                    if (notice) {
-                        notice.style.display = 'block';
-                        setNoticeShown();
-                    }
+                    notice.style.display = 'block';
+                    setNoticeShown();
                 }, 2000);
             }
         }
 
         function closeNotice() {
-            const notice = document.getElementById('notice');
-            if (notice) notice.style.display = 'none';
+            document.getElementById('notice').style.display = 'none';
             setNoticeShown();
         }
 
         window.addEventListener('load', showNotice);
 
-        // FAQ Accordion Toggle
+        // FAQ Toggle
         document.querySelectorAll('.faq-item').forEach(item => {
             item.addEventListener('click', () => {
                 item.classList.toggle('active');
             });
         });
 
-        // Prevent Right Click Context Menu
+        // Prevent right-click only on non-link elements
         document.addEventListener('contextmenu', e => {
             if (!e.target.closest('a')) {
                 e.preventDefault();
