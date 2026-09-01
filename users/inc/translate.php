@@ -21,7 +21,6 @@
     background-color: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-radius: 8px !important;
-    color: #ffffff !important;
 }
 
 /* Target inner select dropdown / text wrapper to expand */
@@ -30,16 +29,22 @@
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
+}
+
+/* Force every child element and text span inside to be white */
+#google_translate_element,
+#google_translate_element *,
+#google_translate_element .goog-te-gadget,
+#google_translate_element .goog-te-gadget-simple,
+#google_translate_element .goog-te-menu-value,
+#google_translate_element .goog-te-menu-value span,
+#google_translate_element a,
+#google_translate_element span {
     color: #ffffff !important;
 }
 
-/* Set text color to white for all inner text spans */
-#google_translate_element .goog-te-menu-value span {
-    color: #ffffff !important;
-}
-
-/* Lighten the default arrow icon */
-#google_translate_element .goog-te-menu-value img {
+/* Turn arrow icon white */
+#google_translate_element img {
     filter: brightness(0) invert(1) !important;
 }
 
@@ -54,7 +59,6 @@
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 </style>
-
 <script type="text/javascript">
 function googleTranslateElementInit() {
     new google.translate.TranslateElement({
