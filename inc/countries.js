@@ -1,5 +1,4 @@
-<?php
-$countries = [
+const countries = [
     'Afghanistan',
     'Albania',
     'Algeria',
@@ -196,4 +195,3 @@ $countries = [
     'Zambia',
     'Zimbabwe'
 ];
-?>
