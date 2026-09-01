@@ -575,7 +575,7 @@
     </style>
 </head>
 <body>
-    <!-- Dynamic Component Holders (Option B) -->
+    <!-- Dynamic Component Holders -->
     <div id="header-container"></div>
     <div id="navbar-container"></div>
 
@@ -584,8 +584,8 @@
         <h1>Unlock Wealth with Illuminate Tube</h1>
         <p>Step into the circle of enlightenment. Watch exclusive Illuminati-related videos and secret archives to unlock high-tier monetary rewards and passive wealth!</p>
         <div class="button-group">
-            <a href="register.html" class="btn btn-register" onclick="console.log('Register button clicked')">Get Started</a>
-            <a href="signin.html" class="btn btn-signin" onclick="console.log('Sign In button clicked')">Sign In</a>
+            <a href="register.html" class="btn btn-register">Get Started</a>
+            <a href="signin.html" class="btn btn-signin">Sign In</a>
         </div>
     </section>
 
@@ -708,7 +708,7 @@
     <!-- CTA Banner -->
     <section class="cta-banner">
         <h2>Unveil the Mysteries & Claim Your Rewards</h2>
-        <a href="register.html" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Tube Now</a>
+        <a href="register.html" class="btn">Join Illuminate Tube Now</a>
     </section>
 
     <!-- Notice Popup -->
@@ -716,7 +716,7 @@
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
         <h2>Welcome to Illuminate Tube</h2>
         <p>Unlock access to Illuminati secret videos and earn premium rewards today. Enter the portal now!</p>
-        <a href="register.html" class="btn btn-register" onclick="console.log('Notice button clicked')">Get Started</a>
+        <a href="register.html" class="btn btn-register">Get Started</a>
     </div>
 
     <div id="footer-container"></div>
@@ -730,56 +730,90 @@
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
     <script>
-        // Fetch HTML Components
-        fetch('inc/header.html').then(res => res.text()).then(data => document.getElementById('header-container').innerHTML = data);
-        fetch('inc/navbar.html').then(res => res.text()).then(data => document.getElementById('navbar-container').innerHTML = data);
-        fetch('inc/footer.html').then(res => res.text()).then(data => document.getElementById('footer-container').innerHTML = data);
+        // Helper function to safely load component HTML files
+        async function loadComponent(targetId, filePath) {
+            try {
+                const response = await fetch(filePath);
+                if (!response.ok) throw new Error(`HTTP ${response.status} loading ${filePath}`);
+                const html = await response.text();
+                const container = document.getElementById(targetId);
+                if (container) {
+                    container.innerHTML = html;
+                    
+                    // Execute any script tags dynamically injected in fetched HTML
+                    container.querySelectorAll('script').forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                        oldScript.parentNode.replaceChild(newScript, oldScript);
+                    });
+                }
+            } catch (err) {
+                console.error(`Error loading component: ${err}`);
+            }
+        }
 
-        // Set Active Navbar Link
-        document.addEventListener('DOMContentLoaded', function() {
+        // Highlight Active Link in Navbar AFTER component loads
+        function setActiveNavLink() {
             const currentPath = window.location.pathname.split('/').pop();
             const links = document.querySelectorAll('.ham-menu ul li a');
             links.forEach(link => {
-                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.html')) {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (currentPath === '' && href === 'index.html')) {
                     link.parentElement.classList.add('active');
                 }
             });
+        }
+
+        // Load all components sequentially/in parallel
+        document.addEventListener('DOMContentLoaded', async function() {
+            await Promise.all([
+                loadComponent('header-container', './inc/header.html'),
+                loadComponent('navbar-container', './inc/navbar.html'),
+                loadComponent('footer-container', './inc/footer.html')
+            ]);
+            
+            // Apply active link state after navbar HTML is inserted into DOM
+            setActiveNavLink();
         });
 
-        // Notice Popup
+        // Notice Popup logic
         function isNoticeShown() {
             return localStorage.getItem('noticeShownIndex');
         }
 
         function setNoticeShown() {
-            localStorage.setItem('noticeShownIndex', true);
+            localStorage.setItem('noticeShownIndex', 'true');
         }
 
         function showNotice() {
             if (!isNoticeShown()) {
                 const notice = document.getElementById('notice');
                 setTimeout(() => {
-                    notice.style.display = 'block';
-                    setNoticeShown();
+                    if (notice) {
+                        notice.style.display = 'block';
+                        setNoticeShown();
+                    }
                 }, 2000);
             }
         }
 
         function closeNotice() {
-            document.getElementById('notice').style.display = 'none';
+            const notice = document.getElementById('notice');
+            if (notice) notice.style.display = 'none';
             setNoticeShown();
         }
 
         window.addEventListener('load', showNotice);
 
-        // FAQ Toggle
+        // FAQ Accordion Toggle
         document.querySelectorAll('.faq-item').forEach(item => {
             item.addEventListener('click', () => {
                 item.classList.toggle('active');
             });
         });
 
-        // Prevent right-click only on non-link elements
+        // Prevent Right Click context menu except on link elements
         document.addEventListener('contextmenu', e => {
             if (!e.target.closest('a')) {
                 e.preventDefault();
