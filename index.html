@@ -653,33 +653,46 @@
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
     <script>
-        // Fetch external HTML templates safely with absolute fallback path options
+        // Fetch external HTML templates safely
         async function loadIncludes() {
             try {
-                // Fetch unified header & footer partials
                 const [headerRes, footerRes] = await Promise.all([
                     fetch('inc/header.html').catch(() => fetch('/inc/header.html')),
                     fetch('inc/footer.html').catch(() => fetch('/inc/footer.html'))
                 ]);
-
+    
                 if (headerRes && headerRes.ok) {
                     document.getElementById('header-container').innerHTML = await headerRes.text();
+                    initNavbarToggle(); // Initialize toggle AFTER header loads
                 } else {
                     console.warn('Could not load header. Ensure server is running and inc/header.html exists.');
                 }
-
+    
                 if (footerRes && footerRes.ok) {
                     document.getElementById('footer-container').innerHTML = await footerRes.text();
                 } else {
                     console.warn('Could not load footer. Ensure server is running and inc/footer.html exists.');
                 }
-
+    
                 setActiveNavLink();
             } catch (error) {
                 console.error('Error fetching include files:', error);
             }
         }
-
+    
+        // Dynamic Navbar Toggle Handler
+        function initNavbarToggle() {
+            const toggleBtn = document.querySelector('.nav-toggle, .hamburger, .menu-icon');
+            const navMenu = document.querySelector('.nav-links, .ham-menu, nav ul');
+    
+            if (toggleBtn && navMenu) {
+                toggleBtn.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    toggleBtn.classList.toggle('open');
+                });
+            }
+        }
+    
         function setActiveNavLink() {
             const currentPath = window.location.pathname.split('/').pop() || 'index.html';
             const links = document.querySelectorAll('.ham-menu ul li a, .header-container nav a');
@@ -694,31 +707,27 @@
                 }
             });
         }
-
+    
         document.addEventListener('DOMContentLoaded', function() {
             loadIncludes();
-
+    
             // Client-side Session Handling
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
             if (isLoggedIn) {
-                document.getElementById('hero-button-group').innerHTML = 
-                    '<a href="users/home.html" class="btn btn-dashboard">Dashboard</a>';
-                document.getElementById('cta-button-container').innerHTML = 
-                    '<a href="users/home.html" class="btn">Go to Dashboard</a>';
-                document.getElementById('notice-button-container').innerHTML = 
-                    '<a href="users/home.html" class="btn btn-dashboard">Go to Dashboard</a>';
+                const heroBtnGroup = document.getElementById('hero-button-group');
+                const ctaBtnContainer = document.getElementById('cta-button-container');
+                const noticeBtnContainer = document.getElementById('notice-button-container');
+    
+                if (heroBtnGroup) heroBtnGroup.innerHTML = '<a href="users/home.html" class="btn btn-dashboard">Dashboard</a>';
+                if (ctaBtnContainer) ctaBtnContainer.innerHTML = '<a href="users/home.html" class="btn">Go to Dashboard</a>';
+                if (noticeBtnContainer) noticeBtnContainer.innerHTML = '<a href="users/home.html" class="btn btn-dashboard">Go to Dashboard</a>';
             }
         });
-
+    
         // Notice Popup Logic
-        function isNoticeShown() {
-            return localStorage.getItem('noticeShownIndex');
-        }
-
-        function setNoticeShown() {
-            localStorage.setItem('noticeShownIndex', 'true');
-        }
-
+        function isNoticeShown() { return localStorage.getItem('noticeShownIndex'); }
+        function setNoticeShown() { localStorage.setItem('noticeShownIndex', 'true'); }
+    
         function showNotice() {
             if (!isNoticeShown()) {
                 const notice = document.getElementById('notice');
@@ -730,15 +739,15 @@
                 }
             }
         }
-
+    
         function closeNotice() {
             const notice = document.getElementById('notice');
             if (notice) notice.style.display = 'none';
             setNoticeShown();
         }
-
+    
         window.addEventListener('load', showNotice);
-
+    
         // FAQ Accordion Toggle
         document.querySelectorAll('.faq-item').forEach(item => {
             item.addEventListener('click', () => {
