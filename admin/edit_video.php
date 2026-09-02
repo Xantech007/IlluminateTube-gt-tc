@@ -13,7 +13,7 @@ require_once '../database/conn.php';
 $video = null;
 if (isset($_GET['id'])) {
     try {
-        $stmt = $pdo->prepare("SELECT id, title, url, reward FROM videos WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT id, title, url, reward, likes FROM videos WHERE id = ?");
         $stmt->execute([$_GET['id']]);
         $video = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$video) {
@@ -33,12 +33,14 @@ if (isset($_GET['id'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = filter_var($_POST['title'], FILTER_SANITIZE_STRING);
     $reward = filter_var($_POST['reward'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    $likes = isset($_POST['likes']) ? intval($_POST['likes']) : 0;
+    
     $upload_dir = '../users/videos/';
     $allowed_types = ['video/mp4', 'video/avi', 'video/quicktime'];
     $max_size = 100 * 1024 * 1024; // 100MB
     $url = $video['url']; // Keep existing URL unless a new file is uploaded
 
-    if (empty($title) || empty($reward)) {
+    if (empty($title) || !isset($_POST['reward'])) {
         $_SESSION['error'] = 'Title and reward are required.';
         header("Location: edit_video.php?id=" . $_GET['id']);
         exit;
@@ -90,8 +92,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Update database
     try {
-        $stmt = $pdo->prepare("UPDATE videos SET title = ?, url = ?, reward = ? WHERE id = ?");
-        $stmt->execute([$title, $url, $reward, $_GET['id']]);
+        $stmt = $pdo->prepare("UPDATE videos SET title = ?, url = ?, reward = ?, likes = ? WHERE id = ?");
+        $stmt->execute([$title, $url, $reward, $likes, $_GET['id']]);
         $_SESSION['success'] = 'Video updated successfully.';
         header("Location: dashboard.php");
         exit;
@@ -144,6 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
+            box-sizing: border-box;
         }
 
         .edit-form input[type="file"] {
@@ -186,11 +189,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form action="" method="POST" enctype="multipart/form-data" class="edit-form">
             <input type="text" name="title" value="<?php echo htmlspecialchars($video['title']); ?>" placeholder="Video Title" required>
             <input type="file" name="video_file" accept=".mp4,.avi,.mov">
-            <p>Current video: <?php echo htmlspecialchars($video['url']); ?> (leave file empty to keep current video)</p>
+            <p style="font-size: 13px; color: #666;">Current video: <?php echo htmlspecialchars($video['url']); ?> (leave file empty to keep current video)</p>
             <input type="number" name="reward" value="<?php echo htmlspecialchars($video['reward']); ?>" placeholder="Reward ($)" step="0.01" required>
+            <input type="number" name="likes" value="<?php echo htmlspecialchars($video['likes'] ?? 0); ?>" placeholder="Likes" min="0" required>
             <button type="submit">Update Video</button>
         </form>
-        <a href="dashboard.php" style="display: block; text-align: center; margin-top: 10px; color: #007bff;">Back to Dashboard</a>
+        <a href="dashboard.php" style="display: block; text-align: center; margin-top: 15px; color: #007bff; text-decoration: none;">Back to Dashboard</a>
     </div>
 </body>
 </html>
