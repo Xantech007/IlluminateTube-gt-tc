@@ -621,7 +621,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Fixed Bottom Menu -->
     <div class="bottom-menu" role="navigation">
         <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
-        <a href="profile.php" class="active"><i class="fa-solid fa-user"></i>Profile</a>
+        <a href="profile.php" class="active"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
         <a href="history.php"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
         <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
         <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
