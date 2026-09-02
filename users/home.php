@@ -1,184 +1,3 @@
-<?php
-session_start();
-require_once '../database/conn.php';
-
-// Generate CSRF token if not set
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    error_log('No user_id in session, redirecting to signin', 3, '../debug.log');
-    header('Location: ../signin.php');
-    exit;
-}
-
-// Initialize session trackers for watched videos
-if (!isset($_SESSION['watched_videos'])) {
-    $_SESSION['watched_videos'] = [];
-}
-
-// Handle AJAX reward collection & DB update directly
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'claim_reward') {
-    header('Content-Type: application/json');
-    $v_id = intval($_POST['video_id']);
-    $user_id = $_SESSION['user_id'];
-
-    // Verify if already watched in DB or session
-    try {
-        $check_stmt = $pdo->prepare("SELECT id FROM activities WHERE user_id = ? AND video_id = ? AND action LIKE 'Watched%'");
-        $check_stmt->execute([$user_id, $v_id]);
-        
-        if ($check_stmt->fetch() || in_array($v_id, $_SESSION['watched_videos'])) {
-            echo json_encode(['status' => 'error', 'message' => 'Video already watched.']);
-            exit;
-        }
-
-        // Fetch reward amount to prevent manipulation from front-end
-        $vid_stmt = $pdo->prepare("SELECT reward FROM videos WHERE id = ?");
-        $vid_stmt->execute([$v_id]);
-        $video_data = $vid_stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$video_data) {
-            echo json_encode(['status' => 'error', 'message' => 'Invalid video.']);
-            exit;
-        }
-
-        $reward = floatval($video_data['reward']);
-
-        $pdo->beginTransaction();
-
-        // 1. Update user balance in Database
-        $update_balance = $pdo->prepare("UPDATE users SET balance = balance + ? WHERE id = ?");
-        $update_balance->execute([$reward, $user_id]);
-
-        // 2. Log activity to prevent double rewards on refresh
-        $log_activity = $pdo->prepare("INSERT INTO activities (user_id, video_id, action, created_at) VALUES (?, ?, ?, NOW())");
-        $log_activity->execute([$user_id, $v_id, 'Watched video #' . $v_id]);
-
-        $pdo->commit();
-
-        // 3. Update session tracking
-        $_SESSION['watched_videos'][] = $v_id;
-
-        // Fetch new updated balance
-        $bal_stmt = $pdo->prepare("SELECT balance FROM users WHERE id = ?");
-        $bal_stmt->execute([$user_id]);
-        $new_balance = floatval($bal_stmt->fetchColumn());
-
-        echo json_encode([
-            'status' => 'success',
-            'new_balance' => number_format($new_balance, 2),
-            'reward' => number_format($reward, 2)
-        ]);
-    } catch (PDOException $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        error_log('Reward Transaction Error: ' . $e->getMessage(), 3, '../debug.log');
-        echo json_encode(['status' => 'error', 'message' => 'Database update failed.']);
-    }
-    exit;
-}
-
-// Fetch user data
-try {
-    $stmt = $pdo->prepare("
-        SELECT name, balance, verification_status, COALESCE(country, '') AS country, upgrade_status
-        FROM users 
-        WHERE id = ?
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$user) {
-        error_log('User not found for ID: ' . $_SESSION['user_id'], 3, '../debug.log');
-        session_destroy();
-        header('Location: ../signin.php?error=user_not_found');
-        exit;
-    }
-    $username = htmlspecialchars($user['name']);
-    $db_balance = floatval($user['balance']);
-    $total_display_balance = number_format($db_balance, 2);
-    $verification_status = $user['verification_status'];
-    $user_country = htmlspecialchars($user['country']);
-    $upgrade_status = $user['upgrade_status'] ?? 'not_upgraded';
-} catch (PDOException $e) {
-    error_log('Database error: ' . $e->getMessage(), 3, '../debug.log');
-    if (file_exists('../error.php')) {
-        include '../error.php';
-    } else {
-        echo 'Database error occurred: ' . htmlspecialchars($e->getMessage());
-    }
-    exit;
-}
-
-// Helper function to check URL reachability
-function url_exists($url) {
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_NOBODY, true);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_exec($ch);
-    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $error = curl_error($ch);
-    curl_close($ch);
-    
-    if ($code !== 200) {
-        return ['status' => false, 'error' => "HTTP $code - $error"];
-    }
-    return ['status' => true];
-}
-
-// Fetch up to 10 videos excluding both DB activities and current session watched videos
-$videos = [];
-$video_error = null;
-
-try {
-    $stmt = $pdo->prepare("
-        SELECT v.id, v.title, v.url, v.reward, COALESCE(v.likes, 0) AS likes 
-        FROM videos v 
-        WHERE v.id NOT IN (
-            SELECT video_id FROM activities 
-            WHERE user_id = ? AND action LIKE 'Watched%'
-        ) 
-        ORDER BY RAND() LIMIT 10
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
-    $fetched_videos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    foreach ($fetched_videos as $vid) {
-        // Exclude session watched videos as well
-        if (in_array($vid['id'], $_SESSION['watched_videos'])) {
-            continue;
-        }
-
-        $full_url = 'https://tasktube.gt.tc/users/videos/' . basename($vid['url']);
-        $url_check = url_exists($full_url);
-        if ($url_check['status']) {
-            $vid['url'] = $full_url;
-            $videos[] = $vid;
-        }
-    }
-
-    if (empty($videos)) {
-        $video_error = 'All videos have been watched! Check back later for new ads.';
-    }
-} catch (PDOException $e) {
-    error_log('Video fetch error: ' . $e->getMessage(), 3, '../debug.log');
-    $video_error = 'Failed to load videos from database.';
-}
-
-$success_message = isset($_GET['success']) ? htmlspecialchars($_GET['success']) : null;
-$error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null;
-?>
-
-<?php include('inc/translate.php'); ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -496,77 +315,102 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     <div class="top-header">
         <div class="user-badge">
             <img src="img/top.png" alt="Logo">
-            <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
+            <span id="usernameDisplay" style="font-size: 14px; font-weight: 600;">John Doe</span>
         </div>
         <div class="balance-badge">
-            $<span id="balance"><?php echo $total_display_balance; ?></span>
+            $<span id="balance">12.50</span>
         </div>
     </div>
 
-    <?php if ($success_message): ?>
-        <div class="notification" role="alert">
-            <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
-            <span><?php echo $success_message; ?></span>
-        </div>
-    <?php endif; ?>
-    <?php if ($error_message): ?>
-        <div class="notification" role="alert">
-            <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
-            <span><?php echo $error_message; ?></span>
-        </div>
-    <?php endif; ?>
+    <!-- Notification Containers for feedback -->
+    <div id="alertContainer"></div>
 
     <!-- TikTok Scroll Container -->
     <div class="tiktok-feed" id="tiktokFeed">
-        <?php if (!empty($videos)): ?>
-            <?php foreach ($videos as $index => $vid): ?>
-                <div class="video-card" data-index="<?php echo $index; ?>" id="video-card-<?php echo $vid['id']; ?>">
-                    <div class="reward-countdown-banner">
-                        <i class="fa-solid fa-stopwatch" style="color: #4ade80;"></i>
-                        Reward in: <span class="timer-display">--s</span>
-                    </div>
+        
+        <!-- Sample Video Card 1 -->
+        <div class="video-card" data-index="0" id="video-card-101">
+            <div class="reward-countdown-banner">
+                <i class="fa-solid fa-stopwatch" style="color: #4ade80;"></i>
+                Reward in: <span class="timer-display">--s</span>
+            </div>
 
-                    <video 
-                        class="feed-video" 
-                        playsinline 
-                        preload="<?php echo $index === 0 ? 'auto' : 'metadata'; ?>"
-                        data-video-id="<?php echo $vid['id']; ?>" 
-                        data-reward="<?php echo $vid['reward']; ?>">
-                        <source src="<?php echo htmlspecialchars($vid['url']); ?>" type="video/mp4">
-                    </video>
+            <video 
+                class="feed-video" 
+                playsinline 
+                preload="auto"
+                data-video-id="101" 
+                data-reward="0.50">
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            </video>
 
-                    <!-- Side Action Buttons -->
-                    <div class="actions-sidebar">
-                        <button class="action-btn like-btn" aria-label="Like video">
-                            <i class="fa-solid fa-heart"></i>
-                            <span class="like-count" data-likes="<?php echo (int)$vid['likes']; ?>">0</span>
-                        </button>
+            <div class="actions-sidebar">
+                <button class="action-btn like-btn" aria-label="Like video">
+                    <i class="fa-solid fa-heart"></i>
+                    <span class="like-count" data-likes="1420">0</span>
+                </button>
 
-                        <div class="action-btn">
-                            <i class="fa-solid fa-coins" style="color: #eab308;"></i>
-                            <span>+$<?php echo number_format($vid['reward'], 2); ?></span>
-                        </div>
-
-                        <button class="action-btn share-btn" aria-label="Share">
-                            <i class="fa-solid fa-share"></i>
-                            <span>Share</span>
-                        </button>
-                    </div>
-
-                    <!-- Video Details Overlay -->
-                    <div class="video-overlay-info">
-                        <h3><?php echo htmlspecialchars($vid['title']); ?></h3>
-                        <p>Watch full ad to earn <span>+$<?php echo number_format($vid['reward'], 2); ?></span> directly to your balance.</p>
-                    </div>
+                <div class="action-btn">
+                    <i class="fa-solid fa-coins" style="color: #eab308;"></i>
+                    <span>+$0.50</span>
                 </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
+
+                <button class="action-btn share-btn" aria-label="Share">
+                    <i class="fa-solid fa-share"></i>
+                    <span>Share</span>
+                </button>
+            </div>
+
+            <div class="video-overlay-info">
+                <h3>Big Buck Bunny Teaser</h3>
+                <p>Watch full ad to earn <span>+$0.50</span> directly to your balance.</p>
+            </div>
+        </div>
+
+        <!-- Sample Video Card 2 -->
+        <div class="video-card" data-index="1" id="video-card-102">
+            <div class="reward-countdown-banner">
+                <i class="fa-solid fa-stopwatch" style="color: #4ade80;"></i>
+                Reward in: <span class="timer-display">--s</span>
+            </div>
+
+            <video 
+                class="feed-video" 
+                playsinline 
+                preload="metadata"
+                data-video-id="102" 
+                data-reward="0.75">
+                <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
+            </video>
+
+            <div class="actions-sidebar">
+                <button class="action-btn like-btn" aria-label="Like video">
+                    <i class="fa-solid fa-heart"></i>
+                    <span class="like-count" data-likes="850">0</span>
+                </button>
+
+                <div class="action-btn">
+                    <i class="fa-solid fa-coins" style="color: #eab308;"></i>
+                    <span>+$0.75</span>
+                </div>
+
+                <button class="action-btn share-btn" aria-label="Share">
+                    <i class="fa-solid fa-share"></i>
+                    <span>Share</span>
+                </button>
+            </div>
+
+            <div class="video-overlay-info">
+                <h3>Sample Cinematic Promo</h3>
+                <p>Watch full ad to earn <span>+$0.75</span> directly to your balance.</p>
+            </div>
+        </div>
 
         <!-- Empty state message displayed when all videos are finished -->
-        <div class="no-videos-container" id="noVideosMsg" style="<?php echo empty($videos) ? 'display: flex;' : 'display: none;'; ?>">
+        <div class="no-videos-container" id="noVideosMsg" style="display: none;">
             <i class="fa-solid fa-circle-check" style="font-size: 56px; color: #22c55e; margin-bottom: 16px;"></i>
             <h2>All Videos Watched!</h2>
-            <p style="margin-top: 8px; color: #9ca3af;"><?php echo $video_error ?: 'You have watched all available videos for today. Please check back later for new ads!'; ?></p>
+            <p style="margin-top: 8px; color: #9ca3af;">You have watched all available videos for today. Please check back later for new ads!</p>
         </div>
     </div>
 
@@ -574,10 +418,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
     <!-- Fixed Bottom Menu -->
     <div class="bottom-menu" role="navigation">
-        <a href="home.php" class="active"><i class="fa-solid fa-house"></i>Home</a>
-        <a href="profile.php"><i class="fa-solid fa-user"></i>Profile</a>
-        <a href="history.php"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
-        <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
+        <a href="home.html" class="active"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
+        <a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
+        <a href="support.html"><i class="fa-solid fa-headset"></i>Support</a>
         <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
     </div>
 
@@ -673,55 +517,31 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                 lastTap = currentTime;
             });
 
-            // Video completion reward dispatch
+            // Video completion reward dispatch (Simulated via frontend handlers)
             video.addEventListener('ended', function() {
-                const videoId = parseInt(video.getAttribute('data-video-id'));
+                const rewardVal = parseFloat(video.getAttribute('data-reward'));
+                
+                // Update balance locally for demonstration
+                const balanceEl = document.getElementById('balance');
+                let currentBalance = parseFloat(balanceEl.textContent) || 0;
+                currentBalance += rewardVal;
+                balanceEl.textContent = currentBalance.toFixed(2);
 
-                $.ajax({
-                    url: window.location.href,
-                    type: 'POST',
-                    data: { action: 'claim_reward', video_id: videoId },
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            // Update total user balance UI dynamically
-                            document.getElementById('balance').textContent = response.new_balance;
-
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Reward Earned!',
-                                text: `+$${response.reward} added to your balance!`,
-                                timer: 1800,
-                                showConfirmButton: false
-                            });
-
-                            // Smoothly fade out and remove watched video card from view
-                            $(card).fadeOut(400, function() {
-                                card.remove();
-                                checkEmptyFeed();
-                            });
-
-                            scrollToNextVideo(card);
-                        } else {
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Notice',
-                                text: response.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        }
-                    },
-                    error: function() {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Failed to add reward. Please check your connection.',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    }
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Reward Earned!',
+                    text: `+$${rewardVal.toFixed(2)} added to your balance!`,
+                    timer: 1800,
+                    showConfirmButton: false
                 });
+
+                // Smoothly fade out and remove watched video card from view
+                $(card).fadeOut(400, function() {
+                    card.remove();
+                    checkEmptyFeed();
+                });
+
+                scrollToNextVideo(card);
             });
         });
 
@@ -774,42 +594,21 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                 confirmButtonText: 'Yes, log out'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $.ajax({
-                        url: 'logout.php',
-                        type: 'POST',
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.success) {
-                                window.location.href = '../signin.php';
-                            }
-                        }
-                    });
+                    window.location.href = 'signin.html';
                 }
             });
         });
 
-        // Fetch Notifications
+        // Simulated notifications loop
         const notificationContainer = document.getElementById('notificationContainer');
-        function fetchNotifications() {
-            $.ajax({
-                url: 'fetch_notifications.php',
-                type: 'GET',
-                dataType: 'json',
-                success: function(notifications) {
-                    notificationContainer.innerHTML = '';
-                    notifications.forEach((message, index) => {
-                        const notification = document.createElement('div');
-                        notification.className = 'notification';
-                        notification.innerHTML = `<span>${message.text}</span>`;
-                        notificationContainer.appendChild(notification);
-                        notification.style.top = `${125 + index * 60}px`;
-                        setTimeout(() => notification.remove(), 3500);
-                    });
-                }
-            });
+        function showMockNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `<i class="fa-solid fa-circle-info" style="color: #4ade80;"></i><span>New bonus videos are available!</span>`;
+            notificationContainer.appendChild(notification);
+            setTimeout(() => notification.remove(), 3500);
         }
-        fetchNotifications();
-        setInterval(fetchNotifications, 20000);
+        setTimeout(showMockNotification, 3000);
 
         // Prevent Context Menu
         document.addEventListener('contextmenu', function(event) {
