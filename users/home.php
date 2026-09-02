@@ -105,8 +105,8 @@ try {
     $upgrade_status = $user['upgrade_status'] ?? 'not_upgraded';
 } catch (PDOException $e) {
     error_log('Database error: ' . $e->getMessage(), 3, '../debug.log');
-    if (file_exists('../error.php')) {
-        include '../error.php';
+    if (file_exists('../error')) {
+        include '../error';
     } else {
         echo 'Database error occurred: ' . htmlspecialchars($e->getMessage());
     }
@@ -157,7 +157,7 @@ try {
             continue;
         }
 
-        $full_url = 'https://tasktube.gt.tc/users/videos/' . basename($vid['url']);
+        $full_url = 'https://illumunatetube.gt.tc/users/videos/' . basename($vid['url']);
         $url_check = url_exists($full_url);
         if ($url_check['status']) {
             $vid['url'] = $full_url;
