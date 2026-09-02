@@ -585,7 +585,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="bottom-menu" role="navigation">
         <a href="home.php">Home</a>
-        <a href="profile.php" class="active">Profile</a>
+        <a href="profile.php" class="active">Withdraw</a>
         <a href="history.php">History</a>
         <a href="support.php">Support</a>
         <button id="logoutBtn" aria-label="Log out">Logout</button>
