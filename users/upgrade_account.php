@@ -240,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: none;
         }
 
-        /* Snap Slide Card */
+        /* Snap Slide Card - Increase bottom padding to create more clearance above the footer */
         .profile-card-slide {
             width: 100%;
             min-height: 100vh;
@@ -250,15 +250,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 80px 20px 90px 20px;
+            padding: 80px 20px 120px 20px; /* Increased bottom padding from 90px to 120px */
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
-
-        /* Card Container styling */
+        
+        /* Card Container Inner - Adjust max-height to ensure internal scrolling handles the extra space */
         .card-inner {
             width: 100%;
             max-width: 460px;
-            max-height: calc(100vh - 170px);
+            max-height: calc(100vh - 200px); /* Increased offset from 170px to 200px */
             overflow-y: auto;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
