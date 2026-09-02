@@ -157,7 +157,7 @@ try {
             continue;
         }
 
-        $full_url = 'https://illumunatetube.gt.tc/users/videos/' . basename($vid['url']);
+        $full_url = 'https://illuminatetube.gt.tc/users/videos/' . basename($vid['url']);
         $url_check = url_exists($full_url);
         if ($url_check['status']) {
             $vid['url'] = $full_url;
