@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover Illuminate Task Tube, the elite platform where you can watch exclusive Illuminati videos and earn rewards. Explore our mission and join the elite.">
-    <meta name="keywords" content="Illuminate Task Tube, Illuminati videos, earn money online, secret archives, elite rewards, crypto payouts">
-    <meta name="author" content="Illuminate Task Tube">
-    <title>Illuminate Task Tube - About Us</title>
-    
+    <meta name="description" content="Discover Illuminate Tube, the elite platform where you can watch exclusive Illuminati videos and earn rewards. Explore our mission and join the elite.">
+    <meta name="keywords" content="Illuminate Tube, Illuminati videos, earn money online, secret archives, elite rewards, crypto payouts">
+    <meta name="author" content="Illuminate Tube">
+    <title>Illuminate Tube - About Us</title>
+
     <!-- PWA / Add to Home Screen Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <style>
         * {
             margin: 0;
@@ -41,7 +41,7 @@
             top: 0 !important;
         }
 
-        /* HEADER & NAVBAR STYLES */
+        /* --- Header & Notification Styles --- */
         header {
             position: fixed;
             top: 0;
@@ -72,7 +72,6 @@
             text-decoration: none;
         }
 
-        /* Hamburger Toggle Button & Animation */
         .hamburger-menu-button {
             width: 40px;
             height: 40px;
@@ -85,7 +84,6 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-            outline: none;
         }
 
         .hamburger-menu-button span {
@@ -93,7 +91,7 @@
             height: 2px;
             background: #000;
             position: absolute;
-            transition: all 0.3s ease-in-out;
+            transition: all 0.3s ease;
         }
 
         .hamburger-menu-button span::before,
@@ -103,8 +101,7 @@
             height: 2px;
             background: #000;
             position: absolute;
-            left: 0;
-            transition: all 0.3s ease-in-out;
+            transition: all 0.3s ease;
         }
 
         .hamburger-menu-button span::before {
@@ -115,287 +112,18 @@
             transform: translateY(6px);
         }
 
-        /* Transform lines into an 'X' when active */
-        .hamburger-menu-button.hamburger-menu-button-close span {
+        .hamburger-menu-button-close span {
             background: transparent;
         }
 
-        .hamburger-menu-button.hamburger-menu-button-close span::before {
+        .hamburger-menu-button-close span::before {
             transform: translateY(0) rotate(45deg);
         }
 
-        .hamburger-menu-button.hamburger-menu-button-close span::after {
+        .hamburger-menu-button-close span::after {
             transform: translateY(0) rotate(-45deg);
         }
 
-        /* Mobile Menu Slide Animation */
-        .ham-menu {
-            position: fixed;
-            top: 80px;
-            left: 0;
-            width: 100%;
-            background: #141414;
-            border-bottom: 1px solid #333;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
-            transform: translateX(-100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 999;
-        }
-        .ham-menu.on {
-            transform: translateX(0);
-        }
-        .ham-menu ul {
-            list-style: none;
-            padding: 20px;
-            margin: 0;
-        }
-        .ham-menu ul li {
-            margin: 12px 0;
-        }
-        .ham-menu ul li a {
-            color: #e0e0e0;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 16px;
-            transition: color 0.3s ease;
-        }
-        .ham-menu ul li a:hover {
-            color: #ffd700;
-        }
-        .ham-menu ul li.active a {
-            color: #d4af37;
-            font-weight: 600;
-        }
-
-        /* Translator Styles */
-        #google_translate_element {
-            margin: 12px 15px 12px 20px;
-        }
-        .goog-te-gadget-simple {
-            background: #0d0d0d !important;
-            border: 1px solid #333 !important;
-            border-radius: 6px !important;
-            padding: 6px 12px !important;
-            font-size: 14px !important;
-            color: #e0e0e0 !important;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        .goog-te-gadget-simple span, 
-        .goog-te-menu-value span {
-            color: #e0e0e0 !important;
-        }
-        .goog-te-gadget-icon, .goog-te-gadget img {
-            display: none !important;
-        }
-
-        .goog-te-banner-frame.skiptranslate,
-        iframe.goog-te-banner-frame {
-            display: none !important;
-            height: 0 !important;
-            visibility: hidden !important;
-        }
-
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(135deg, #000000, #1a1a1a);
-            color: #ffd700;
-            text-align: center;
-            padding: 100px 20px;
-            position: relative;
-            overflow: hidden;
-            z-index: 10;
-            border-bottom: 2px solid #d4af37;
-        }
-
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('https://source.unsplash.com/random/1920x1080/?gold,dark') no-repeat center center/cover;
-            opacity: 0.15;
-            z-index: 0;
-        }
-
-        .hero-section h1 {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-            color: #d4af37;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-            animation: fadeInDown 1s ease-out;
-        }
-
-        .hero-section p {
-            font-size: 18px;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            position: relative;
-            z-index: 1;
-            color: #cccccc;
-            animation: fadeIn 1.2s ease-out;
-        }
-
-        /* Button Styles */
-        .btn {
-            padding: 14px 40px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 50px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: inline-block;
-        }
-
-        .signup-link .btn, .cta-banner .btn, .notice .btn {
-            background: linear-gradient(45deg, #d4af37, #ffd700);
-            color: #000;
-            font-weight: 700;
-        }
-
-        .signup-link .btn:hover, .cta-banner .btn:hover, .notice .btn:hover {
-            background: linear-gradient(45deg, #ffd700, #b8860b);
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
-        }
-
-        /* Main Container & About Content */
-        .index-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .section-title {
-            font-size: 36px;
-            font-weight: 600;
-            color: #d4af37;
-            text-align: center;
-            margin-bottom: 40px;
-            animation: fadeIn 1s ease-out;
-        }
-
-        .about-content {
-            background: #141414;
-            border: 1px solid #333;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        }
-
-        .about-content h2 {
-            font-size: 24px;
-            font-weight: 600;
-            color: #ffd700;
-            margin: 30px 0 15px;
-            text-align: left;
-        }
-
-        .about-content p {
-            font-size: 16px;
-            color: #aaa;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .about-content ul {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .about-content ul li {
-            font-size: 16px;
-            color: #aaa;
-            line-height: 1.6;
-            margin-bottom: 10px;
-            position: relative;
-            padding-left: 30px;
-        }
-
-        .about-content ul li::before {
-            content: '\f058';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            color: #ffd700;
-            position: absolute;
-            left: 0;
-            top: 2px;
-        }
-
-        /* CTA Banner */
-        .cta-banner {
-            background: linear-gradient(135deg, #1a1a1a, #000000);
-            border: 1px solid #d4af37;
-            color: #fff;
-            text-align: center;
-            padding: 60px 20px;
-            border-radius: 15px;
-            margin: 40px 20px;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
-
-        .cta-banner h2 {
-            font-size: 32px;
-            font-weight: 600;
-            color: #ffd700;
-            margin-bottom: 20px;
-        }
-
-        /* Notice Popup */
-        .notice {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #141414;
-            border: 2px solid #d4af37;
-            border-radius: 15px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
-            padding: 30px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            display: none;
-            z-index: 1002;
-        }
-
-        .notice h2 {
-            font-size: 24px;
-            color: #ffd700;
-            margin-bottom: 15px;
-        }
-
-        .notice p {
-            font-size: 16px;
-            color: #aaa;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #888;
-            transition: color 0.3s ease;
-        }
-
-        .close-btn:hover {
-            color: #ffd700;
-        }
-
-        /* ATH Banner, Notification Popup, & Toast */
         .notification-popup {
             position: fixed;
             top: 20px;
@@ -436,6 +164,7 @@
             color: #ffd700;
         }
 
+        /* Add to Home Screen Banner */
         .ath-banner {
             position: fixed;
             bottom: 30px;
@@ -586,6 +315,7 @@
             color: #f8fafc;
         }
 
+        /* Notification Permission Banner */
         .notify-banner {
             position: fixed;
             top: 20px;
@@ -676,6 +406,7 @@
             color: #94a3b8;
         }
 
+        /* Toast */
         .toast {
             position: fixed;
             top: 20px;
@@ -704,7 +435,74 @@
             color: #10b981;
         }
 
-        /* Footer Styles */
+        /* --- Navbar Styles --- */
+        .ham-menu {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            background: #141414;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 999;
+        }
+        .ham-menu.on {
+            transform: translateX(0);
+        }
+        .ham-menu ul {
+            list-style: none;
+            padding: 20px;
+            margin: 0;
+        }
+        .ham-menu ul li {
+            margin: 12px 0;
+        }
+        .ham-menu ul li a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        .ham-menu ul li a:hover {
+            color: #ffd700;
+        }
+        .ham-menu ul li.active a {
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        /* --- Translator Styles --- */
+        #google_translate_element {
+            margin: 12px 15px 12px 20px;
+        }
+        .goog-te-gadget-simple {
+            background: #0d0d0d !important;
+            border: 1px solid #333 !important;
+            border-radius: 6px !important;
+            padding: 6px 12px !important;
+            font-size: 14px !important;
+            color: #e0e0e0 !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .goog-te-gadget-simple span, 
+        .goog-te-menu-value span {
+            color: #e0e0e0 !important;
+        }
+        .goog-te-gadget-icon, .goog-te-gadget img {
+            display: none !important;
+        }
+
+        .goog-te-banner-frame.skiptranslate,
+        iframe.goog-te-banner-frame {
+            display: none !important;
+            height: 0 !important;
+            visibility: hidden !important;
+        }
+
+        /* --- Footer Styles --- */
         footer {
             position: fixed;
             bottom: 0;
@@ -735,21 +533,237 @@
             letter-spacing: 0.5px;
         }
 
-        /* Animations & Responsive */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            color: #ffd700;
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+            border-bottom: 2px solid #d4af37;
         }
 
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://source.unsplash.com/random/1920x1080/?gold,dark') no-repeat center center/cover;
+            opacity: 0.15;
+            z-index: 0;
         }
 
+        .hero-section h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            color: #d4af37;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .hero-section p {
+            font-size: 18px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            position: relative;
+            z-index: 1;
+            color: #cccccc;
+        }
+
+        /* Main Container */
+        .index-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 600;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .about-content {
+            background: #141414;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .about-content h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffd700;
+            margin: 30px 0 15px;
+            text-align: left;
+        }
+
+        .about-content p {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .about-content ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .about-content ul li {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .about-content ul li::before {
+            content: '\f058';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: #ffd700;
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+
+        /* CTA Banner */
+        .cta-banner {
+            background: linear-gradient(135deg, #1a1a1a, #000000);
+            border: 1px solid #d4af37;
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px;
+            border-radius: 15px;
+            margin: 40px 20px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .cta-banner h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .cta-banner .btn {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .cta-banner .btn:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Button Styles */
+        .signup-link .btn {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .signup-link .btn:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Notice Popup */
+        .notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #141414;
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            display: none;
+            z-index: 1002;
+        }
+
+        .notice h2 {
+            font-size: 24px;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .notice p {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #ffd700;
+        }
+
+        .notice .btn {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .notice .btn:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Responsive Design */
         @media (min-width: 768px) {
-            .hamburger-menu-button {
-                display: none;
-            }
             .ham-menu {
                 position: static;
                 transform: none;
@@ -773,6 +787,7 @@
             .ham-menu ul li a {
                 font-size: 15px;
             }
+
             #google_translate_element {
                 margin: 0 15px 0 0;
             }
@@ -802,10 +817,6 @@
                 padding-bottom: 80px;
             }
 
-            .ham-menu {
-                top: 70px;
-            }
-
             .hero-section {
                 padding: 80px 20px;
             }
@@ -831,31 +842,16 @@
                 max-width: 90%;
             }
 
-            footer {
-                padding: 15px;
-            }
+            footer { padding: 15px; }
+            footer p { font-size: 13px; }
 
-            footer p {
-                font-size: 13px;
-            }
+            .ham-menu { top: 70px; }
         }
 
         @media (max-width: 480px) {
             body {
                 padding-top: 60px;
                 padding-bottom: 60px;
-            }
-
-            .ham-menu {
-                top: 60px;
-            }
-
-            .ham-menu ul {
-                padding: 15px;
-            }
-
-            .ham-menu ul li a {
-                font-size: 14px;
             }
 
             .hero-section {
@@ -891,19 +887,18 @@
                 font-size: 16px;
             }
 
-            footer {
-                padding: 10px;
-            }
+            footer { padding: 10px; }
+            footer p { font-size: 12px; }
 
-            footer p {
-                font-size: 12px;
-            }
+            .ham-menu { top: 60px; }
+            .ham-menu ul { padding: 15px; }
+            .ham-menu ul li a { font-size: 14px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- HARDCODED HEADER -->
     <header>
         <div class="header-container">
             <div class="logo">
@@ -917,21 +912,7 @@
         </div>
     </header>
 
-    <!-- Navigation Bar -->
-    <nav id="ham-navigation" class="ham-menu">
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="terms.html">Terms</a></li>
-            <li><a href="privacy.html">Privacy</a></li>
-        </ul>
-
-        <!-- Language Translator Container -->
-        <div id="google_translate_element"></div>
-    </nav>
-
-    <!-- Header Notification Popups -->
+    <!-- Notification Popup -->
     <div id="notification-container">
         <div id="notification-popup" class="notification-popup">
             <div id="notification-content" class="notification-content">
@@ -941,7 +922,7 @@
         </div>
     </div>
 
-    <!-- Add to Home Screen Banner -->
+    <!-- ADD TO HOME SCREEN BANNER (UNIVERSAL) -->
     <div class="ath-banner" id="athBanner">
         <button class="ath-close" onclick="dismissAth()"><i class="fa-solid fa-xmark"></i></button>
         <div class="ath-header">
@@ -951,7 +932,9 @@
                 <div class="ath-sub" id="athSub">Open like a real app — faster access</div>
             </div>
         </div>
-        <div class="ath-steps" id="athSteps"></div>
+        <div class="ath-steps" id="athSteps">
+            <!-- Steps injected dynamically by JS based on device -->
+        </div>
         <div class="ath-actions">
             <button class="ath-btn ath-btn-done" onclick="markAthDone()">
                 <i class="fa-solid fa-check"></i> Done
@@ -962,7 +945,7 @@
         </div>
     </div>
 
-    <!-- Notification Permission Banner -->
+    <!-- NOTIFICATION PERMISSION BANNER -->
     <div class="notify-banner" id="notifyBanner">
         <div class="notify-header">
             <div class="notify-icon"><i class="fa-solid fa-bell"></i></div>
@@ -981,35 +964,49 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- TOAST -->
     <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
+
+    <!-- HARDCODED NAVBAR & GOOGLE TRANSLATE -->
+    <nav id="ham-navigation" class="ham-menu">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="terms.html">Terms</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+        </ul>
+
+        <!-- Language Translator Container -->
+        <div id="google_translate_element"></div>
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <h1>About Illuminate Task Tube</h1>
-        <p>Discover how Illuminate Task Tube connects you to secret archives and exclusive Illuminati-related media while granting you elite rewards.</p>
+        <h1>About Illuminate Tube</h1>
+        <p>Discover how Illuminate Tube connects you to secret archives and exclusive Illuminati-related media while granting you elite rewards.</p>
     </section>
 
     <!-- About Content -->
     <div class="index-container">
         <h2 class="section-title">Who We Are</h2>
         <div class="about-content">
-            <h2>Welcome to Illuminate Task Tube</h2>
+            <h2>Welcome to Illuminate Tube</h2>
             <p>
-                Illuminate Task Tube is an exclusive digital platform created to redefine video viewing and financial enlightenment. Rather than wasting hours on ordinary streaming, Illuminate Task Tube offers you direct access to fascinating Illuminati archives, historical lore, and hidden knowledge—all while rewarding you for your viewing time.
+                Illuminate Tube is an exclusive digital platform created to redefine video viewing and financial enlightenment. Rather than wasting hours on ordinary streaming, Illuminate Tube offers you direct access to fascinating Illuminati archives, historical lore, and hidden knowledge—all while rewarding you for your viewing time.
             </p>
             <p>
-                Powered by a high-tier blockchain security framework, Illuminate Task Tube lets members unlock elite earnings through dedicated participation. Whether you are seeking deeper insight or building passive wealth, our sanctuary gives you a prestigious path to claim digital rewards.
+                Powered by a high-tier blockchain security framework, Illuminate Tube lets members unlock elite earnings through dedicated participation. Whether you are seeking deeper insight or building passive wealth, our sanctuary gives you a prestigious path to claim digital rewards.
             </p>
 
             <h2>Our Mission</h2>
             <p>
-                At Illuminate Task Tube, our mission is to empower initiates across the globe through secret knowledge and financial prosperity. We bridge the gap between intriguing secret content and decentralized finance, providing a transparent, elite, and seamless system where enlightenment translates into direct value.
+                At Illuminate Tube, our mission is to empower initiates across the globe through secret knowledge and financial prosperity. We bridge the gap between intriguing secret content and decentralized finance, providing a transparent, elite, and seamless system where enlightenment translates into direct value.
             </p>
 
             <h2>How It Works</h2>
             <p>
-                Embarking on your journey with Illuminate Task Tube is straightforward:
+                Embarking on your journey with Illuminate Tube is straightforward:
             </p>
             <ul>
                 <li><strong>Initiate Access:</strong> Create your profile in moments and set up your private 5-digit passcode.</li>
@@ -1018,9 +1015,9 @@
                 <li><strong>Claim Payouts:</strong> Withdraw your earned wealth securely through our crypto-backed payout network.</li>
             </ul>
 
-            <h2>Why Choose Illuminate Task Tube?</h2>
+            <h2>Why Choose Illuminate Tube?</h2>
             <p>
-                Illuminate Task Tube stands as a premier destination for knowledge seekers and earners alike due to our unique offerings:
+                Illuminate Tube stands as a premier destination for knowledge seekers and earners alike due to our unique offerings:
             </p>
             <ul>
                 <li><strong>Exclusive Content:</strong> Access rare and captivating Illuminati archives unavailable on conventional platforms.</li>
@@ -1029,7 +1026,7 @@
                 <li><strong>Global Circle:</strong> Available worldwide to all who seek enlightenment and passive wealth creation.</li>
             </ul>
             <p>
-                Join thousands of initiates who are transforming their screen time into wealth and discovery with Illuminate Task Tube.
+                Join thousands of initiates who are transforming their screen time into wealth and discovery with Illuminate Tube.
             </p>
             <p class="signup-link">
                 Ready to enter the circle? <a href="register.html" class="btn">Sign Up Now</a>
@@ -1039,33 +1036,33 @@
 
     <!-- CTA Banner -->
     <section class="cta-banner">
-        <h2>Join Illuminate Task Tube Today</h2>
+        <h2>Join Illuminate Tube Today</h2>
         <a href="register.html" class="btn" onclick="console.log('CTA button clicked')">Start Earning Now</a>
     </section>
 
     <!-- Notice Popup -->
     <div class="notice" id="notice">
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
-        <h2>Enter Illuminate Task Tube</h2>
+        <h2>Enter Illuminate Tube</h2>
         <p>Unlock secret video archives and earn premium crypto rewards today. Register now and join the elite!</p>
         <a href="register.html" class="btn" onclick="console.log('Notice button clicked')">Get Started</a>
     </div>
 
-    <!-- Footer -->
+    <!-- HARDCODED FOOTER -->
     <footer id="footer">
         <p>&copy; <span id="copyright-year"></span> Illuminate Tube. All rights reserved.</p>
     </footer>
 
-    <!-- Google Translate Scripts -->
+    <!-- Google Translate Script Initialization -->
     <script type="text/javascript">
-    function googleTranslateElementInit() {
-        new google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,fr,es,de,pt,ar,zh-CN,ru',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false
-        }, 'google_translate_element');
-    }
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,fr,es,de,pt,ar,zh-CN,ru',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
     </script>
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
@@ -1077,42 +1074,47 @@
     </script>
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
-    <!-- Dynamic Functionality Scripts -->
+    <!-- Application & Header Scripts -->
     <script>
-        // Set dynamic copyright year
+        // Set dynamic copyright year & active navbar link
         document.addEventListener('DOMContentLoaded', function() {
-            const copyYear = document.getElementById('copyright-year');
-            if (copyYear) copyYear.textContent = new Date().getFullYear();
-        });
-
-        // Scroll Footer Controller
-        window.addEventListener('scroll', function() {
-            const footer = document.getElementById('footer');
-            if (footer) {
-                const windowHeight = window.innerHeight;
-                const documentHeight = document.documentElement.scrollHeight;
-                const scrollPosition = window.scrollY || window.pageYOffset;
-
-                if (scrollPosition + windowHeight >= documentHeight - 50) {
-                    footer.classList.add('visible');
-                } else {
-                    footer.classList.remove('visible');
-                }
+            const copyrightElem = document.getElementById('copyright-year');
+            if (copyrightElem) {
+                copyrightElem.textContent = new Date().getFullYear();
             }
+            setActiveNavLink();
+            registerServiceWorker();
+            initAthBanner();
         });
 
-        // Set Active Navbar Link
-        document.addEventListener('DOMContentLoaded', function() {
+        // Highlight Active Link in Navbar
+        function setActiveNavLink() {
             const currentPath = window.location.pathname.split('/').pop();
             const links = document.querySelectorAll('.ham-menu ul li a');
             links.forEach(link => {
-                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'about.html')) {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (currentPath === '' && href === 'index.html')) {
                     link.parentElement.classList.add('active');
                 }
             });
+        }
+
+        // Footer Visibility on Scroll
+        window.addEventListener('scroll', function() {
+            const footer = document.getElementById('footer');
+            if (!footer) return;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const scrollPosition = window.scrollY || window.pageYOffset;
+
+            if (scrollPosition + windowHeight >= documentHeight - 50) {
+                footer.classList.add('visible');
+            } else {
+                footer.classList.remove('visible');
+            }
         });
 
-        // Toast
+        // Toast logic
         function showToast(msg) {
             const t = document.getElementById("toast");
             document.getElementById("toastMsg").textContent = msg;
@@ -1188,7 +1190,7 @@
                     '</div>';
             }
             
-            if (stepsContainer) stepsContainer.innerHTML = stepsHTML;
+            stepsContainer.innerHTML = stepsHTML;
             
             setTimeout(function() {
                 const banner = document.getElementById("athBanner");
@@ -1263,7 +1265,7 @@
             }, 600);
         }
 
-        // Service Worker
+        // Service Worker Registration
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js')
@@ -1275,6 +1277,68 @@
                     });
             }
         }
+
+        // Hamburger Menu & Load Handlers
+        document.addEventListener("DOMContentLoaded", function() {
+            const button = document.getElementById('hamburger-menu');
+            if (button) {
+                button.addEventListener('click', function() {
+                    const span = button.getElementsByTagName('span')[0];
+                    if (span) span.classList.toggle('hamburger-menu-button-close');
+                    const nav = document.getElementById('ham-navigation');
+                    if (nav) nav.classList.toggle('on');
+                });
+            }
+
+            $('.menu li a').on('click', function() {
+                $('#hamburger-menu').click();
+            });
+
+            // Notification Queue Logic
+            const notificationQueue = [];
+            let isNotificationShowing = false;
+            const delay = 7000;
+            const messages = [
+                "@Alex unlocked vault access & earned $150.00! 19min ago",
+                "@Jame completed initiation reward $50.00! 20min ago",
+                "@Gloria accessed archive & earned $200.00! 53min ago",
+                "@Sophie received initiate payload $75.00! 1hr ago",
+                "@Mark unlocked vault tier $120.00! 2hrs ago"
+            ];
+
+            function showNotification(message) {
+                notificationQueue.push(message);
+                if (!isNotificationShowing) {
+                    showNextNotification();
+                }
+            }
+
+            function showNextNotification() {
+                if (notificationQueue.length === 0) {
+                    isNotificationShowing = false;
+                    return;
+                }
+
+                const message = notificationQueue.shift();
+                const notificationPopup = document.getElementById("notification-popup");
+                const messageElement = document.getElementById("notification-message");
+                if (messageElement && notificationPopup) {
+                    messageElement.textContent = message;
+                    notificationPopup.classList.add("notification-show");
+                    isNotificationShowing = true;
+
+                    setTimeout(() => {
+                        notificationPopup.classList.remove("notification-show");
+                        isNotificationShowing = false;
+                        setTimeout(showNextNotification, 500);
+                    }, 4000);
+                }
+            }
+
+            messages.forEach((message, i) => {
+                setTimeout(() => showNotification(message), (i + 1) * delay);
+            });
+        });
 
         // Notice Popup Logic
         function isNoticeShown() {
@@ -1305,76 +1369,7 @@
 
         window.addEventListener('load', showNotice);
 
-        // Hamburger Menu & Notification Queue
-        document.addEventListener("DOMContentLoaded", function() {
-            registerServiceWorker();
-            initAthBanner();
-
-            const button = document.getElementById('hamburger-menu');
-            if (button) {
-                button.addEventListener('click', function() {
-                    // Toggle the animation class on the button itself
-                    button.classList.toggle('hamburger-menu-button-close');
-                    
-                    // Toggle navigation menu visibility
-                    const nav = document.getElementById('ham-navigation');
-                    if (nav) nav.classList.toggle('on');
-                });
-            }
-
-            $('.ham-menu ul li a').on('click', function() {
-                if ($('#ham-navigation').hasClass('on')) {
-                    $('#hamburger-menu').click();
-                }
-            });
-
-            const notificationQueue = [];
-            let isNotificationShowing = false;
-            const delay = 7000;
-            const messages = [
-                "@Alex unlocked vault access & earned $150.00! 19min ago",
-                "@Jame completed initiation reward $50.00! 20min ago",
-                "@Gloria accessed archive & earned $200.00! 53min ago",
-                "@Sophie received initiate payload $75.00! 1hr ago",
-                "@Mark unlocked vault tier $120.00! 2hrs ago"
-            ];
-
-            function showNotification(message) {
-                notificationQueue.push(message);
-                if (!isNotificationShowing) {
-                    showNextNotification();
-                }
-            }
-
-            function showNextNotification() {
-                if (notificationQueue.length > 0) {
-                    isNotificationShowing = true;
-                    const message = notificationQueue.shift();
-                    const popup = document.getElementById("notification-popup");
-                    const messageElement = document.getElementById("notification-message");
-
-                    if (popup && messageElement) {
-                        messageElement.textContent = message;
-                        popup.classList.add("notification-show");
-
-                        setTimeout(function() {
-                            popup.classList.remove("notification-show");
-                            setTimeout(function() {
-                                isNotificationShowing = false;
-                                showNextNotification();
-                            }, 500);
-                        }, 3000);
-                    }
-                }
-            }
-
-            setInterval(function() {
-                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                showNotification(randomMessage);
-            }, delay);
-        });
-
-        // Prevent right-click on non-link elements
+        // Prevent right-click only on non-link elements
         document.addEventListener('contextmenu', e => {
             if (!e.target.closest('a')) {
                 e.preventDefault();
