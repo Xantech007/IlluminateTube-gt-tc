@@ -1,0 +1,801 @@
+<?php
+// index.php
+session_start(); // Start session to check user login status
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Unlock exclusive rewards by watching Illuminati secret archives and elite videos with Illuminate Tube. Join our elite platform today!">
+    <meta name="keywords" content="Illuminate Tube, Illuminati videos, watch and earn, secret knowledge, elite rewards, crypto earnings">
+    <meta name="author" content="Illuminate Tube">
+    <title>Illuminate Tube - Unlock Rewards Watching Exclusive Content</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #0d0d0d;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #e0e0e0;
+            padding-top: 80px; /* Matches header height */
+            padding-bottom: 100px; /* Matches footer height */
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            color: #ffd700;
+            text-align: center;
+            padding: 120px 20px;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+            border-bottom: 2px solid #d4af37;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://source.unsplash.com/random/1920x1080/?gold,dark') no-repeat center center/cover;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .hero-section h1 {
+            font-size: 52px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            color: #d4af37;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero-section p {
+            font-size: 20px;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            position: relative;
+            z-index: 1;
+            color: #cccccc;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        /* Button Styles */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 50;
+        }
+
+        .btn {
+            padding: 14px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .btn-register, .btn-dashboard {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            border: none;
+            font-weight: 700;
+        }
+
+        .btn-register:hover, .btn-dashboard:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-signin {
+            background-color: transparent;
+            color: #ffd700;
+            border: 2px solid #d4af37;
+        }
+
+        .btn-signin:hover {
+            background-color: #d4af37;
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Main Container */
+        .index-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 600;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            margin-bottom: 60px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .step-card {
+            background: #141414;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-10px);
+            border-color: #d4af37;
+        }
+
+        .step-card i {
+            font-size: 36px;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .step-card h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .step-card p {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .feature-card {
+            background: #141414;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: #d4af37;
+        }
+
+        .feature-card i {
+            font-size: 40px;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: #111;
+            padding: 60px 20px;
+            text-align: center;
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card h3 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 16px;
+            color: #aaa;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            background: #111;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonial-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .testimonial-card img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            object-fit: cover;
+            border: 2px solid #d4af37;
+        }
+
+        .testimonial-card p {
+            font-size: 16px;
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-card h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffd700;
+        }
+
+        .testimonial-card span {
+            font-size: 14px;
+            color: #888;
+        }
+
+        /* FAQ Section */
+        .faq {
+            margin-bottom: 60px;
+        }
+
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: #141414;
+            border: 1px solid #333;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .faq-item h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffd700;
+            padding: 20px;
+            margin: 0;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .faq-item h3::after {
+            content: '\f078'; /* Font Awesome chevron-down */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active h3::after {
+            transform: rotate(180deg);
+        }
+
+        .faq-item p {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 1.6;
+            padding: 0 20px 20px;
+            display: none;
+        }
+
+        .faq-item.active p {
+            display: block;
+        }
+
+        /* CTA Banner */
+        .cta-banner {
+            background: linear-gradient(135deg, #1a1a1a, #000000);
+            border: 1px solid #d4af37;
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px;
+            border-radius: 15px;
+            margin: 40px 20px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .cta-banner h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .cta-banner .btn {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .cta-banner .btn:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Notice Popup */
+        .notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #141414;
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            display: none;
+            z-index: 1002;
+        }
+
+        .notice h2 {
+            font-size: 24px;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .notice p {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #ffd700;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-section h1 {
+                font-size: 40px;
+            }
+
+            .hero-section p {
+                font-size: 18px;
+            }
+
+            .section-title {
+                font-size: 32px;
+            }
+
+            .step-card, .feature-card, .testimonial-card, .stat-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+                padding-bottom: 80px;
+            }
+
+            .hero-section {
+                padding: 80px 20px;
+            }
+
+            .hero-section h1 {
+                font-size: 36px;
+            }
+
+            .hero-section p {
+                font-size: 16px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .stat-card h3 {
+                font-size: 28px;
+            }
+
+            .cta-banner h2 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 60px;
+                padding-bottom: 60px;
+            }
+
+            .hero-section {
+                padding: 60px 15px;
+            }
+
+            .hero-section h1 {
+                font-size: 28px;
+            }
+
+            .hero-section p {
+                font-size: 14px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .step-card, .feature-card, .testimonial-card, .stat-card {
+                padding: 15px;
+            }
+
+            .stat-card h3 {
+                font-size: 24px;
+            }
+
+            .faq-item h3 {
+                font-size: 16px;
+            }
+
+            .faq-item p {
+                font-size: 14px;
+            }
+
+            .cta-banner {
+                padding: 40px 15px;
+            }
+
+            .cta-banner h2 {
+                font-size: 24px;
+            }
+
+            .cta-banner .btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <?php include 'inc/header.php'; ?>
+    <?php include 'inc/navbar.php'; ?>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1>Unlock Wealth with Illuminate Tube</h1>
+        <p>Step into the circle of enlightenment. Watch exclusive Illuminati-related videos and secret archives to unlock high-tier monetary rewards and passive wealth!</p>
+        <div class="button-group">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="users/home.php" class="btn btn-dashboard" onclick="console.log('Dashboard button clicked')">Dashboard</a>
+            <?php else: ?>
+                <a href="register.php" class="btn btn-register" onclick="console.log('Register button clicked')">Get Started</a>
+                <a href="signin.php" class="btn btn-signin" onclick="console.log('Sign In button clicked')">Sign In</a>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <div class="index-container how-it-works">
+        <h2 class="section-title">How Illuminate Tube Works</h2>
+        <div class="steps">
+            <div class="step-card">
+                <i class="fas fa-eye"></i>
+                <h3>1. Initiate Access</h3>
+                <p>Register your secret credentials with your email and a secure 5-digit passcode in moments.</p>
+            </div>
+            <div class="step-card">
+                <i class="fas fa-film"></i>
+                <h3>2. Watch Secret Content</h3>
+                <p>Explore a collection of Illuminati-related videos, documentary archives, and hidden lore to earn rewards.</p>
+            </div>
+            <div class="step-card">
+                <i class="fas fa-coins"></i>
+                <h3>3. Claim Wealth</h3>
+                <p>Transfer your accrued rewards directly into your account using our secure payout portal.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="index-container">
+        <h2 class="section-title">Why Join Illuminate Tube?</h2>
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-crown"></i>
+                <h3>Elite Reward Rates</h3>
+                <p>Unlock lucrative earnings by viewing rare, high-value Illuminati content with optimal stream performance.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-gem"></i>
+                <h3>Exclusive Access</h3>
+                <p>Watch intriguing and mysterious videos anytime on any device with guaranteed access.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Encrypted & Private</h3>
+                <p>Your data and reward claims are secured with elite encryption standards for total safety.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-headset"></i>
+                <h3>Dedicated Concierge</h3>
+                <p>Enjoy round-the-clock member support via LiveChat or our <a href="contact.php" style="color: #ffd700;">Contact page</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <h2 class="section-title">Our Empire</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>50K+</h3>
+                <p>Initiated Members</p>
+            </div>
+            <div class="stat-card">
+                <h3>$1M+</h3>
+                <p>Rewards Distributed</p>
+            </div>
+            <div class="stat-card">
+                <h3>10M+</h3>
+                <p>Videos Unlocked</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <h2 class="section-title">Words from Initiates</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="Sarah M.">
+                <p>"Illuminate Tube granted me access to incredible content while generating solid daily rewards!"</p>
+                <h4>Sarah M.</h4>
+                <span>Initiate Member</span>
+            </div>
+            <div class="testimonial-card">
+                <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="James K.">
+                <p>"The best platform for unique illuminati videos and instant reward transfers. Highly recommended!"</p>
+                <h4>James K.</h4>
+                <span>Gold Tier User</span>
+            </div>
+            <div class="testimonial-card">
+                <img src="https://randomuser.me/api/portraits/women/3.jpg" alt="Emily R.">
+                <p>"Seamless design, captivating videos, and elite support. Truly a unique earning portal."</p>
+                <h4>Emily R.</h4>
+                <span>Elite Member</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="index-container faq">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3>How do I start earning with Illuminate Tube?</h3>
+                <p>Sign up using your email and passcode, log into the portal, and begin watching Illuminati-related videos to claim rewards instantly.</p>
+            </div>
+            <div class="faq-item">
+                <h3>What is required to join?</h3>
+                <p>You only need a connected device. Anyone seeking knowledge and rewards is welcome.</p>
+            </div>
+            <div class="faq-item">
+                <h3>How do payouts work?</h3>
+                <p>Rewards are processed through our encrypted payout pipeline straight to your preferred wallet address.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Is Illuminate Tube secure?</h3>
+                <p>We maintain end-to-end security protocol to shield user activity. Review our <a href="privacy.php" style="color: #ffd700;">Privacy Policy</a> for full details.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Banner -->
+    <section class="cta-banner">
+        <h2>Unveil the Mysteries & Claim Your Rewards</h2>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <a href="users/home.php" class="btn" onclick="console.log('Dashboard CTA clicked')">Go to Dashboard</a>
+        <?php else: ?>
+            <a href="register.php" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Tube Now</a>
+        <?php endif; ?>
+    </section>
+
+    <!-- Notice Popup -->
+    <div class="notice" id="notice">
+        <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
+        <h2>Welcome to Illuminate Tube</h2>
+        <p>Unlock access to Illuminati secret videos and earn premium rewards today. Enter the portal now!</p>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <a href="users/home.php" class="btn btn-dashboard" onclick="console.log('Notice dashboard clicked')">Go to Dashboard</a>
+        <?php else: ?>
+            <a href="register.php" class="btn btn-register" onclick="console.log('Notice button clicked')">Get Started</a>
+        <?php endif; ?>
+    </div>
+
+    <?php include 'inc/footer.php'; ?>
+
+    <!-- LiveChat Script -->
+    <script>
+        window.__lc = window.__lc || {};
+        window.__lc.license = 15808029;
+        (function(n,t,c){function i(n){return e._h?e._h.apply(null,n):e._q.push(n)}var e={_q:[],_h:null,_v:"2.0",on:function(){i(["on",c.call(arguments)])},once:function(){i(["once",c.call(arguments)])},off:function(){i(["off",c.call(arguments)])},get:function(){if(!e._h)throw new Error("[LiveChatWidget] You can't use getters before load.");return i(["get",c.call(arguments)])},call:function(){i(["call",c.call(arguments)])},init:function(){var n=t.createElement("script");n.async=!0,n.type="text/javascript",n.src="https://cdn.livechatinc.com/tracking.js",t.head.appendChild(n)}};!n.__lc.asyncInit&&e.init(),n.LiveChatWidget=n.LiveChatWidget||e}(window,document,[].slice))
+    </script>
+    <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
+
+    <script>
+        // Set Active Navbar Link
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname.split('/').pop();
+            const links = document.querySelectorAll('.ham-menu ul li a');
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.php')) {
+                    link.parentElement.classList.add('active');
+                }
+            });
+        });
+
+        // Notice Popup
+        function isNoticeShown() {
+            return localStorage.getItem('noticeShownIndex');
+        }
+
+        function setNoticeShown() {
+            localStorage.setItem('noticeShownIndex', true);
+        }
+
+        function showNotice() {
+            if (!isNoticeShown()) {
+                const notice = document.getElementById('notice');
+                setTimeout(() => {
+                    notice.style.display = 'block';
+                    setNoticeShown();
+                }, 2000);
+            }
+        }
+
+        function closeNotice() {
+            document.getElementById('notice').style.display = 'none';
+            setNoticeShown();
+        }
+
+        window.addEventListener('load', showNotice);
+
+        // FAQ Toggle
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
+        });
+
+        // Prevent right-click only on non-link elements
+        document.addEventListener('contextmenu', e => {
+            if (!e.target.closest('a')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
