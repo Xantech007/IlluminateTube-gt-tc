@@ -66,9 +66,9 @@ try {
     error_log('Telegram fetch error: ' . $e->getMessage(), 3, '../debug.log');
 }
 
-// Fetch all videos
+// Fetch all videos including likes
 try {
-    $stmt = $pdo->prepare("SELECT id, title, url, reward FROM videos ORDER BY id");
+    $stmt = $pdo->prepare("SELECT id, title, url, reward, likes FROM videos ORDER BY id");
     $stmt->execute();
     $videos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -382,6 +382,7 @@ try {
                                 <th>Title</th>
                                 <th>URL</th>
                                 <th>Reward ($)</th>
+                                <th>Likes</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -392,6 +393,7 @@ try {
                                     <td><?php echo htmlspecialchars($video['title']); ?></td>
                                     <td><?php echo htmlspecialchars($video['url']); ?></td>
                                     <td><?php echo number_format($video['reward'], 2); ?></td>
+                                    <td><?php echo htmlspecialchars($video['likes'] ?? 0); ?></td>
                                     <td>
                                         <a href="edit_video.php?id=<?php echo $video['id']; ?>">Edit</a>
                                         <a href="delete_video.php?id=<?php echo $video['id']; ?>" class="delete" onclick="return confirm('Are you sure you want to delete this video?');">Delete</a>
