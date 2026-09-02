@@ -1,87 +1,3 @@
-<?php
-// register.php
-session_start();
-require_once 'database/conn.php';
-require_once 'inc/countries.php';
-
-// Function to detect country from IP
-function detectCountryFromIp() {
-    $ip = $_SERVER['REMOTE_ADDR'];
-    $url = "https://ipapi.co/{$ip}/country_name/";
-    $response = @file_get_contents($url);
-    if ($response === false) {
-        file_put_contents('debug.log', "Failed to fetch country from ipapi.co for IP: {$ip}\n", FILE_APPEND);
-        return 'Nigeria';
-    }
-    $country = trim($response);
-    return in_array($country, $GLOBALS['countries']) ? $country : 'Nigeria';
-}
-
-$response = ['success' => false, 'error' => ''];
-
-// Prevent caching
-header('Cache-Control: no-cache, no-store, must-revalidate');
-header('Pragma: no-cache');
-header('Expires: 0');
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerData'])) {
-    $data = json_decode($_POST['registerData'], true);
-
-    if (!empty($data['name']) && !empty($data['email']) && !empty($data['gender']) && !empty($data['country']) && isset($data['password'])) {
-
-        $name     = trim($data['name']);
-        $email    = trim($data['email']);
-        $gender   = $data['gender'];
-        $country  = trim($data['country']);
-        $password = $data['password']; // allow 1+ char
-
-        // Validate email
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $response['error'] = "Invalid email format.";
-        }
-        elseif (!in_array($country, $countries)) {
-            $response['error'] = "Invalid country selected.";
-        }
-        // Minimum 1 character password validation
-        elseif (strlen($password) < 1) {
-            $response['error'] = "Password must be at least 1 character long.";
-        }
-        else {
-            try {
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
-                $stmt->execute([$email]);
-                if ($stmt->fetchColumn() > 0) {
-                    $response['error'] = "Email already registered.";
-                } else {
-                    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-                    $stmt = $pdo->prepare("INSERT INTO users (name, email, gender, passcode, country) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->execute([$name, $email, $gender, $hashedPassword, $country]);
-
-                    $userId = $pdo->lastInsertId();
-
-                    $_SESSION['user_id']   = $userId;
-                    $_SESSION['email']     = $email;
-                    $_SESSION['passcode']  = $hashedPassword;
-
-                    $response['success'] = true;
-                }
-            } catch (PDOException $e) {
-                $response['error'] = "Database error occurred.";
-                file_put_contents('debug.log', 'DB Error: '.$e->getMessage()."\n", FILE_APPEND);
-            }
-        }
-    } else {
-        $response['error'] = "Please fill all required fields.";
-    }
-
-    header('Content-Type: application/json');
-    echo json_encode($response);
-    exit;
-}
-
-$detected_country = detectCountryFromIp();
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,6 +7,16 @@ $detected_country = detectCountryFromIp();
     <meta name="keywords" content="Illuminate Tube, register, initiate account, earn rewards, vault access, passive income">
     <meta name="author" content="Illuminate Tube">
     <title>Illuminate Tube - Register</title>
+
+    <!-- PWA / Add to Home Screen Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Illuminate Tube">
+    <link rel="apple-touch-icon" href="img/palmpay.webp">
+    <meta name="theme-color" content="#141414">
+    <meta name="mobile-web-app-capable" content="yes">
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -110,7 +36,501 @@ $detected_country = detectCountryFromIp();
             color: #e0e0e0;
             padding-top: 80px;
             padding-bottom: 100px;
+            top: 0 !important;
         }
+
+        /* --- Header & Notification Styles --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #141414;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            padding: 15px 20px;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        .logo a {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .hamburger-menu-button {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            border: 2px solid #000;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .hamburger-menu-button span {
+            width: 20px;
+            height: 2px;
+            background: #000;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu-button span::before,
+        .hamburger-menu-button span::after {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: #000;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu-button span::before {
+            transform: translateY(-6px);
+        }
+
+        .hamburger-menu-button span::after {
+            transform: translateY(6px);
+        }
+
+        .hamburger-menu-button-close span {
+            background: transparent;
+        }
+
+        .hamburger-menu-button-close span::before {
+            transform: translateY(0) rotate(45deg);
+        }
+
+        .hamburger-menu-button-close span::after {
+            transform: translateY(0) rotate(-45deg);
+        }
+
+        .notification-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #141414, #1a1a1a);
+            border: 1px solid #d4af37;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            max-width: 320px;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+            transition: all 0.4s ease;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            color: #e0e0e0;
+        }
+
+        .notification-popup.notification-show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .notification-content {
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-content i {
+            margin-right: 12px;
+            font-size: 18px;
+            color: #ffd700;
+        }
+
+        /* Add to Home Screen Banner */
+        .ath-banner {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 16px 20px;
+            z-index: 2000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+        }
+
+        .ath-banner.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .ath-banner.hidden {
+            display: none !important;
+        }
+
+        .ath-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ath-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .ath-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .ath-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .ath-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .ath-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ath-step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffd700;
+            font-size: 11px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .ath-step-text {
+            font-size: 12px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .ath-step-text strong {
+            color: #f8fafc;
+            font-weight: 700;
+        }
+
+        .ath-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ath-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .ath-btn-done {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+        }
+
+        .ath-btn-later {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .ath-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #334155;
+            border: none;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ath-close:hover {
+            background: #475569;
+            color: #f8fafc;
+        }
+
+        /* Notification Permission Banner */
+        .notify-banner {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 16px 20px;
+            z-index: 2000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+        }
+
+        .notify-banner.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .notify-banner.hidden {
+            display: none !important;
+        }
+
+        .notify-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .notify-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .notify-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .notify-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .notify-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .notify-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .notify-btn-allow {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: #fff;
+        }
+
+        .notify-btn-deny {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: #1e293b;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 2001;
+            transition: all 0.4s;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast i {
+            color: #10b981;
+        }
+
+        /* --- Navbar Styles --- */
+        .ham-menu {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            background: #141414;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 999;
+        }
+        .ham-menu.on {
+            transform: translateX(0);
+        }
+        .ham-menu ul {
+            list-style: none;
+            padding: 20px;
+            margin: 0;
+        }
+        .ham-menu ul li {
+            margin: 12px 0;
+        }
+        .ham-menu ul li a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        .ham-menu ul li a:hover {
+            color: #ffd700;
+        }
+        .ham-menu ul li.active a {
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        /* --- Translator Styles --- */
+        #google_translate_element {
+            margin: 12px 15px 12px 20px;
+        }
+        .goog-te-gadget-simple {
+            background: #0d0d0d !important;
+            border: 1px solid #333 !important;
+            border-radius: 6px !important;
+            padding: 6px 12px !important;
+            font-size: 14px !important;
+            color: #e0e0e0 !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .goog-te-gadget-simple span, 
+        .goog-te-menu-value span {
+            color: #e0e0e0 !important;
+        }
+        .goog-te-gadget-icon, .goog-te-gadget img {
+            display: none !important;
+        }
+
+        .goog-te-banner-frame.skiptranslate,
+        iframe.goog-te-banner-frame {
+            display: none !important;
+            height: 0 !important;
+            visibility: hidden !important;
+        }
+
+        /* --- Footer Styles --- */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #141414;
+            border-top: 1px solid #333;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        footer.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        footer p {
+            margin: 0;
+            color: #d4af37;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
         .hero-section {
             background: linear-gradient(135deg, #000000, #1a1a1a);
             color: #ffd700;
@@ -357,6 +777,37 @@ $detected_country = detectCountryFromIp();
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
+
+        @media (min-width: 768px) {
+            .ham-menu {
+                position: static;
+                transform: none;
+                box-shadow: none;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                background: transparent;
+                border-bottom: none;
+                gap: 15px;
+            }
+            .ham-menu ul {
+                display: flex;
+                gap: 20px;
+                padding: 0;
+                margin: 0;
+            }
+            .ham-menu ul li {
+                margin: 0;
+            }
+            .ham-menu ul li a {
+                font-size: 15px;
+            }
+
+            #google_translate_element {
+                margin: 0 15px 0 0;
+            }
+        }
+
         @media (max-width: 1024px) {
             .hero-section h1 { font-size: 36px; }
             .hero-section p { font-size: 16px; }
@@ -373,6 +824,7 @@ $detected_country = detectCountryFromIp();
             .input-field, .country-select { height: 45px; font-size: 15px; }
             .submit-btn { padding: 12px; font-size: 16px; }
             .cta-banner h2 { font-size: 28px; }
+            .ham-menu { top: 70px; }
         }
         @media (max-width: 480px) {
             body { padding-top: 60px; padding-bottom: 60px; }
@@ -386,12 +838,91 @@ $detected_country = detectCountryFromIp();
             .cta-banner { padding: 40px 15px; }
             .cta-banner h2 { font-size: 24px; }
             .cta-banner .btn { padding: 12px 30px; font-size: 16px; }
+            .ham-menu { top: 60px; }
+            .ham-menu ul { padding: 15px; }
+            .ham-menu ul li a { font-size: 14px; }
         }
     </style>
 </head>
 <body>
-    <?php include 'inc/header.php'; ?>
-    <?php include 'inc/navbar.php'; ?>
+    <!-- HARDCODED HEADER -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="img/palmpay.webp" alt="Illuminate Tube Logo">
+                </a>
+            </div>
+            <button id="hamburger-menu" data-toggle="ham-navigation" class="hamburger-menu-button">
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Notification Popup -->
+    <div id="notification-container">
+        <div id="notification-popup" class="notification-popup">
+            <div id="notification-content" class="notification-content">
+                <i class="fas fa-coins"></i>
+                <p id="notification-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD TO HOME SCREEN BANNER (UNIVERSAL) -->
+    <div class="ath-banner" id="athBanner">
+        <button class="ath-close" onclick="dismissAth()"><i class="fa-solid fa-xmark"></i></button>
+        <div class="ath-header">
+            <div class="ath-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+            <div>
+                <div class="ath-title" id="athTitle">Add Illuminate Tube to Home Screen</div>
+                <div class="ath-sub" id="athSub">Open like a real app — faster access</div>
+            </div>
+        </div>
+        <div class="ath-steps" id="athSteps"></div>
+        <div class="ath-actions">
+            <button class="ath-btn ath-btn-done" onclick="markAthDone()">
+                <i class="fa-solid fa-check"></i> Done
+            </button>
+            <button class="ath-btn ath-btn-later" onclick="dismissAth()">
+                Later
+            </button>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION PERMISSION BANNER -->
+    <div class="notify-banner" id="notifyBanner">
+        <div class="notify-header">
+            <div class="notify-icon"><i class="fa-solid fa-bell"></i></div>
+            <div>
+                <div class="notify-title">Stay Updated</div>
+                <div class="notify-sub">Get instant alerts for rewards, bonuses & new tasks</div>
+            </div>
+        </div>
+        <div class="notify-actions">
+            <button class="notify-btn notify-btn-allow" onclick="requestNotify()">
+                <i class="fa-solid fa-bell"></i> Allow
+            </button>
+            <button class="notify-btn notify-btn-deny" onclick="dismissNotify()">
+                Not Now
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
+
+    <!-- HARDCODED NAVBAR & GOOGLE TRANSLATE -->
+    <nav id="ham-navigation" class="ham-menu">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="terms.html">Terms</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+        </ul>
+        <div id="google_translate_element"></div>
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero-section">
@@ -405,17 +936,12 @@ $detected_country = detectCountryFromIp();
         <div class="register-content">
             <h2>Register for <span>Illuminate Tube</span></h2>
             <p>Fill in your details to get started</p>
-            <form id="register-form" method="POST">
+            <form id="register-form">
                 <input type="text" id="name" name="name" class="input-field" placeholder="Full Name" required>
                 <input type="email" id="email" name="email" class="input-field" placeholder="Email Address" required>
                 <input type="password" id="password" name="password" class="input-field" placeholder="Passcode (create a passcode you can remember)" required>
                 <select id="country" name="country" class="country-select" required>
                     <option value="" disabled selected>Select your country</option>
-                    <?php foreach ($countries as $country): ?>
-                        <option value="<?php echo htmlspecialchars($country); ?>">
-                            <?php echo htmlspecialchars($country); ?>
-                        </option>
-                    <?php endforeach; ?>
                 </select>
                 <div class="gender-options">
                     <label><input type="radio" name="gender" value="male" required> Male</label>
@@ -424,14 +950,14 @@ $detected_country = detectCountryFromIp();
                 </div>
                 <button type="submit" class="submit-btn btn">Submit Registration</button>
             </form>
-            <p class="login-link">Already an initiate? <a href="signin.php">Sign In</a></p>
+            <p class="login-link">Already an initiate? <a href="signin.html">Sign In</a></p>
         </div>
     </div>
 
     <!-- CTA Banner -->
     <section class="cta-banner">
         <h2>Start Your Journey with Illuminate Tube</h2>
-        <a href="register.php" class="btn">Join Now</a>
+        <a href="register.html" class="btn">Join Now</a>
     </section>
 
     <!-- Notice Popup -->
@@ -439,10 +965,26 @@ $detected_country = detectCountryFromIp();
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
         <h2>Join Illuminate Tube Today</h2>
         <p>Unlock exclusive vault access and system privileges. Register now and begin your initiation!</p>
-        <a href="register.php" class="btn">Get Started</a>
+        <a href="register.html" class="btn">Get Started</a>
     </div>
 
-    <?php include 'inc/footer.php'; ?>
+    <!-- HARDCODED FOOTER -->
+    <footer id="footer">
+        <p>&copy; <span id="copyright-year"></span> Illuminate Tube. All rights reserved.</p>
+    </footer>
+
+    <!-- Google Translate Script Initialization -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,fr,es,de,pt,ar,zh-CN,ru',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <!-- LiveChat Script -->
     <script>
@@ -452,36 +994,325 @@ $detected_country = detectCountryFromIp();
     </script>
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
+    <!-- Hardcoded Countries Array & App Logic -->
     <script>
-        // Set Active Navbar Link
+        const countries = [
+            'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda',
+            'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain',
+            'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan',
+            'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria',
+            'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada',
+            'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros',
+            'Congo (Congo-Brazzaville)', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus',
+            'Czechia (Czech Republic)', 'Democratic Republic of the Congo', 'Denmark',
+            'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador',
+            'Equatorial Guinea', 'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia', 'Fiji',
+            'Finland', 'France', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece',
+            'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras',
+            'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel',
+            'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Kuwait',
+            'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya',
+            'Liechtenstein', 'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia',
+            'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius',
+            'Mexico', 'Micronesia', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco',
+            'Mozambique', 'Myanmar', 'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand',
+            'Nicaragua', 'Niger', 'Nigeria', 'North Korea', 'North Macedonia', 'Norway',
+            'Oman', 'Pakistan', 'Palau', 'Palestine', 'Panama', 'Papua New Guinea', 'Paraguay',
+            'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Rwanda',
+            'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa',
+            'San Marino', 'Sao Tome and Principe', 'Saudi Arabia', 'Senegal', 'Serbia',
+            'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands',
+            'Somalia', 'South Africa', 'South Korea', 'South Sudan', 'Spain', 'Sri Lanka',
+            'Sudan', 'Suriname', 'Sweden', 'Switzerland', 'Syria', 'Taiwan', 'Tajikistan',
+            'Tanzania', 'Thailand', 'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago',
+            'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu', 'Uganda', 'Ukraine',
+            'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan',
+            'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
+        ];
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Populate countries dropdown
+            const countrySelect = document.getElementById('country');
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                countrySelect.appendChild(option);
+            });
+
+            // Set copyright year
+            const copyrightElem = document.getElementById('copyright-year');
+            if (copyrightElem) {
+                copyrightElem.textContent = new Date().getFullYear();
+            }
+
+            // Set Active Navbar Link
             const currentPath = window.location.pathname.split('/').pop();
             const links = document.querySelectorAll('.ham-menu ul li a');
             links.forEach(link => {
-                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.php')) {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (currentPath === '' && href === 'index.html')) {
                     link.parentElement.classList.add('active');
                 }
+            });
+
+            registerServiceWorker();
+            initAthBanner();
+        });
+
+        // Footer Visibility on Scroll
+        window.addEventListener('scroll', function() {
+            const footer = document.getElementById('footer');
+            if (!footer) return;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const scrollPosition = window.scrollY || window.pageYOffset;
+
+            if (scrollPosition + windowHeight >= documentHeight - 50) {
+                footer.classList.add('visible');
+            } else {
+                footer.classList.remove('visible');
+            }
+        });
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            document.getElementById("toastMsg").textContent = msg;
+            t.classList.add("show");
+            setTimeout(function() { t.classList.remove("show"); }, 2500);
+        }
+
+        // Device Detection & PWA
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+            const isAndroid = /Android/.test(ua);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+            const isChrome = /Chrome/.test(ua) && !/Edg/.test(ua);
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            return { isIOS, isAndroid, isSafari, isChrome, isStandalone };
+        }
+
+        function initAthBanner() {
+            if (localStorage.getItem("IlluminateTubeAthDone") === "true") return;
+            if (localStorage.getItem("IlluminateTubeAthDismissed") === "true") return;
+            
+            const device = getDeviceInfo();
+            if (device.isStandalone) return;
+            if (!device.isIOS && !device.isAndroid) return;
+            
+            const stepsContainer = document.getElementById("athSteps");
+            let stepsHTML = "";
+            
+            if (device.isIOS && device.isSafari) {
+                stepsHTML = 
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">1</div>' +
+                        '<div class="ath-step-text">Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket" style="color:#ffd700;"></i> at the bottom</div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">2</div>' +
+                        '<div class="ath-step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">3</div>' +
+                        '<div class="ath-step-text">Tap <strong>"Add"</strong> — app icon appears on your home screen</div>' +
+                    '</div>';
+            } else if (device.isAndroid && device.isChrome) {
+                stepsHTML = 
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">1</div>' +
+                        '<div class="ath-step-text">Tap the <strong>Menu</strong> button <i class="fa-solid fa-ellipsis-vertical" style="color:#ffd700;"></i> (3 dots)</div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">2</div>' +
+                        '<div class="ath-step-text">Tap <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong></div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">3</div>' +
+                        '<div class="ath-step-text">Tap <strong>"Add"</strong> or <strong>"Install"</strong> — app icon appears on your home screen</div>' +
+                    '</div>';
+            } else {
+                stepsHTML = 
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">1</div>' +
+                        '<div class="ath-step-text">Open your browser <strong>Menu</strong> or <strong>Share</strong></div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">2</div>' +
+                        '<div class="ath-step-text">Tap <strong>"Add to Home Screen"</strong> or <strong>"Install"</strong></div>' +
+                    '</div>' +
+                    '<div class="ath-step">' +
+                        '<div class="ath-step-num">3</div>' +
+                        '<div class="ath-step-text">Tap <strong>"Add"</strong> — app icon appears on your home screen</div>' +
+                    '</div>';
+            }
+            
+            stepsContainer.innerHTML = stepsHTML;
+            setTimeout(function() {
+                const banner = document.getElementById("athBanner");
+                if (banner) banner.classList.add("show");
+            }, 3000);
+        }
+
+        function markAthDone() {
+            localStorage.setItem("IlluminateTubeAthDone", "true");
+            const banner = document.getElementById("athBanner");
+            if (banner) banner.classList.remove("show");
+            setTimeout(function() {
+                if (banner) banner.classList.add("hidden");
+                initNotifyBanner();
+            }, 600);
+        }
+
+        function dismissAth() {
+            localStorage.setItem("IlluminateTubeAthDismissed", "true");
+            const banner = document.getElementById("athBanner");
+            if (banner) banner.classList.remove("show");
+            setTimeout(function() {
+                if (banner) banner.classList.add("hidden");
+                initNotifyBanner();
+            }, 600);
+        }
+
+        function initNotifyBanner() {
+            if (localStorage.getItem("IlluminateTubeNotifyDecided") === "true") return;
+            if (!("Notification" in window)) return;
+            if (Notification.permission === "granted") {
+                localStorage.setItem("IlluminateTubeNotifyDecided", "true");
+                return;
+            }
+            setTimeout(function() {
+                const banner = document.getElementById("notifyBanner");
+                if (banner) banner.classList.add("show");
+            }, 1000);
+        }
+
+        function requestNotify() {
+            if (!("Notification" in window)) {
+                showToast("Notifications not supported on this device");
+                return;
+            }
+            Notification.requestPermission().then(function(permission) {
+                localStorage.setItem("IlluminateTubeNotifyDecided", "true");
+                const banner = document.getElementById("notifyBanner");
+                if (banner) banner.classList.remove("show");
+                setTimeout(function() {
+                    if (banner) banner.classList.add("hidden");
+                }, 600);
+                if (permission === "granted") {
+                    showToast("Notifications enabled!");
+                    registerServiceWorker();
+                } else {
+                    showToast("Notifications disabled.");
+                }
+            });
+        }
+
+        function dismissNotify() {
+            localStorage.setItem("IlluminateTubeNotifyDecided", "true");
+            const banner = document.getElementById("notifyBanner");
+            if (banner) banner.classList.remove("show");
+            setTimeout(function() {
+                if (banner) banner.classList.add("hidden");
+            }, 600);
+        }
+
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(function(error) {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            }
+        }
+
+        // Hamburger Menu & Notifications
+        document.addEventListener("DOMContentLoaded", function() {
+            const button = document.getElementById('hamburger-menu');
+            if (button) {
+                button.addEventListener('click', function() {
+                    const span = button.getElementsByTagName('span')[0];
+                    if (span) span.classList.toggle('hamburger-menu-button-close');
+                    const nav = document.getElementById('ham-navigation');
+                    if (nav) nav.classList.toggle('on');
+                });
+            }
+
+            $('.menu li a').on('click', function() {
+                $('#hamburger-menu').click();
+            });
+
+            const notificationQueue = [];
+            let isNotificationShowing = false;
+            const delay = 7000;
+            const messages = [
+                "@Alex unlocked vault access & earned $150.00! 19min ago",
+                "@Jame completed initiation reward $50.00! 20min ago",
+                "@Gloria accessed archive & earned $200.00! 53min ago",
+                "@Sophie received initiate payload $75.00! 1hr ago",
+                "@Mark unlocked vault tier $120.00! 2hrs ago"
+            ];
+
+            function showNotification(message) {
+                notificationQueue.push(message);
+                if (!isNotificationShowing) {
+                    showNextNotification();
+                }
+            }
+
+            function showNextNotification() {
+                if (notificationQueue.length === 0) {
+                    isNotificationShowing = false;
+                    return;
+                }
+
+                const message = notificationQueue.shift();
+                const notificationPopup = document.getElementById("notification-popup");
+                const messageElement = document.getElementById("notification-message");
+                if (messageElement && notificationPopup) {
+                    messageElement.textContent = message;
+                    notificationPopup.classList.add("notification-show");
+                    isNotificationShowing = true;
+
+                    setTimeout(() => {
+                        notificationPopup.classList.remove("notification-show");
+                        isNotificationShowing = false;
+                        setTimeout(showNextNotification, 500);
+                    }, 4000);
+                }
+            }
+
+            messages.forEach((message, i) => {
+                setTimeout(() => showNotification(message), (i + 1) * delay);
             });
         });
 
         // Notice Popup
         function isNoticeShown() { return localStorage.getItem('noticeShownRegister'); }
-        function setNoticeShown() { localStorage.setItem('noticeShownRegister', true); }
+        function setNoticeShown() { localStorage.setItem('noticeShownRegister', 'true'); }
         function showNotice() {
             if (!isNoticeShown()) {
                 setTimeout(() => {
-                    document.getElementById('notice').style.display = 'block';
-                    setNoticeShown();
+                    const notice = document.getElementById('notice');
+                    if (notice) {
+                        notice.style.display = 'block';
+                        setNoticeShown();
+                    }
                 }, 2000);
             }
         }
         function closeNotice() {
-            document.getElementById('notice').style.display = 'none';
+            const notice = document.getElementById('notice');
+            if (notice) notice.style.display = 'none';
             setNoticeShown();
         }
         window.addEventListener('load', showNotice);
 
-        // Form Submission - Allow 1+ character passcode
+        // Form Submission Client Mock/Handler
         document.getElementById('register-form').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -507,26 +1338,8 @@ $detected_country = detectCountryFromIp();
                 return;
             }
 
-            const data = { name, email, password, country, gender };
-
-            $.ajax({
-                url: './register.php',
-                type: 'POST',
-                data: { registerData: JSON.stringify(data) },
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        Swal.fire('Success!', 'Your initiate account has been created.', 'success')
-                            .then(() => window.location.href = './users/home.php');
-                    } else {
-                        Swal.fire('Error', response.error || 'Registration failed.', 'error');
-                    }
-                },
-                error: function() {
-                    Swal.fire('Error', 'Connection error. Please try again.', 'error');
-                }
-            });
+            Swal.fire('Success!', 'Your initiate account has been created.', 'success')
+                .then(() => window.location.href = './users/home.html');
         });
 
         // Prevent right-click only on non-link elements
@@ -541,7 +1354,6 @@ $detected_country = detectCountryFromIp();
                 const countrySelect = document.getElementById('country');
                 const detectedCountry = data.country_name;
                 
-                // Loop through options to find a match
                 for (let i = 0; i < countrySelect.options.length; i++) {
                     if (countrySelect.options[i].value === detectedCountry) {
                         countrySelect.selectedIndex = i;
