@@ -72,6 +72,7 @@
             text-decoration: none;
         }
 
+        /* Hamburger Toggle Button & Animation */
         .hamburger-menu-button {
             width: 40px;
             height: 40px;
@@ -84,6 +85,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            outline: none;
         }
 
         .hamburger-menu-button span {
@@ -91,7 +93,7 @@
             height: 2px;
             background: #000;
             position: absolute;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease-in-out;
         }
 
         .hamburger-menu-button span::before,
@@ -101,7 +103,8 @@
             height: 2px;
             background: #000;
             position: absolute;
-            transition: all 0.3s ease;
+            left: 0;
+            transition: all 0.3s ease-in-out;
         }
 
         .hamburger-menu-button span::before {
@@ -112,18 +115,20 @@
             transform: translateY(6px);
         }
 
-        .hamburger-menu-button-close span {
+        /* Transform lines into an 'X' when active */
+        .hamburger-menu-button.hamburger-menu-button-close span {
             background: transparent;
         }
 
-        .hamburger-menu-button-close span::before {
+        .hamburger-menu-button.hamburger-menu-button-close span::before {
             transform: translateY(0) rotate(45deg);
         }
 
-        .hamburger-menu-button-close span::after {
+        .hamburger-menu-button.hamburger-menu-button-close span::after {
             transform: translateY(0) rotate(-45deg);
         }
 
+        /* Mobile Menu Slide Animation */
         .ham-menu {
             position: fixed;
             top: 80px;
@@ -742,6 +747,9 @@
         }
 
         @media (min-width: 768px) {
+            .hamburger-menu-button {
+                display: none;
+            }
             .ham-menu {
                 position: static;
                 transform: none;
@@ -1305,15 +1313,19 @@
             const button = document.getElementById('hamburger-menu');
             if (button) {
                 button.addEventListener('click', function() {
-                    const span = button.getElementsByTagName('span')[0];
-                    if (span) span.classList.toggle('hamburger-menu-button-close');
+                    // Toggle the animation class on the button itself
+                    button.classList.toggle('hamburger-menu-button-close');
+                    
+                    // Toggle navigation menu visibility
                     const nav = document.getElementById('ham-navigation');
                     if (nav) nav.classList.toggle('on');
                 });
             }
 
-            $('.menu li a').on('click', function() {
-                $('#hamburger-menu').click();
+            $('.ham-menu ul li a').on('click', function() {
+                if ($('#ham-navigation').hasClass('on')) {
+                    $('#hamburger-menu').click();
+                }
             });
 
             const notificationQueue = [];
