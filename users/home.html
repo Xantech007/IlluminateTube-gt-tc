@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Dashboard | Cash Tube</title>
+    <title>Dashboard | Illuminate Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -315,102 +315,25 @@
     <div class="top-header">
         <div class="user-badge">
             <img src="img/top.png" alt="Logo">
-            <span id="usernameDisplay" style="font-size: 14px; font-weight: 600;">John Doe</span>
+            <span id="usernameDisplay" style="font-size: 14px; font-weight: 600;">Guest User</span>
         </div>
         <div class="balance-badge">
-            $<span id="balance">12.50</span>
+            $<span id="balance">0.00</span>
         </div>
     </div>
 
-    <!-- Notification Containers for feedback -->
-    <div id="alertContainer"></div>
+    <!-- Notification placeholder elements -->
+    <div id="staticNotificationContainer"></div>
 
     <!-- TikTok Scroll Container -->
     <div class="tiktok-feed" id="tiktokFeed">
+        <!-- Dynamic video cards will be loaded here via JS (mocked or populated) -->
         
-        <!-- Sample Video Card 1 -->
-        <div class="video-card" data-index="0" id="video-card-101">
-            <div class="reward-countdown-banner">
-                <i class="fa-solid fa-stopwatch" style="color: #4ade80;"></i>
-                Reward in: <span class="timer-display">--s</span>
-            </div>
-
-            <video 
-                class="feed-video" 
-                playsinline 
-                preload="auto"
-                data-video-id="101" 
-                data-reward="0.50">
-                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-            </video>
-
-            <div class="actions-sidebar">
-                <button class="action-btn like-btn" aria-label="Like video">
-                    <i class="fa-solid fa-heart"></i>
-                    <span class="like-count" data-likes="1420">0</span>
-                </button>
-
-                <div class="action-btn">
-                    <i class="fa-solid fa-coins" style="color: #eab308;"></i>
-                    <span>+$0.50</span>
-                </div>
-
-                <button class="action-btn share-btn" aria-label="Share">
-                    <i class="fa-solid fa-share"></i>
-                    <span>Share</span>
-                </button>
-            </div>
-
-            <div class="video-overlay-info">
-                <h3>Big Buck Bunny Teaser</h3>
-                <p>Watch full ad to earn <span>+$0.50</span> directly to your balance.</p>
-            </div>
-        </div>
-
-        <!-- Sample Video Card 2 -->
-        <div class="video-card" data-index="1" id="video-card-102">
-            <div class="reward-countdown-banner">
-                <i class="fa-solid fa-stopwatch" style="color: #4ade80;"></i>
-                Reward in: <span class="timer-display">--s</span>
-            </div>
-
-            <video 
-                class="feed-video" 
-                playsinline 
-                preload="metadata"
-                data-video-id="102" 
-                data-reward="0.75">
-                <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
-            </video>
-
-            <div class="actions-sidebar">
-                <button class="action-btn like-btn" aria-label="Like video">
-                    <i class="fa-solid fa-heart"></i>
-                    <span class="like-count" data-likes="850">0</span>
-                </button>
-
-                <div class="action-btn">
-                    <i class="fa-solid fa-coins" style="color: #eab308;"></i>
-                    <span>+$0.75</span>
-                </div>
-
-                <button class="action-btn share-btn" aria-label="Share">
-                    <i class="fa-solid fa-share"></i>
-                    <span>Share</span>
-                </button>
-            </div>
-
-            <div class="video-overlay-info">
-                <h3>Sample Cinematic Promo</h3>
-                <p>Watch full ad to earn <span>+$0.75</span> directly to your balance.</p>
-            </div>
-        </div>
-
         <!-- Empty state message displayed when all videos are finished -->
         <div class="no-videos-container" id="noVideosMsg" style="display: none;">
             <i class="fa-solid fa-circle-check" style="font-size: 56px; color: #22c55e; margin-bottom: 16px;"></i>
             <h2>All Videos Watched!</h2>
-            <p style="margin-top: 8px; color: #9ca3af;">You have watched all available videos for today. Please check back later for new ads!</p>
+            <p id="videoErrorText" style="margin-top: 8px; color: #9ca3af;">You have watched all available videos for today. Please check back later for new ads!</p>
         </div>
     </div>
 
@@ -426,28 +349,110 @@
     </div>
 
     <script>
+        // Mock state initialization to match original PHP functionality in a purely HTML/JS client environment
+        let userState = {
+            name: "Illuminate User",
+            balance: 125.50,
+            watchedVideos: []
+        };
+
+        // Sample video items to simulate the server response dataset
+        let mockVideos = [
+            {
+                id: 1,
+                title: "Exploring Nature's Wonders",
+                url: "https://www.w3schools.com/html/mov_bbb.mp4",
+                reward: 0.50,
+                likes: 1240
+            },
+            {
+                id: 2,
+                title: "Amazing Urban Architecture",
+                url: "https://www.w3schools.com/html/mov_bbb.mp4",
+                reward: 0.75,
+                likes: 8500
+            }
+        ];
+
+        // Initialize UI values
+        document.getElementById('usernameDisplay').textContent = userState.name;
+        document.getElementById('balance').textContent = userState.balance.toFixed(2);
+
+        function renderVideos() {
+            const feed = document.getElementById('tiktokFeed');
+            // Keep the no-videos message element intact, remove previous video-cards
+            document.querySelectorAll('.video-card').forEach(card => card.remove());
+
+            const availableVideos = mockVideos.filter(v => !userState.watchedVideos.includes(v.id));
+
+            if (availableVideos.length === 0) {
+                document.getElementById('noVideosMsg').style.display = 'flex';
+                return;
+            }
+
+            document.getElementById('noVideosMsg').style.display = 'none';
+
+            availableVideos.forEach((vid, index) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'video-card';
+                cardDiv.setAttribute('data-index', index);
+                cardDiv.id = `video-card-${vid.id}`;
+
+                cardDiv.innerHTML = `
+                    <div class="reward-countdown-banner">
+                        <i class="fa-solid fa-stopwatch" style="color: #4ade80;"></i>
+                        Reward in: <span class="timer-display">--s</span>
+                    </div>
+                    <video 
+                        class="feed-video" 
+                        playsinline 
+                        preload="${index === 0 ? 'auto' : 'metadata'}"
+                        data-video-id="${vid.id}" 
+                        data-reward="${vid.reward}">
+                        <source src="${vid.url}" type="video/mp4">
+                    </video>
+                    <div class="actions-sidebar">
+                        <button class="action-btn like-btn" aria-label="Like video">
+                            <i class="fa-solid fa-heart"></i>
+                            <span class="like-count" data-likes="${vid.likes}">${formatLikes(vid.likes)}</span>
+                        </button>
+                        <div class="action-btn">
+                            <i class="fa-solid fa-coins" style="color: #eab308;"></i>
+                            <span>+$${vid.reward.toFixed(2)}</span>
+                        </div>
+                        <button class="action-btn share-btn" aria-label="Share">
+                            <i class="fa-solid fa-share"></i>
+                            <span>Share</span>
+                        </button>
+                    </div>
+                    <div class="video-overlay-info">
+                        <h3>${vid.title}</h3>
+                        <p>Watch full ad to earn <span>+$${vid.reward.toFixed(2)}</span> directly to your balance.</p>
+                    </div>
+                `;
+                feed.insertBefore(cardDiv, document.getElementById('noVideosMsg'));
+            });
+
+            initVideoFunctionality();
+        }
+
         function formatLikes(num) {
             if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
             if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
             return num.toString();
         }
 
-        document.querySelectorAll('.like-count').forEach(span => {
-            const rawLikes = parseInt(span.getAttribute('data-likes')) || 0;
-            span.textContent = formatLikes(rawLikes);
-        });
-
         const feed = document.getElementById('tiktokFeed');
 
         function checkEmptyFeed() {
-            const visibleCards = document.querySelectorAll('.video-card:not([style*="display: none"])');
+            const visibleCards = document.querySelectorAll('.video-card');
             if (visibleCards.length === 0) {
                 document.getElementById('noVideosMsg').style.display = 'flex';
             }
         }
 
         function scrollToNextVideo(card) {
-            const remainingCards = Array.from(document.querySelectorAll('.video-card')).filter(c => c.style.display !== 'none' && c !== card);
+            const remainingCards = Array.from(document.querySelectorAll('.video-card')).filter(c => c !== card);
             if (remainingCards.length > 0) {
                 setTimeout(() => {
                     remainingCards[0].scrollIntoView({ behavior: 'smooth' });
@@ -455,103 +460,130 @@
             }
         }
 
-        // IntersectionObserver for video autoplay and timer countdown
-        const observerOptions = {
-            root: feed,
-            threshold: 0.6
-        };
+        function initVideoFunctionality() {
+            const observerOptions = {
+                root: feed,
+                threshold: 0.6
+            };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const video = entry.target.querySelector('video');
-                if (!video) return;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target.querySelector('video');
+                    if (!video) return;
 
-                if (entry.isIntersecting) {
-                    video.play().catch(err => console.log('Autoplay prevented:', err));
-                } else {
-                    video.pause();
-                }
-            });
-        }, observerOptions);
+                    if (entry.isIntersecting) {
+                        video.play().catch(err => console.log('Autoplay prevented:', err));
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, observerOptions);
 
-        document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
+            document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
 
-        // Video interaction, real-time timer countdown, and completion logic
-        document.querySelectorAll('.feed-video').forEach(video => {
-            const card = video.closest('.video-card');
-            const timerDisplay = card.querySelector('.timer-display');
+            document.querySelectorAll('.feed-video').forEach(video => {
+                const card = video.closest('.video-card');
+                const timerDisplay = card.querySelector('.timer-display');
 
-            // Dynamic live time update display
-            video.addEventListener('timeupdate', function() {
-                if (video.duration) {
-                    const remaining = Math.ceil(video.duration - video.currentTime);
-                    timerDisplay.textContent = remaining > 0 ? `${remaining}s` : 'Processing...';
-                }
-            });
-
-            video.addEventListener('click', function() {
-                if (video.paused) {
-                    video.play();
-                } else {
-                    video.pause();
-                }
-            });
-
-            // Double tap heart gesture
-            let lastTap = 0;
-            video.addEventListener('touchend', function(e) {
-                const currentTime = new Date().getTime();
-                const tapLength = currentTime - lastTap;
-                if (tapLength < 300 && tapLength > 0) {
-                    const likeBtn = card.querySelector('.like-btn');
-                    triggerLike(likeBtn);
-
-                    const touch = e.changedTouches[0];
-                    const heart = document.createElement('i');
-                    heart.className = 'fa-solid fa-heart heart-animation';
-                    heart.style.left = `${touch.clientX}px`;
-                    heart.style.top = `${touch.clientY}px`;
-                    card.appendChild(heart);
-                    setTimeout(() => heart.remove(), 800);
-                }
-                lastTap = currentTime;
-            });
-
-            // Video completion reward dispatch (Simulated via frontend handlers)
-            video.addEventListener('ended', function() {
-                const rewardVal = parseFloat(video.getAttribute('data-reward'));
-                
-                // Update balance locally for demonstration
-                const balanceEl = document.getElementById('balance');
-                let currentBalance = parseFloat(balanceEl.textContent) || 0;
-                currentBalance += rewardVal;
-                balanceEl.textContent = currentBalance.toFixed(2);
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Reward Earned!',
-                    text: `+$${rewardVal.toFixed(2)} added to your balance!`,
-                    timer: 1800,
-                    showConfirmButton: false
+                video.addEventListener('timeupdate', function() {
+                    if (video.duration) {
+                        const remaining = Math.ceil(video.duration - video.currentTime);
+                        timerDisplay.textContent = remaining > 0 ? `${remaining}s` : 'Processing...';
+                    }
                 });
 
-                // Smoothly fade out and remove watched video card from view
-                $(card).fadeOut(400, function() {
-                    card.remove();
-                    checkEmptyFeed();
+                video.addEventListener('click', function() {
+                    if (video.paused) {
+                        video.play();
+                    } else {
+                        video.pause();
+                    }
                 });
 
-                scrollToNextVideo(card);
-            });
-        });
+                let lastTap = 0;
+                video.addEventListener('touchend', function(e) {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTap;
+                    if (tapLength < 300 && tapLength > 0) {
+                        const likeBtn = card.querySelector('.like-btn');
+                        triggerLike(likeBtn);
 
-        // Like button toggle
-        document.querySelectorAll('.like-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                triggerLike(btn);
+                        const touch = e.changedTouches[0];
+                        const heart = document.createElement('i');
+                        heart.className = 'fa-solid fa-heart heart-animation';
+                        heart.style.left = `${touch.clientX}px`;
+                        heart.style.top = `${touch.clientY}px`;
+                        card.appendChild(heart);
+                        setTimeout(() => heart.remove(), 800);
+                    }
+                    lastTap = currentTime;
+                });
+
+                video.addEventListener('ended', function() {
+                    const videoId = parseInt(video.getAttribute('data-video-id'));
+                    const rewardAmt = parseFloat(video.getAttribute('data-reward'));
+
+                    if (userState.watchedVideos.includes(videoId)) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Notice',
+                            text: 'Video already watched.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        return;
+                    }
+
+                    // Simulate AJAX reward claim processing
+                    setTimeout(() => {
+                        userState.balance += rewardAmt;
+                        userState.watchedVideos.push(videoId);
+
+                        document.getElementById('balance').textContent = userState.balance.toFixed(2);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Reward Earned!',
+                            text: `+$${rewardAmt.toFixed(2)} added to your balance!`,
+                            timer: 1800,
+                            showConfirmButton: false
+                        });
+
+                        $(card).fadeOut(400, function() {
+                            card.remove();
+                            checkEmptyFeed();
+                        });
+
+                        scrollToNextVideo(card);
+                    }, 300);
+                });
             });
-        });
+
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    triggerLike(btn);
+                });
+            });
+
+            document.querySelectorAll('.share-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'Watch & Earn on Illuminate Tube',
+                            url: window.location.href
+                        }).catch(console.error);
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Share',
+                            text: 'Link copied to clipboard!'
+                        });
+                    }
+                });
+            });
+        }
 
         function triggerLike(btn) {
             const isLiked = btn.classList.toggle('liked');
@@ -563,26 +595,6 @@
             countSpan.textContent = formatLikes(rawCount);
         }
 
-        // Native share functionality
-        document.querySelectorAll('.share-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Watch & Earn on Cash Tube',
-                        url: window.location.href
-                    }).catch(console.error);
-                } else {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Share',
-                        text: 'Link copied to clipboard!'
-                    });
-                }
-            });
-        });
-
-        // Logout Flow
         document.getElementById('logoutBtn').addEventListener('click', () => {
             Swal.fire({
                 title: 'Log out?',
@@ -599,18 +611,9 @@
             });
         });
 
-        // Simulated notifications loop
-        const notificationContainer = document.getElementById('notificationContainer');
-        function showMockNotification() {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `<i class="fa-solid fa-circle-info" style="color: #4ade80;"></i><span>New bonus videos are available!</span>`;
-            notificationContainer.appendChild(notification);
-            setTimeout(() => notification.remove(), 3500);
-        }
-        setTimeout(showMockNotification, 3000);
+        // Initial render execution
+        renderVideos();
 
-        // Prevent Context Menu
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
         });
