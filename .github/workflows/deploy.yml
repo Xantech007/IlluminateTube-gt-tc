@@ -1,0 +1,20 @@
+name: 🚀 Deploy Website on Push
+on:
+  push:
+    branches: [ master ]
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get Latest Code
+      uses: actions/checkout@v4
+    - name: 📂 Sync Files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP2_SERVER }}
+        username: ${{ secrets.FTP2_USERNAME }}
+        password: ${{ secrets.FTP2_PASSWORD }}
+        server-dir: illuminatetube.gt.tc/htdocs/  # Adjust to your target directory, e.g., public_html/subfolder/
+        protocol: ftp  # Use 'ftps' for secure FTP if supported by Namecheap
+        port: 21  # Adjust to 21098 for SFTP if needed
