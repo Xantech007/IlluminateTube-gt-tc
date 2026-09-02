@@ -322,7 +322,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         .actions-sidebar {
             position: absolute;
             right: 16px;
-            bottom: 200px;
+            bottom: 240px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -365,7 +365,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Bottom Info Overlay */
         .video-overlay-info {
             position: absolute;
-            bottom: 200px;
+            bottom: 240px;
             left: 16px;
             right: 80px;
             z-index: 10;
@@ -575,7 +575,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     <!-- Fixed Bottom Menu -->
     <div class="bottom-menu" role="navigation">
         <a href="home.php" class="active"><i class="fa-solid fa-house"></i>Home</a>
-        <a href="profile.php"><i class="fa-solid fa-user"></i>Profile</a>
+        <a href="profile.php"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
         <a href="history.php"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
         <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
         <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
