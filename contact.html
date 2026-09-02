@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Contact Illuminate Task Tube's elite support team 24/7 via Telegram for assistance with your account, login, or secret archive inquiries.">
-    <meta name="keywords" content="Illuminate Task Tube, contact support, Illuminati videos, elite rewards, crypto payouts, customer service">
-    <meta name="author" content="Illuminate Task Tube">
-    <title>Illuminate Task Tube - Contact Us</title>
-    
+    <meta name="description" content="Contact Illuminate Tube's elite support team 24/7 via Telegram for assistance with your account, login, or secret archive inquiries.">
+    <meta name="keywords" content="Illuminate Tube, contact support, Illuminati videos, elite rewards, crypto payouts, customer service">
+    <meta name="author" content="Illuminate Tube">
+    <title>Illuminate Tube - Contact Us</title>
+
     <!-- PWA / Add to Home Screen Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <style>
         * {
             margin: 0;
@@ -41,7 +40,7 @@
             top: 0 !important;
         }
 
-        /* HEADER & NAVBAR STYLES */
+        /* --- Header & Notification Styles --- */
         header {
             position: fixed;
             top: 0;
@@ -72,7 +71,6 @@
             text-decoration: none;
         }
 
-        /* Hamburger Toggle Button & Animation */
         .hamburger-menu-button {
             width: 40px;
             height: 40px;
@@ -85,7 +83,6 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-            outline: none;
         }
 
         .hamburger-menu-button span {
@@ -93,7 +90,7 @@
             height: 2px;
             background: #000;
             position: absolute;
-            transition: all 0.3s ease-in-out;
+            transition: all 0.3s ease;
         }
 
         .hamburger-menu-button span::before,
@@ -103,8 +100,7 @@
             height: 2px;
             background: #000;
             position: absolute;
-            left: 0;
-            transition: all 0.3s ease-in-out;
+            transition: all 0.3s ease;
         }
 
         .hamburger-menu-button span::before {
@@ -115,20 +111,330 @@
             transform: translateY(6px);
         }
 
-        /* Transform lines into an 'X' when active */
-        .hamburger-menu-button.hamburger-menu-button-close span {
+        .hamburger-menu-button-close span {
             background: transparent;
         }
 
-        .hamburger-menu-button.hamburger-menu-button-close span::before {
+        .hamburger-menu-button-close span::before {
             transform: translateY(0) rotate(45deg);
         }
 
-        .hamburger-menu-button.hamburger-menu-button-close span::after {
+        .hamburger-menu-button-close span::after {
             transform: translateY(0) rotate(-45deg);
         }
 
-        /* Mobile Menu Slide Animation */
+        .notification-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #141414, #1a1a1a);
+            border: 1px solid #d4af37;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            max-width: 320px;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+            transition: all 0.4s ease;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            color: #e0e0e0;
+        }
+
+        .notification-popup.notification-show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .notification-content {
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-content i {
+            margin-right: 12px;
+            font-size: 18px;
+            color: #ffd700;
+        }
+
+        /* Add to Home Screen Banner */
+        .ath-banner {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 16px 20px;
+            z-index: 2000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+        }
+
+        .ath-banner.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .ath-banner.hidden {
+            display: none !important;
+        }
+
+        .ath-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ath-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .ath-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .ath-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .ath-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .ath-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ath-step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffd700;
+            font-size: 11px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .ath-step-text {
+            font-size: 12px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .ath-step-text strong {
+            color: #f8fafc;
+            font-weight: 700;
+        }
+
+        .ath-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ath-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .ath-btn-done {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+        }
+
+        .ath-btn-later {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .ath-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #334155;
+            border: none;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ath-close:hover {
+            background: #475569;
+            color: #f8fafc;
+        }
+
+        /* Notification Permission Banner */
+        .notify-banner {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 16px 20px;
+            z-index: 2000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+        }
+
+        .notify-banner.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .notify-banner.hidden {
+            display: none !important;
+        }
+
+        .notify-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .notify-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .notify-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .notify-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .notify-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .notify-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .notify-btn-allow {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: #fff;
+        }
+
+        .notify-btn-deny {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: #1e293b;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 2001;
+            transition: all 0.4s;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast i {
+            color: #10b981;
+        }
+
+        /* --- Navbar Styles --- */
         .ham-menu {
             position: fixed;
             top: 80px;
@@ -167,7 +473,7 @@
             font-weight: 600;
         }
 
-        /* Translator Styles */
+        /* --- Translator Styles --- */
         #google_translate_element {
             margin: 12px 15px 12px 20px;
         }
@@ -193,6 +499,37 @@
             display: none !important;
             height: 0 !important;
             visibility: hidden !important;
+        }
+
+        /* --- Footer Styles --- */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #141414;
+            border-top: 1px solid #333;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        footer.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        footer p {
+            margin: 0;
+            color: #d4af37;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         /* Hero Section */
@@ -227,7 +564,6 @@
             z-index: 1;
             color: #d4af37;
             text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-            animation: fadeInDown 1s ease-out;
         }
 
         .hero-section p {
@@ -238,7 +574,6 @@
             position: relative;
             z-index: 1;
             color: #cccccc;
-            animation: fadeIn 1.2s ease-out;
         }
 
         /* Main Container */
@@ -254,7 +589,6 @@
             color: #d4af37;
             text-align: center;
             margin-bottom: 40px;
-            animation: fadeIn 1s ease-out;
         }
 
         .contact-content {
@@ -441,321 +775,8 @@
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
 
-        /* Notification Popups & ATH Banner */
-        .ath-banner {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(120px);
-            width: calc(100% - 40px);
-            max-width: 400px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 16px 20px;
-            z-index: 2000;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0;
-        }
-
-        .ath-banner.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .ath-banner.hidden {
-            display: none !important;
-        }
-
-        .ath-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .ath-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            background: linear-gradient(45deg, #d4af37, #ffd700);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-size: 18px;
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-        }
-
-        .ath-title {
-            font-size: 15px;
-            font-weight: 800;
-            color: #f8fafc;
-        }
-
-        .ath-sub {
-            font-size: 12px;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        .ath-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-
-        .ath-step {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .ath-step-num {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: rgba(212, 175, 55, 0.15);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffd700;
-            font-size: 11px;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-
-        .ath-step-text {
-            font-size: 12px;
-            color: #cbd5e1;
-            font-weight: 500;
-        }
-
-        .ath-step-text strong {
-            color: #f8fafc;
-            font-weight: 700;
-        }
-
-        .ath-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .ath-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 14px;
-            border: none;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .ath-btn-done {
-            background: linear-gradient(45deg, #d4af37, #ffd700);
-            color: #000;
-        }
-
-        .ath-btn-later {
-            background: #334155;
-            color: #94a3b8;
-        }
-
-        .ath-close {
-            position: absolute;
-            top: 10px;
-            right: 14px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #334155;
-            border: none;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .ath-close:hover {
-            background: #475569;
-            color: #f8fafc;
-        }
-
-        .notify-banner {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-120px);
-            width: calc(100% - 40px);
-            max-width: 400px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 16px 20px;
-            z-index: 2000;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0;
-        }
-
-        .notify-banner.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .notify-banner.hidden {
-            display: none !important;
-        }
-
-        .notify-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .notify-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #10b981, #34d399);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 16px;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .notify-title {
-            font-size: 15px;
-            font-weight: 800;
-            color: #f8fafc;
-        }
-
-        .notify-sub {
-            font-size: 12px;
-            color: #94a3b8;
-            font-weight: 500;
-            line-height: 1.5;
-        }
-
-        .notify-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 14px;
-        }
-
-        .notify-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 14px;
-            border: none;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .notify-btn-allow {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: #fff;
-        }
-
-        .notify-btn-deny {
-            background: #334155;
-            color: #94a3b8;
-        }
-
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-80px);
-            background: #1e293b;
-            color: #fff;
-            padding: 14px 24px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            z-index: 2001;
-            transition: all 0.4s;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border: 1px solid #334155;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .toast i {
-            color: #10b981;
-        }
-
-        /* Footer Styles */
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            background: #141414;
-            border-top: 1px solid #333;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        footer.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        footer p {
-            margin: 0;
-            color: #d4af37;
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        /* Animations & Responsive */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        /* Responsive Design */
         @media (min-width: 768px) {
-            .hamburger-menu-button {
-                display: none;
-            }
             .ham-menu {
                 position: static;
                 transform: none;
@@ -779,6 +800,7 @@
             .ham-menu ul li a {
                 font-size: 15px;
             }
+
             #google_translate_element {
                 margin: 0 15px 0 0;
             }
@@ -808,10 +830,6 @@
                 padding-bottom: 80px;
             }
 
-            .ham-menu {
-                top: 70px;
-            }
-
             .hero-section {
                 padding: 80px 20px;
             }
@@ -832,31 +850,21 @@
                 font-size: 28px;
             }
 
-            footer {
-                padding: 15px;
+            .notification-popup {
+                right: 10px;
+                max-width: 90%;
             }
 
-            footer p {
-                font-size: 13px;
-            }
+            footer { padding: 15px; }
+            footer p { font-size: 13px; }
+
+            .ham-menu { top: 70px; }
         }
 
         @media (max-width: 480px) {
             body {
                 padding-top: 60px;
                 padding-bottom: 60px;
-            }
-
-            .ham-menu {
-                top: 60px;
-            }
-
-            .ham-menu ul {
-                padding: 15px;
-            }
-
-            .ham-menu ul li a {
-                font-size: 14px;
             }
 
             .hero-section {
@@ -892,19 +900,17 @@
                 font-size: 16px;
             }
 
-            footer {
-                padding: 10px;
-            }
+            footer { padding: 10px; }
+            footer p { font-size: 12px; }
 
-            footer p {
-                font-size: 12px;
-            }
+            .ham-menu { top: 60px; }
+            .ham-menu ul { padding: 15px; }
+            .ham-menu ul li a { font-size: 14px; }
         }
     </style>
 </head>
 <body>
-
-    <!-- Header -->
+    <!-- HARDCODED HEADER -->
     <header>
         <div class="header-container">
             <div class="logo">
@@ -918,21 +924,17 @@
         </div>
     </header>
 
-    <!-- Navigation Bar -->
-    <nav id="ham-navigation" class="ham-menu">
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="terms.html">Terms</a></li>
-            <li><a href="privacy.html">Privacy</a></li>
-        </ul>
+    <!-- Notification Popup -->
+    <div id="notification-container">
+        <div id="notification-popup" class="notification-popup">
+            <div id="notification-content" class="notification-content">
+                <i class="fas fa-coins"></i>
+                <p id="notification-message"></p>
+            </div>
+        </div>
+    </div>
 
-        <!-- Language Translator Container -->
-        <div id="google_translate_element"></div>
-    </nav>
-
-    <!-- Add to Home Screen Banner -->
+    <!-- ADD TO HOME SCREEN BANNER (UNIVERSAL) -->
     <div class="ath-banner" id="athBanner">
         <button class="ath-close" onclick="dismissAth()"><i class="fa-solid fa-xmark"></i></button>
         <div class="ath-header">
@@ -942,7 +944,9 @@
                 <div class="ath-sub" id="athSub">Open like a real app — faster access</div>
             </div>
         </div>
-        <div class="ath-steps" id="athSteps"></div>
+        <div class="ath-steps" id="athSteps">
+            <!-- Steps injected dynamically by JS based on device -->
+        </div>
         <div class="ath-actions">
             <button class="ath-btn ath-btn-done" onclick="markAthDone()">
                 <i class="fa-solid fa-check"></i> Done
@@ -953,7 +957,7 @@
         </div>
     </div>
 
-    <!-- Notification Permission Banner -->
+    <!-- NOTIFICATION PERMISSION BANNER -->
     <div class="notify-banner" id="notifyBanner">
         <div class="notify-header">
             <div class="notify-icon"><i class="fa-solid fa-bell"></i></div>
@@ -972,12 +976,26 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- TOAST -->
     <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
+
+    <!-- HARDCODED NAVBAR & GOOGLE TRANSLATE -->
+    <nav id="ham-navigation" class="ham-menu">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="terms.html">Terms</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+        </ul>
+
+        <!-- Language Translator Container -->
+        <div id="google_translate_element"></div>
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <h1>Contact Illuminate Task Tube</h1>
+        <h1>Contact Illuminate Tube</h1>
         <p>Reach out to our 24/7 elite support team via Telegram for help with your account, vault access, or general inquiries!</p>
     </section>
 
@@ -986,7 +1004,7 @@
         <h2 class="section-title">Get in Touch</h2>
         <div class="contact-content">
             <p>
-                We're here to assist you with any questions or issues you may have! At Illuminate Task Tube, our dedicated support team is available 24/7. Whether you need help with your initiate account, access code issues, or reward payout inquiries, feel free to reach out.
+                We're here to assist you with any questions or issues you may have! At Illuminate Tube, our dedicated support team is available 24/7. Whether you need help with your initiate account, access code issues, or reward payout inquiries, feel free to reach out.
             </p>
 
             <div class="contact-info">
@@ -1029,28 +1047,28 @@
     <!-- Notice Popup -->
     <div class="notice" id="notice">
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
-        <h2>Contact Illuminate Task Tube</h2>
+        <h2>Contact Illuminate Tube</h2>
         <p>Need assistance? Our support team is here to help you 24/7 via Telegram. Reach out today to get started or resolve any issues!</p>
         <a href="https://t.me/IlluminateTubeSupport" class="btn" onclick="openTelegram(event, 'https://t.me/IlluminateTubeSupport')">
             Message Us
         </a>
     </div>
 
-    <!-- Footer -->
+    <!-- HARDCODED FOOTER -->
     <footer id="footer">
         <p>&copy; <span id="copyright-year"></span> Illuminate Tube. All rights reserved.</p>
     </footer>
 
-    <!-- Google Translate Scripts -->
+    <!-- Google Translate Script Initialization -->
     <script type="text/javascript">
-    function googleTranslateElementInit() {
-        new google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,fr,es,de,pt,ar,zh-CN,ru',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false
-        }, 'google_translate_element');
-    }
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,fr,es,de,pt,ar,zh-CN,ru',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
     </script>
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
@@ -1062,57 +1080,93 @@
     </script>
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
-    <!-- Dynamic Functionality Scripts -->
     <script>
         // Set dynamic copyright year
         document.addEventListener('DOMContentLoaded', function() {
-            const copyYear = document.getElementById('copyright-year');
-            if (copyYear) copyYear.textContent = new Date().getFullYear();
-        });
+            const copyrightElem = document.getElementById('copyright-year');
+            if (copyrightElem) {
+                copyrightElem.textContent = new Date().getFullYear();
+            }
+            setActiveNavLink();
+            registerServiceWorker();
+            initAthBanner();
 
-        // Scroll Footer Controller
-        window.addEventListener('scroll', function() {
-            const footer = document.getElementById('footer');
-            if (footer) {
-                const windowHeight = window.innerHeight;
-                const documentHeight = document.documentElement.scrollHeight;
-                const scrollPosition = window.scrollY || window.pageYOffset;
+            const button = document.getElementById('hamburger-menu');
+            if (button) {
+                button.addEventListener('click', function() {
+                    const span = button.getElementsByTagName('span')[0];
+                    if (span) span.classList.toggle('hamburger-menu-button-close');
+                    const nav = document.getElementById('ham-navigation');
+                    if (nav) nav.classList.toggle('on');
+                });
+            }
 
-                if (scrollPosition + windowHeight >= documentHeight - 50) {
-                    footer.classList.add('visible');
-                } else {
-                    footer.classList.remove('visible');
+            $('.menu li a').on('click', function() {
+                $('#hamburger-menu').click();
+            });
+
+            // Notification Queue Logic
+            const notificationQueue = [];
+            let isNotificationShowing = false;
+            const delay = 7000;
+            const messages = [
+                "@Alex unlocked vault access & earned $150.00! 19min ago",
+                "@Jame completed initiation reward $50.00! 20min ago",
+                "@Gloria accessed archive & earned $200.00! 53min ago",
+                "@Sophie received initiate payload $75.00! 1hr ago",
+                "@Mark unlocked vault tier $120.00! 2hrs ago"
+            ];
+
+            function showNotification(message) {
+                notificationQueue.push(message);
+                if (!isNotificationShowing) {
+                    showNextNotification();
                 }
             }
-        });
 
-        // Set Active Navbar Link
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPath = window.location.pathname.split('/').pop();
-            const links = document.querySelectorAll('.ham-menu ul li a');
-            links.forEach(link => {
-                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'contact.html')) {
-                    link.parentElement.classList.add('active');
+            function showNextNotification() {
+                if (notificationQueue.length === 0) {
+                    isNotificationShowing = false;
+                    return;
                 }
+
+                const message = notificationQueue.shift();
+                const notificationPopup = document.getElementById("notification-popup");
+                const messageElement = document.getElementById("notification-message");
+                if (messageElement && notificationPopup) {
+                    messageElement.textContent = message;
+                    notificationPopup.classList.add("notification-show");
+                    isNotificationShowing = true;
+
+                    setTimeout(() => {
+                        notificationPopup.classList.remove("notification-show");
+                        isNotificationShowing = false;
+                        setTimeout(showNextNotification, 500);
+                    }, 4000);
+                }
+            }
+
+            messages.forEach((message, i) => {
+                setTimeout(() => showNotification(message), (i + 1) * delay);
             });
         });
 
-        // Telegram Deep Link Handling for WebViews
-        function openTelegram(event, url) {
-            event.preventDefault();
-            const isWebView = /wv|AndroidWebView|iPhone.*Mobile/i.test(navigator.userAgent) || window.Android || (window.webkit && window.webkit.messageHandlers);
-            
-            if (isWebView) {
-                var windowRef = window.open(url, '_system');
-                if (!windowRef || windowRef.closed || typeof windowRef.closed == 'undefined') {
-                    window.location.href = url;
-                }
-            } else {
-                window.open(url, '_blank', 'noopener,noreferrer');
-            }
-        }
+        // Footer Visibility on Scroll
+        window.addEventListener('scroll', function() {
+            const footer = document.getElementById('footer');
+            if (!footer) return;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const scrollPosition = window.scrollY || window.pageYOffset;
 
-        // Toast
+            if (scrollPosition + windowHeight >= documentHeight - 50) {
+                footer.classList.add('visible');
+            } else {
+                footer.classList.remove('visible');
+            }
+        });
+
+        // Toast logic
         function showToast(msg) {
             const t = document.getElementById("toast");
             document.getElementById("toastMsg").textContent = msg;
@@ -1188,7 +1242,7 @@
                     '</div>';
             }
             
-            if (stepsContainer) stepsContainer.innerHTML = stepsHTML;
+            stepsContainer.innerHTML = stepsHTML;
             
             setTimeout(function() {
                 const banner = document.getElementById("athBanner");
@@ -1241,10 +1295,15 @@
                 localStorage.setItem("IlluminateTubeNotifyDecided", "true");
                 const banner = document.getElementById("notifyBanner");
                 if (banner) banner.classList.remove("show");
-                setTimeout(function() { if (banner) banner.classList.add("hidden"); }, 600);
+                setTimeout(function() {
+                    if (banner) banner.classList.add("hidden");
+                }, 600);
                 
                 if (permission === "granted") {
                     showToast("Notifications enabled!");
+                    registerServiceWorker();
+                } else {
+                    showToast("Notifications disabled.");
                 }
             });
         }
@@ -1253,7 +1312,54 @@
             localStorage.setItem("IlluminateTubeNotifyDecided", "true");
             const banner = document.getElementById("notifyBanner");
             if (banner) banner.classList.remove("show");
-            setTimeout(function() { if (banner) banner.classList.add("hidden"); }, 600);
+            setTimeout(function() {
+                if (banner) banner.classList.add("hidden");
+            }, 600);
+        }
+
+        // Service Worker Registration
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(function(error) {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            }
+        }
+
+        // Highlight Active Link in Navbar
+        function setActiveNavLink() {
+            const currentPath = window.location.pathname.split('/').pop();
+            const links = document.querySelectorAll('.ham-menu ul li a');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (currentPath === '' && href === 'index.html')) {
+                    link.parentElement.classList.add('active');
+                }
+            });
+        }
+
+        // Telegram Deep Link Handling for WebViews
+        function openTelegram(event, url) {
+            event.preventDefault();
+            
+            // Check if loaded inside a WebView environment
+            const isWebView = /wv|AndroidWebView|iPhone.*Mobile/i.test(navigator.userAgent) || window.Android || (window.webkit && window.webkit.messageHandlers);
+            
+            if (isWebView) {
+                // Try opening using external browser intent target
+                var windowRef = window.open(url, '_system');
+                if (!windowRef || windowRef.closed || typeof windowRef.closed == 'undefined') {
+                    // Fallback to directly changing browser location
+                    window.location.href = url;
+                }
+            } else {
+                // Standard browser behavior
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
         }
 
         // Notice Popup
@@ -1262,49 +1368,28 @@
         }
 
         function setNoticeShown() {
-            localStorage.setItem('noticeShownContact', true);
+            localStorage.setItem('noticeShownContact', 'true');
         }
 
         function showNotice() {
             if (!isNoticeShown()) {
                 const notice = document.getElementById('notice');
                 setTimeout(() => {
-                    notice.style.display = 'block';
-                    setNoticeShown();
-                }, 2000);
+                    if (notice) {
+                        notice.style.display = 'block';
+                        setNoticeShown();
+                    }
+                }, 2000); // Match index.php timing
             }
         }
 
         function closeNotice() {
-            document.getElementById('notice').style.display = 'none';
+            const notice = document.getElementById('notice');
+            if (notice) notice.style.display = 'none';
             setNoticeShown();
         }
 
-        // Hamburger Menu & Navigation Event Listeners
-        document.addEventListener("DOMContentLoaded", function() {
-            const button = document.getElementById('hamburger-menu');
-            if (button) {
-                button.addEventListener('click', function() {
-                    // Toggle the animation class on the button itself
-                    button.classList.toggle('hamburger-menu-button-close');
-                    
-                    // Toggle navigation menu visibility
-                    const nav = document.getElementById('ham-navigation');
-                    if (nav) nav.classList.toggle('on');
-                });
-            }
-
-            $('.ham-menu ul li a').on('click', function() {
-                if ($('#ham-navigation').hasClass('on')) {
-                    $('#hamburger-menu').click();
-                }
-            });
-        });
-
-        window.addEventListener('load', function() {
-            showNotice();
-            initAthBanner();
-        });
+        window.addEventListener('load', showNotice);
 
         // Prevent right-click only on non-link elements
         document.addEventListener('contextmenu', e => {
