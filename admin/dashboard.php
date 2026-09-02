@@ -62,7 +62,6 @@ try {
         $telegram_link = $support_data['telegram'];
     }
 } catch (PDOException $e) {
-    // If table doesn't exist or column is missing prior to setup
     error_log('Telegram fetch error: ' . $e->getMessage(), 3, '../debug.log');
 }
 
@@ -366,6 +365,7 @@ try {
                 <input type="text" name="title" placeholder="Video Title" required>
                 <input type="file" name="video_file" accept=".mp4,.avi,.mov" required>
                 <input type="number" name="reward" placeholder="Reward ($)" step="0.01" required>
+                <input type="number" name="likes" placeholder="Initial Likes" min="0" value="0" required>
                 <button type="submit" id="addVideoButton">Add Video</button>
                 <div class="loading" id="loadingIndicator">Uploading video, please wait...</div>
             </form>
