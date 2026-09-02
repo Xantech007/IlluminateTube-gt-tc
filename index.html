@@ -7,8 +7,8 @@
     <meta name="keywords" content="Illuminate Tube, Illuminati videos, watch and earn, secret knowledge, elite rewards, crypto earnings">
     <meta name="author" content="Illuminate Tube">
     <title>Illuminate Tube - Unlock Rewards Watching Exclusive Content</title>
-    
-    <!-- PWA / Add to Home Screen Meta Tags -->
+
+    <!-- PWA / Add to Home Screen Meta Tags (from header.html) -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <style>
         * {
             margin: 0;
@@ -36,12 +36,12 @@
             display: flex;
             flex-direction: column;
             color: #e0e0e0;
-            padding-top: 80px; /* Matches header height */
-            padding-bottom: 100px; /* Matches footer height */
+            padding-top: 80px;
+            padding-bottom: 100px;
             top: 0 !important;
         }
 
-        /* HEADER & NAVBAR STYLES */
+        /* --- Header & Notification Styles --- */
         header {
             position: fixed;
             top: 0;
@@ -124,6 +124,318 @@
             transform: translateY(0) rotate(-45deg);
         }
 
+        .notification-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #141414, #1a1a1a);
+            border: 1px solid #d4af37;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            max-width: 320px;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+            transition: all 0.4s ease;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            color: #e0e0e0;
+        }
+
+        .notification-popup.notification-show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .notification-content {
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-content i {
+            margin-right: 12px;
+            font-size: 18px;
+            color: #ffd700;
+        }
+
+        /* Add to Home Screen Banner */
+        .ath-banner {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 16px 20px;
+            z-index: 2000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+        }
+
+        .ath-banner.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .ath-banner.hidden {
+            display: none !important;
+        }
+
+        .ath-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ath-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .ath-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .ath-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .ath-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .ath-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ath-step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffd700;
+            font-size: 11px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .ath-step-text {
+            font-size: 12px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .ath-step-text strong {
+            color: #f8fafc;
+            font-weight: 700;
+        }
+
+        .ath-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ath-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .ath-btn-done {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+        }
+
+        .ath-btn-later {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .ath-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #334155;
+            border: none;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ath-close:hover {
+            background: #475569;
+            color: #f8fafc;
+        }
+
+        /* Notification Permission Banner */
+        .notify-banner {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 16px 20px;
+            z-index: 2000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+        }
+
+        .notify-banner.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .notify-banner.hidden {
+            display: none !important;
+        }
+
+        .notify-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .notify-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .notify-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .notify-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .notify-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .notify-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .notify-btn-allow {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: #fff;
+        }
+
+        .notify-btn-deny {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: #1e293b;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 2001;
+            transition: all 0.4s;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast i {
+            color: #10b981;
+        }
+
+        /* --- Navbar Styles --- */
         .ham-menu {
             position: fixed;
             top: 80px;
@@ -162,7 +474,7 @@
             font-weight: 600;
         }
 
-        /* Translator Styles */
+        /* --- Translator Styles --- */
         #google_translate_element {
             margin: 12px 15px 12px 20px;
         }
@@ -188,6 +500,37 @@
             display: none !important;
             height: 0 !important;
             visibility: hidden !important;
+        }
+
+        /* --- Footer Styles --- */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #141414;
+            border-top: 1px solid #333;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        footer.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        footer p {
+            margin: 0;
+            color: #d4af37;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         /* Hero Section */
@@ -549,14 +892,11 @@
         .cta-banner .btn {
             background: linear-gradient(45deg, #d4af37, #ffd700);
             color: #000;
-            padding: 15px 30px;
+            padding: 15px 40px;
             font-size: 18px;
             font-weight: 700;
             border-radius: 50px;
             transition: background-color 0.3s ease, transform 0.3s ease;
-            display: inline-block;
-            white-space: nowrap;
-            max-width: 100%;
         }
 
         .cta-banner .btn:hover {
@@ -610,347 +950,7 @@
             color: #ffd700;
         }
 
-        /* Notification Popups & ATH Banner */
-        .notification-popup {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #141414, #1a1a1a);
-            border: 1px solid #d4af37;
-            border-radius: 12px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
-            padding: 15px 20px;
-            max-width: 320px;
-            width: 100%;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-20px);
-            transition: all 0.4s ease;
-            z-index: 1001;
-            display: flex;
-            align-items: center;
-            color: #e0e0e0;
-        }
-
-        .notification-popup.notification-show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .notification-content {
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-        }
-
-        .notification-content i {
-            margin-right: 12px;
-            font-size: 18px;
-            color: #ffd700;
-        }
-
-        .ath-banner {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(120px);
-            width: calc(100% - 40px);
-            max-width: 400px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 16px 20px;
-            z-index: 2000;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0;
-        }
-
-        .ath-banner.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .ath-banner.hidden {
-            display: none !important;
-        }
-
-        .ath-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .ath-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            background: linear-gradient(45deg, #d4af37, #ffd700);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-size: 18px;
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-        }
-
-        .ath-title {
-            font-size: 15px;
-            font-weight: 800;
-            color: #f8fafc;
-        }
-
-        .ath-sub {
-            font-size: 12px;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        .ath-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-
-        .ath-step {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .ath-step-num {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: rgba(212, 175, 55, 0.15);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffd700;
-            font-size: 11px;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-
-        .ath-step-text {
-            font-size: 12px;
-            color: #cbd5e1;
-            font-weight: 500;
-        }
-
-        .ath-step-text strong {
-            color: #f8fafc;
-            font-weight: 700;
-        }
-
-        .ath-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .ath-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 14px;
-            border: none;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .ath-btn-done {
-            background: linear-gradient(45deg, #d4af37, #ffd700);
-            color: #000;
-        }
-
-        .ath-btn-later {
-            background: #334155;
-            color: #94a3b8;
-        }
-
-        .ath-close {
-            position: absolute;
-            top: 10px;
-            right: 14px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #334155;
-            border: none;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .ath-close:hover {
-            background: #475569;
-            color: #f8fafc;
-        }
-
-        .notify-banner {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-120px);
-            width: calc(100% - 40px);
-            max-width: 400px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 16px 20px;
-            z-index: 2000;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0;
-        }
-
-        .notify-banner.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .notify-banner.hidden {
-            display: none !important;
-        }
-
-        .notify-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .notify-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #10b981, #34d399);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 16px;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .notify-title {
-            font-size: 15px;
-            font-weight: 800;
-            color: #f8fafc;
-        }
-
-        .notify-sub {
-            font-size: 12px;
-            color: #94a3b8;
-            font-weight: 500;
-            line-height: 1.5;
-        }
-
-        .notify-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 14px;
-        }
-
-        .notify-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 14px;
-            border: none;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .notify-btn-allow {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: #fff;
-        }
-
-        .notify-btn-deny {
-            background: #334155;
-            color: #94a3b8;
-        }
-
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-80px);
-            background: #1e293b;
-            color: #fff;
-            padding: 14px 24px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            z-index: 2001;
-            transition: all 0.4s;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border: 1px solid #334155;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .toast i {
-            color: #10b981;
-        }
-
-        /* Footer Styles */
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            background: #141414;
-            border-top: 1px solid #333;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        footer.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        footer p {
-            margin: 0;
-            color: #d4af37;
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        /* Animations & Responsive */
+        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -961,6 +961,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Responsive Design */
         @media (min-width: 768px) {
             .ham-menu {
                 position: static;
@@ -985,27 +986,17 @@
             .ham-menu ul li a {
                 font-size: 15px;
             }
+
             #google_translate_element {
                 margin: 0 15px 0 0;
             }
         }
 
         @media (max-width: 1024px) {
-            .hero-section h1 {
-                font-size: 40px;
-            }
-
-            .hero-section p {
-                font-size: 18px;
-            }
-
-            .section-title {
-                font-size: 32px;
-            }
-
-            .step-card, .feature-card, .testimonial-card, .stat-card {
-                padding: 20px;
-            }
+            .hero-section h1 { font-size: 40px; }
+            .hero-section p { font-size: 18px; }
+            .section-title { font-size: 32px; }
+            .step-card, .feature-card, .testimonial-card, .stat-card { padding: 20px; }
         }
 
         @media (max-width: 768px) {
@@ -1014,65 +1005,25 @@
                 padding-bottom: 80px;
             }
 
-            .ham-menu {
-                top: 70px;
-            }
-
-            .hero-section {
-                padding: 80px 20px;
-            }
-
-            .hero-section h1 {
-                font-size: 36px;
-            }
-
-            .hero-section p {
-                font-size: 16px;
-            }
-
-            .section-title {
-                font-size: 28px;
-            }
-
-            .button-group {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .btn {
-                padding: 12px 30px;
-                font-size: 16px;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-
-            .stat-card h3 {
-                font-size: 28px;
-            }
-
-            .cta-banner h2 {
-                font-size: 24px;
-            }
-
-            .cta-banner .btn {
-                padding: 12px 20px;
-                font-size: 15px;
-            }
-
+            .hero-section { padding: 80px 20px; }
+            .hero-section h1 { font-size: 36px; }
+            .hero-section p { font-size: 16px; }
+            .section-title { font-size: 28px; }
+            .button-group { flex-direction: column; gap: 15px; }
+            .btn { padding: 12px 30px; font-size: 16px; }
+            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+            .stat-card h3 { font-size: 28px; }
+            .cta-banner h2 { font-size: 28px; }
+            
             .notification-popup {
                 right: 10px;
                 max-width: 90%;
             }
 
-            footer {
-                padding: 15px;
-            }
+            footer { padding: 15px; }
+            footer p { font-size: 13px; }
 
-            footer p {
-                font-size: 13px;
-            }
+            .ham-menu { top: 70px; }
         }
 
         @media (max-width: 480px) {
@@ -1081,92 +1032,30 @@
                 padding-bottom: 60px;
             }
 
-            .ham-menu {
-                top: 60px;
-            }
+            .hero-section { padding: 60px 15px; }
+            .hero-section h1 { font-size: 28px; }
+            .hero-section p { font-size: 14px; }
+            .section-title { font-size: 24px; }
+            .step-card, .feature-card, .testimonial-card, .stat-card { padding: 15px; }
+            .stat-card h3 { font-size: 24px; }
+            .faq-item h3 { font-size: 16px; }
+            .faq-item p { font-size: 14px; }
+            .cta-banner { padding: 40px 15px; }
+            .cta-banner h2 { font-size: 24px; }
+            .cta-banner .btn { padding: 12px 30px; font-size: 16px; }
 
-            .ham-menu ul {
-                padding: 15px;
-            }
+            footer { padding: 10px; }
+            footer p { font-size: 12px; }
 
-            .ham-menu ul li a {
-                font-size: 14px;
-            }
-
-            .hero-section {
-                padding: 60px 15px;
-            }
-
-            .hero-section h1 {
-                font-size: 28px;
-            }
-
-            .hero-section p {
-                font-size: 14px;
-            }
-
-            .section-title {
-                font-size: 24px;
-            }
-
-            .step-card, .feature-card, .testimonial-card, .stat-card {
-                padding: 15px;
-            }
-
-            .stat-card h3 {
-                font-size: 24px;
-            }
-
-            .faq-item h3 {
-                font-size: 16px;
-            }
-
-            .faq-item p {
-                font-size: 14px;
-            }
-
-            .cta-banner {
-                padding: 35px 10px;
-                margin: 30px 10px;
-            }
-
-            .cta-banner h2 {
-                font-size: clamp(16px, 4.2vw, 20px);
-            }
-
-            .cta-banner .btn {
-                padding: 10px 14px;
-                font-size: clamp(12px, 3.2vw, 14px);
-            }
-
-            footer {
-                padding: 10px;
-            }
-
-            footer p {
-                font-size: 12px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .cta-banner {
-                padding: 25px 8px;
-            }
-
-            .cta-banner h2 {
-                font-size: 15px;
-            }
-
-            .cta-banner .btn {
-                padding: 8px 10px;
-                font-size: 11px;
-            }
+            .ham-menu { top: 60px; }
+            .ham-menu ul { padding: 15px; }
+            .ham-menu ul li a { font-size: 14px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- HARDCODED HEADER -->
     <header>
         <div class="header-container">
             <div class="logo">
@@ -1180,21 +1069,7 @@
         </div>
     </header>
 
-    <!-- Navigation Bar -->
-    <nav id="ham-navigation" class="ham-menu">
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="terms.html">Terms</a></li>
-            <li><a href="privacy.html">Privacy</a></li>
-        </ul>
-
-        <!-- Language Translator Container -->
-        <div id="google_translate_element"></div>
-    </nav>
-
-    <!-- Header Notification Popups -->
+    <!-- Notification Popup -->
     <div id="notification-container">
         <div id="notification-popup" class="notification-popup">
             <div id="notification-content" class="notification-content">
@@ -1204,7 +1079,7 @@
         </div>
     </div>
 
-    <!-- Add to Home Screen Banner -->
+    <!-- ADD TO HOME SCREEN BANNER (UNIVERSAL) -->
     <div class="ath-banner" id="athBanner">
         <button class="ath-close" onclick="dismissAth()"><i class="fa-solid fa-xmark"></i></button>
         <div class="ath-header">
@@ -1214,7 +1089,9 @@
                 <div class="ath-sub" id="athSub">Open like a real app — faster access</div>
             </div>
         </div>
-        <div class="ath-steps" id="athSteps"></div>
+        <div class="ath-steps" id="athSteps">
+            <!-- Steps injected dynamically by JS based on device -->
+        </div>
         <div class="ath-actions">
             <button class="ath-btn ath-btn-done" onclick="markAthDone()">
                 <i class="fa-solid fa-check"></i> Done
@@ -1225,7 +1102,7 @@
         </div>
     </div>
 
-    <!-- Notification Permission Banner -->
+    <!-- NOTIFICATION PERMISSION BANNER -->
     <div class="notify-banner" id="notifyBanner">
         <div class="notify-header">
             <div class="notify-icon"><i class="fa-solid fa-bell"></i></div>
@@ -1244,16 +1121,30 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- TOAST -->
     <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
+
+    <!-- HARDCODED NAVBAR & GOOGLE TRANSLATE -->
+    <nav id="ham-navigation" class="ham-menu">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="terms.html">Terms</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+        </ul>
+
+        <!-- Language Translator Container (hardcoded from translate.html) -->
+        <div id="google_translate_element"></div>
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero-section">
         <h1>Unlock Wealth with Illuminate Tube</h1>
         <p>Step into the circle of enlightenment. Watch exclusive Illuminati-related videos and secret archives to unlock high-tier monetary rewards and passive wealth!</p>
         <div class="button-group">
-            <a href="register.html" class="btn btn-register" onclick="console.log('Register button clicked')">Get Started</a>
-            <a href="signin.html" class="btn btn-signin" onclick="console.log('Sign In button clicked')">Sign In</a>
+            <a href="register.html" class="btn btn-register">Get Started</a>
+            <a href="signin.html" class="btn btn-signin">Sign In</a>
         </div>
     </section>
 
@@ -1376,7 +1267,7 @@
     <!-- CTA Banner -->
     <section class="cta-banner">
         <h2>Unveil the Mysteries & Claim Your Rewards</h2>
-        <a href="register.html" class="btn" onclick="console.log('CTA button clicked')">Join Illuminate Tube Now</a>
+        <a href="register.html" class="btn">Join Illuminate Tube Now</a>
     </section>
 
     <!-- Notice Popup -->
@@ -1384,24 +1275,24 @@
         <span class="close-btn" onclick="closeNotice()" aria-label="Close notice">×</span>
         <h2>Welcome to Illuminate Tube</h2>
         <p>Unlock access to Illuminati secret videos and earn premium rewards today. Enter the portal now!</p>
-        <a href="register.html" class="btn btn-register" onclick="console.log('Notice button clicked')">Get Started</a>
+        <a href="register.html" class="btn btn-register">Get Started</a>
     </div>
 
-    <!-- Footer -->
+    <!-- HARDCODED FOOTER -->
     <footer id="footer">
         <p>&copy; <span id="copyright-year"></span> Illuminate Tube. All rights reserved.</p>
     </footer>
 
-    <!-- Google Translate Scripts -->
+    <!-- Google Translate Script Initialization -->
     <script type="text/javascript">
-    function googleTranslateElementInit() {
-        new google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,fr,es,de,pt,ar,zh-CN,ru',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false
-        }, 'google_translate_element');
-    }
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,fr,es,de,pt,ar,zh-CN,ru',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
     </script>
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
@@ -1413,42 +1304,45 @@
     </script>
     <noscript><a href="https://www.livechat.com/chat-with/15808029/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
 
-    <!-- Dynamic Functionality Scripts -->
+    <!-- Application & Header Scripts -->
     <script>
         // Set dynamic copyright year
         document.addEventListener('DOMContentLoaded', function() {
-            const copyYear = document.getElementById('copyright-year');
-            if (copyYear) copyYear.textContent = new Date().getFullYear();
-        });
-
-        // Scroll Footer Controller
-        window.addEventListener('scroll', function() {
-            const footer = document.getElementById('footer');
-            if (footer) {
-                const windowHeight = window.innerHeight;
-                const documentHeight = document.documentElement.scrollHeight;
-                const scrollPosition = window.scrollY || window.pageYOffset;
-
-                if (scrollPosition + windowHeight >= documentHeight - 50) {
-                    footer.classList.add('visible');
-                } else {
-                    footer.classList.remove('visible');
-                }
+            const copyrightElem = document.getElementById('copyright-year');
+            if (copyrightElem) {
+                copyrightElem.textContent = new Date().getFullYear();
             }
+            setActiveNavLink();
         });
 
-        // Set Active Navbar Link
-        document.addEventListener('DOMContentLoaded', function() {
+        // Highlight Active Link in Navbar
+        function setActiveNavLink() {
             const currentPath = window.location.pathname.split('/').pop();
             const links = document.querySelectorAll('.ham-menu ul li a');
             links.forEach(link => {
-                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.html')) {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (currentPath === '' && href === 'index.html')) {
                     link.parentElement.classList.add('active');
                 }
             });
+        }
+
+        // Footer Visibility on Scroll
+        window.addEventListener('scroll', function() {
+            const footer = document.getElementById('footer');
+            if (!footer) return;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const scrollPosition = window.scrollY || window.pageYOffset;
+
+            if (scrollPosition + windowHeight >= documentHeight - 50) {
+                footer.classList.add('visible');
+            } else {
+                footer.classList.remove('visible');
+            }
         });
 
-        // Toast
+        // Toast logic
         function showToast(msg) {
             const t = document.getElementById("toast");
             document.getElementById("toastMsg").textContent = msg;
@@ -1524,7 +1418,7 @@
                     '</div>';
             }
             
-            if (stepsContainer) stepsContainer.innerHTML = stepsHTML;
+            stepsContainer.innerHTML = stepsHTML;
             
             setTimeout(function() {
                 const banner = document.getElementById("athBanner");
@@ -1599,7 +1493,7 @@
             }, 600);
         }
 
-        // Service Worker
+        // Service Worker Registration
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js')
@@ -1612,7 +1506,7 @@
             }
         }
 
-        // Hamburger Menu & Notification Queue
+        // Hamburger Menu & Load Handlers
         document.addEventListener("DOMContentLoaded", function() {
             registerServiceWorker();
             initAthBanner();
@@ -1631,6 +1525,7 @@
                 $('#hamburger-menu').click();
             });
 
+            // Notification Queue Logic
             const notificationQueue = [];
             let isNotificationShowing = false;
             const delay = 7000;
@@ -1676,21 +1571,23 @@
             });
         });
 
-        // Notice Modal Logic
+        // Notice Popup Logic
         function isNoticeShown() {
-            return localStorage.setItem ? localStorage.getItem('noticeShownIndex') : null;
+            return localStorage.getItem('noticeShownIndex');
         }
 
         function setNoticeShown() {
-            if (localStorage.setItem) localStorage.setItem('noticeShownIndex', true);
+            localStorage.setItem('noticeShownIndex', 'true');
         }
 
         function showNotice() {
             if (!isNoticeShown()) {
                 const notice = document.getElementById('notice');
                 setTimeout(() => {
-                    if (notice) notice.style.display = 'block';
-                    setNoticeShown();
+                    if (notice) {
+                        notice.style.display = 'block';
+                        setNoticeShown();
+                    }
                 }, 2000);
             }
         }
@@ -1703,14 +1600,14 @@
 
         window.addEventListener('load', showNotice);
 
-        // FAQ Toggle Logic
+        // FAQ Accordion Toggle
         document.querySelectorAll('.faq-item').forEach(item => {
             item.addEventListener('click', () => {
                 item.classList.toggle('active');
             });
         });
 
-        // Prevent Context Menu on Non-Links
+        // Prevent Right Click Context Menu
         document.addEventListener('contextmenu', e => {
             if (!e.target.closest('a')) {
                 e.preventDefault();
@@ -1719,4 +1616,3 @@
     </script>
 </body>
 </html>
-```[cite: 1]
