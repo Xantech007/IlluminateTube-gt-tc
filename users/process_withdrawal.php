@@ -207,7 +207,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
 
         /* Fixed Header Overlay */
         .top-header {
-            position: fixed;
+            position: sticky;
             top: 0;
             left: 0;
             width: 100%;
@@ -216,12 +216,9 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
-            pointer-events: none;
-        }
-
-        .top-header * {
-            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .user-badge {
@@ -251,6 +248,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
             font-weight: 700;
             color: #4ade80;
         }
+
 
         /* Center Layout Wrapper */
         .page-wrapper {
