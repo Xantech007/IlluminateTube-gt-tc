@@ -115,9 +115,9 @@ try {
 }
 
 // Process withdrawal
-$channel = filter_var($_POST['channel'] ?? '', FILTER_SANITIZE_STRING);
-$bank_name = filter_var($_POST['bank_name'] ?? '', FILTER_SANITIZE_STRING);
-$bank_account = filter_var($_POST['bank_account'] ?? '', FILTER_SANITIZE_STRING);
+$channel = htmlspecialchars($_POST['channel'] ?? '', ENT_QUOTES, 'UTF-8');
+$bank_name = htmlspecialchars($_POST['bank_name'] ?? '', ENT_QUOTES, 'UTF-8');
+$bank_account = htmlspecialchars($_POST['bank_account'] ?? '', ENT_QUOTES, 'UTF-8');
 $amount = filter_var($_POST['amount'] ?? 0, FILTER_VALIDATE_FLOAT);
 $error = null;
 $new_balance = $balance; // Default to original balance in case of error
