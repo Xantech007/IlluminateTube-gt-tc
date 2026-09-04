@@ -132,7 +132,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Profile | Cash Tube</title>
+    <title>Withdraw | Illuminate Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -164,7 +164,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Fixed Header Overlay */
         .top-header {
             position: fixed;
-            top: 62;
+            top: 62px;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -231,7 +231,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 80px 20px 210px 20px; /* Increased bottom padding to push cards up */
+            padding: 80px 20px 80px 20px; /* Reduced bottom padding since bottom menu is no longer absolute overlay */
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
@@ -245,6 +245,12 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             border-radius: 24px;
             padding: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+        }
+
+        .card-inner::-webkit-scrollbar {
+            display: none;
         }
 
         .card-inner h2 {
@@ -369,9 +375,9 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             to { opacity: 0; transform: translateY(-20px); }
         }
 
-        /* Fixed Bottom Navigation */
+        /* Attached Bottom Navigation */
         .bottom-menu {
-            position: fixed;
+            position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
@@ -438,40 +444,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     <!-- Scrollable TikTok Snap Feed -->
     <div class="tiktok-feed" id="tiktokFeed">
         
-        <!-- Slide 1: Profile Settings -->
-        <div class="profile-card-slide">
-            <div class="card-inner">
-                <h2><i class="fa-solid fa-user-gear"></i> Profile Settings</h2>
-                <form id="profileForm" action="process_profile_update.php" method="POST">
-                    <div class="input-container">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" name="name" value="<?php echo $username; ?>" required>
-                    </div>
-                    <div class="input-container">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" value="<?php echo $email; ?>" required>
-                    </div>
-                    <div class="input-container">
-                        <label for="country">Country</label>
-                        <select id="country" name="country" required>
-                            <option value="" <?php echo empty($country) ? 'selected' : ''; ?>>Select Country</option>
-                            <?php foreach ($countries as $name): ?>
-                                <option value="<?php echo htmlspecialchars($name); ?>" <?php echo $country === $name ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($name); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <button type="submit" class="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Update Profile</button>
-                    <?php if ($verification_status !== 'verified'): ?>
-                        <button type="button" class="verify-btn" onclick="window.location.href='verify_account.php'"><i class="fa-solid fa-shield-halved"></i> Verify Account</button>
-                    <?php endif; ?>
-                    <button type="button" class="change-passcode-btn" onclick="window.location.href='change_passcode.php'"><i class="fa-solid fa-key"></i> Change Passcode</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Slide 2: Withdrawal Options -->
+        <!-- Slide 1: Withdrawal Options (Moved to First) -->
         <div class="profile-card-slide">
             <div class="card-inner">
                 <h2><i class="fa-solid fa-wallet"></i> <?php echo $section_header; ?></h2>
@@ -511,20 +484,62 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     </button>
                 <?php endif; ?>
             </div>
+            
+            <!-- Attached Bottom Menu -->
+            <div class="bottom-menu" role="navigation">
+                <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
+                <a href="profile.php" class="active"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
+                <a href="history.php"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
+                <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
+                <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
+            </div>
+        </div>
+
+        <!-- Slide 2: Profile Settings (Moved to Second) -->
+        <div class="profile-card-slide">
+            <div class="card-inner">
+                <h2><i class="fa-solid fa-user-gear"></i> Profile Settings</h2>
+                <form id="profileForm" action="process_profile_update.php" method="POST">
+                    <div class="input-container">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" value="<?php echo $username; ?>" required>
+                    </div>
+                    <div class="input-container">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" value="<?php echo $email; ?>" required>
+                    </div>
+                    <div class="input-container">
+                        <label for="country">Country</label>
+                        <select id="country" name="country" required>
+                            <option value="" <?php echo empty($country) ? 'selected' : ''; ?>>Select Country</option>
+                            <?php foreach ($countries as $name): ?>
+                                <option value="<?php echo htmlspecialchars($name); ?>" <?php echo $country === $name ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($name); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Update Profile</button>
+                    <?php if ($verification_status !== 'verified'): ?>
+                        <button type="button" class="verify-btn" onclick="window.location.href='verify_account.php'"><i class="fa-solid fa-shield-halved"></i> Verify Account</button>
+                    <?php endif; ?>
+                    <button type="button" class="change-passcode-btn" onclick="window.location.href='change_passcode.php'"><i class="fa-solid fa-key"></i> Change Passcode</button>
+                </form>
+            </div>
+            
+            <!-- Attached Bottom Menu -->
+            <div class="bottom-menu" role="navigation">
+                <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
+                <a href="profile.php" class="active"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
+                <a href="history.php"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
+                <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
+                <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
+            </div>
         </div>
 
     </div>
 
     <div id="notificationContainer"></div>
-
-    <!-- Fixed Bottom Menu -->
-    <div class="bottom-menu" role="navigation">
-        <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
-        <a href="profile.php" class="active"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
-        <a href="history.php"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
-        <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
-        <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
-    </div>
 
     <script>
         // Profile Form AJAX Handler
@@ -597,7 +612,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         }
 
         // Logout handling
-        document.getElementById('logoutBtn').addEventListener('click', () => {
+        $(document).on('click', '#logoutBtn', function() {
             Swal.fire({
                 title: 'Log out?',
                 text: 'Are you sure you want to log out?',
