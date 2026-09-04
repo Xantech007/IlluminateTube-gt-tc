@@ -208,7 +208,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
         /* Fixed Header Overlay */
         .top-header {
             position: fixed;
-            top: 0;
+            top: 62;
             left: 0;
             width: 100%;
             z-index: 100;
