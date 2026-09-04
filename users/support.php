@@ -144,16 +144,17 @@ if (empty($telegram_raw)) {
 
         html, body {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            min-height: 100vh;
             background-color: var(--bg-color);
             color: var(--text-color);
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         /* Fixed Header Overlay */
         .top-header {
-            position: fixed;
-            top: 62px;
+            position: sticky;
+            top: 0;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -161,12 +162,9 @@ if (empty($telegram_raw)) {
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
-            pointer-events: none;
-        }
-
-        .top-header * {
-            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .user-badge {
@@ -197,38 +195,22 @@ if (empty($telegram_raw)) {
             color: #4ade80;
         }
 
-        /* TikTok Style Fullscreen Feed Wrapper */
-        .tiktok-feed {
-            width: 100%;
-            height: 100vh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
-        }
 
-        .tiktok-feed::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Individual Snap Slide Card */
-        .profile-card-slide {
+        /* Standard Page Content Container */
+        .page-container {
             width: 100%;
-            height: 100vh;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 90px 20px 100px 20px;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 80px 20px 210px 20px;
-            background: radial-gradient(circle at center, #111827 0%, #000000 100%);
+            flex-direction: column;
+            gap: 20px;
         }
 
         /* Card Container styling */
         .card-inner {
             width: 100%;
-            max-width: 550px;
-            max-height: calc(100vh - 290px);
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -237,16 +219,6 @@ if (empty($telegram_raw)) {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .card-inner::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .card-inner::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
         }
 
         .card-inner h2 {
@@ -259,7 +231,6 @@ if (empty($telegram_raw)) {
             align-items: center;
             justify-content: center;
             gap: 10px;
-            flex-shrink: 0;
         }
 
         .support-info-box {
@@ -345,10 +316,8 @@ if (empty($telegram_raw)) {
             padding: 14px;
             border-radius: 16px;
             text-decoration: none;
-            margin-top: auto;
             box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            flex-shrink: 0;
         }
 
         .telegram-btn:hover {
@@ -437,50 +406,45 @@ if (empty($telegram_raw)) {
         </div>
     </div>
 
-    <!-- Scrollable TikTok Snap Feed -->
-    <div class="tiktok-feed" id="tiktokFeed">
-        
-        <!-- Slide 1: Contact Support -->
-        <div class="profile-card-slide">
-            <div class="card-inner">
-                <h2><i class="fa-solid fa-headset"></i> Contact Support</h2>
+    <!-- Main Scrollable Page Content -->
+    <div class="page-container">
+        <div class="card-inner">
+            <h2><i class="fa-solid fa-headset"></i> Contact Support</h2>
+            
+            <div class="support-info-box">
+                <p>We're here to help with any questions or issues you may have! Our dedicated support team is available 24/7. Reach out directly on Telegram for assistance with your account, login, or general inquiries.</p>
                 
-                <div class="support-info-box">
-                    <p>We're here to help with any questions or issues you may have! Our dedicated support team is available 24/7. Reach out directly on Telegram for assistance with your account, login, or general inquiries.</p>
-                    
-                    <div class="support-item">
-                        <i class="fab fa-telegram"></i>
-                        <span>Telegram: 
-                            <a href="https://t.me/<?php echo $telegram_clean; ?>" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
-                                <?php echo htmlspecialchars($telegram_raw); ?>
-                            </a>
-                        </span>
-                    </div>
-                    <div class="support-item">
-                        <i class="far fa-clock"></i>
-                        <span>Availability: <strong>24/7</strong></span>
-                    </div>
-                    <div class="support-item">
-                        <i class="fas fa-hourglass-half"></i>
-                        <span>Response Time: <strong>Usually within 24 hours</strong></span>
-                    </div>
+                <div class="support-item">
+                    <i class="fab fa-telegram"></i>
+                    <span>Telegram: 
+                        <a href="https://t.me/<?php echo $telegram_clean; ?>" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')">
+                            <?php echo htmlspecialchars($telegram_raw); ?>
+                        </a>
+                    </span>
                 </div>
-
-                <div class="support-info-box">
-                    <strong style="font-size: 14px; color: #ffffff; display: block; margin-bottom: 8px;">We Can Help With:</strong>
-                    <ul class="help-list">
-                        <li>Technical Support for Login/Access Issues</li>
-                        <li>Account Verification Requests</li>
-                        <li>General Inquiry and Earnings Help</li>
-                    </ul>
+                <div class="support-item">
+                    <i class="far fa-clock"></i>
+                    <span>Availability: <strong>24/7</strong></span>
                 </div>
-
-                <a href="https://t.me/<?php echo $telegram_clean; ?>" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')" class="telegram-btn">
-                    <i class="fab fa-telegram"></i> Message Us on Telegram
-                </a>
+                <div class="support-item">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span>Response Time: <strong>Usually within 24 hours</strong></span>
+                </div>
             </div>
-        </div>
 
+            <div class="support-info-box">
+                <strong style="font-size: 14px; color: #ffffff; display: block; margin-bottom: 8px;">We Can Help With:</strong>
+                <ul class="help-list">
+                    <li>Technical Support for Login/Access Issues</li>
+                    <li>Account Verification Requests</li>
+                    <li>General Inquiry and Earnings Help</li>
+                </ul>
+            </div>
+
+            <a href="https://t.me/<?php echo $telegram_clean; ?>" onclick="openTelegram(event, 'https://t.me/<?php echo $telegram_clean; ?>')" class="telegram-btn">
+                <i class="fab fa-telegram"></i> Message Us on Telegram
+            </a>
+        </div>
     </div>
 
     <div id="notificationContainer"></div>
