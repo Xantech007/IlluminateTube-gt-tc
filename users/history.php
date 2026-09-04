@@ -155,7 +155,7 @@ try {
         /* Fixed Header Overlay */
         .top-header {
             position: fixed;
-            top: 62px;
+            top: 0;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -221,8 +221,8 @@ try {
             position: relative;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 80px 20px 210px 20px;
+            align-items: flex-start;
+            padding: 70px 20px 85px 20px;
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
@@ -230,12 +230,12 @@ try {
         .card-inner {
             width: 100%;
             max-width: 550px;
-            max-height: calc(100vh - 290px);
+            max-height: calc(100vh - 155px);
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 24px;
-            padding: 24px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
@@ -244,7 +244,7 @@ try {
         .card-inner h2 {
             font-size: 20px;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-align: center;
             color: #ffffff;
             display: flex;
