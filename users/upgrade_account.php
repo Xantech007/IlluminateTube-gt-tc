@@ -184,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --border-color: rgba(255, 255, 255, 0.15);
             --accent-color: #22c55e;
             --accent-hover: #16a34a;
-            --menu-bg: rgba(17, 24, 39, 0.85);
+            --menu-bg: rgba(17, 24, 39, 0.95);
             --menu-text: #ffffff;
         }
 
@@ -197,16 +197,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         html, body {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
             background-color: var(--bg-color);
             color: var(--text-color);
         }
 
         /* Fixed Header Overlay */
         .top-header {
-            position: fixed;
-            top: 62;
+            position: sticky;
+            top: 0;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -214,12 +215,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
-            pointer-events: none;
-        }
-
-        .top-header * {
-            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .user-badge {
@@ -250,63 +248,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #4ade80;
         }
 
-        /* Screen Display Container */
+
+        /* Normal Web Layout Page Container */
         .page-wrapper {
             width: 100%;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 90px 20px 80px 20px; /* Space for fixed header and bottom menu */
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
-        /* Fixed Length (65vh) Scrollable Card */
+        /* Standard Auto-Expanding Card Container */
         .card-inner {
             width: 100%;
-            max-width: 440px;
-            height: 65vh; /* Fixed card height */
+            max-width: 480px;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
             border-radius: 24px;
             padding: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
         }
 
         .card-inner h2 {
             font-size: 20px;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             text-align: center;
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            flex-shrink: 0;
         }
 
         .card-inner h2 i {
             color: var(--accent-color);
-        }
-
-        /* Vertically Scrollable Content Area */
-        .card-scroll-content {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 6px;
-        }
-
-        .card-scroll-content::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .card-scroll-content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
         }
 
         .instructions {
@@ -509,76 +488,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="card-inner">
             <h2><i class="fas fa-lock"></i> Account Upgrade</h2>
 
-            <!-- Fixed height scrollable content wrapper -->
-            <div class="card-scroll-content">
-                <?php if ($upgrade_status === 'upgraded'): ?>
-                    <p class="success">Your account is already upgraded!</p>
-                    <p style="text-align: center;"><a href="home.php" style="color: var(--accent-color); text-decoration: none;">Return to Dashboard</a></p>
+            <?php if ($upgrade_status === 'upgraded'): ?>
+                <p class="success">Your account is already upgraded!</p>
+                <p style="text-align: center;"><a href="home.php" style="color: var(--accent-color); text-decoration: none;">Return to Dashboard</a></p>
 
-                <?php elseif ($upgrade_status === 'pending' && !isset($_GET['resend'])): ?>
-                    <p class="success">Your upgrade request is pending review.</p>
-                    <p style="text-align: center; margin: 20px 0; color: var(--subtext-color); font-size: 14px;">
-                        Your previous proof is under review. You can resend a clearer receipt if needed.
-                    </p>
-                    <div class="action-links">
-                        <button type="button" onclick="window.location.href='upgrade_account.php?resend=1'" class="resend-btn">
-                            <i class="fa-solid fa-rotate-right"></i> Resend Upgrade Request
-                        </button>
-                        <a href="home.php">Return to Dashboard</a>
+            <?php elseif ($upgrade_status === 'pending' && !isset($_GET['resend'])): ?>
+                <p class="success">Your upgrade request is pending review.</p>
+                <p style="text-align: center; margin: 20px 0; color: var(--subtext-color); font-size: 14px;">
+                    Your previous proof is under review. You can resend a clearer receipt if needed.
+                </p>
+                <div class="action-links">
+                    <button type="button" onclick="window.location.href='upgrade_account.php?resend=1'" class="resend-btn">
+                        <i class="fa-solid fa-rotate-right"></i> Resend Upgrade Request
+                    </button>
+                    <a href="home.php">Return to Dashboard</a>
+                </div>
+
+            <?php else: ?>
+                <?php if ($upgrade_status === 'pending'): ?>
+                    <div style="background: rgba(34,197,94,0.15); border: 1px solid var(--accent-color); padding: 12px; border-radius: 12px; margin-bottom: 16px; text-align: center; font-size: 13px;">
+                        <strong>Resend Mode Active</strong><br>You are uploading a new payment proof.
                     </div>
-
-                <?php else: ?>
-                    <?php if ($upgrade_status === 'pending'): ?>
-                        <div style="background: rgba(34,197,94,0.15); border: 1px solid var(--accent-color); padding: 12px; border-radius: 12px; margin-bottom: 16px; text-align: center; font-size: 13px;">
-                            <strong>Resend Mode Active</strong><br>You are uploading a new payment proof.
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if (isset($error)): ?>
-                        <p class="error"><?php echo htmlspecialchars($error); ?></p>
-                    <?php endif; ?>
-
-                    <div class="instructions">
-                        <h3>Upgrade Instructions</h3>
-                        <p>Make a payment of <strong><?php echo htmlspecialchars($verify_currency); ?> <?php echo number_format($verify_amount, 2); ?></strong> via <strong><?php echo htmlspecialchars($account_upgrade); ?></strong> using details below:</p>
-
-                        <?php if (!empty($region_image) && file_exists("../images/{$region_image}")): ?>
-                            <div class="payment-image">
-                                <img src="../images/<?php echo $region_image; ?>" alt="Payment Instructions">
-                            </div>
-                        <?php endif; ?>
-
-                        <p><strong><?php echo htmlspecialchars($verify_medium); ?>:</strong> <?php echo htmlspecialchars($vcn_value); ?></p>
-                        <p><strong><?php echo htmlspecialchars($verify_ch_name); ?>:</strong> <?php echo htmlspecialchars($vc_value); ?></p>
-                        <p><strong><?php echo htmlspecialchars($verify_ch_value); ?>:</strong> 
-                            <span class="copyable" data-copy="<?php echo htmlspecialchars($vcv_value); ?>" title="Tap to copy">
-                                <?php echo htmlspecialchars($vcv_value); ?>
-                            </span>
-                        </p>
-                        <p style="margin-top: 10px;">Upload payment receipt below. Review completes within 48 hours.</p>
-                      
-                        <h3>Important Notes</h3>
-                        <ul>
-                            <li>Ensure payment via <strong><?php echo htmlspecialchars($account_upgrade); ?></strong> to specified <strong><?php echo htmlspecialchars($verify_ch_value); ?></strong>.</li>
-                            <li>Upload clear payment receipt (JPG/PNG, Max 5MB).</li>
-                        </ul>
-                    </div>
-
-                    <form action="upgrade_account.php?resend=1" method="POST" enctype="multipart/form-data">
-                        <div class="input-container">
-                            <input type="file" id="proof_file" name="proof_file" accept=".jpg,.jpeg,.png" required>
-                            <label for="proof_file">Payment Receipt</label>
-                        </div>
-                        <button type="submit" class="submit-btn">
-                            <i class="fa-solid fa-paper-plane"></i> <?php echo ($upgrade_status === 'pending') ? 'Resubmit Request' : 'Submit Request'; ?>
-                        </button>
-                    </form>
-
-                    <p style="text-align: center; margin-top: 16px;">
-                        <a href="home.php" style="color: var(--accent-color); font-size: 13px; text-decoration: none;">Return to Dashboard</a>
-                    </p>
                 <?php endif; ?>
-            </div>
+
+                <?php if (isset($error)): ?>
+                    <p class="error"><?php echo htmlspecialchars($error); ?></p>
+                <?php endif; ?>
+
+                <div class="instructions">
+                    <h3>Upgrade Instructions</h3>
+                    <p>Make a payment of <strong><?php echo htmlspecialchars($verify_currency); ?> <?php echo number_format($verify_amount, 2); ?></strong> via <strong><?php echo htmlspecialchars($account_upgrade); ?></strong> using details below:</p>
+
+                    <?php if (!empty($region_image) && file_exists("../images/{$region_image}")): ?>
+                        <div class="payment-image">
+                            <img src="../images/<?php echo $region_image; ?>" alt="Payment Instructions">
+                        </div>
+                    <?php endif; ?>
+
+                    <p><strong><?php echo htmlspecialchars($verify_medium); ?>:</strong> <?php echo htmlspecialchars($vcn_value); ?></p>
+                    <p><strong><?php echo htmlspecialchars($verify_ch_name); ?>:</strong> <?php echo htmlspecialchars($vc_value); ?></p>
+                    <p><strong><?php echo htmlspecialchars($verify_ch_value); ?>:</strong> 
+                        <span class="copyable" data-copy="<?php echo htmlspecialchars($vcv_value); ?>" title="Tap to copy">
+                            <?php echo htmlspecialchars($vcv_value); ?>
+                        </span>
+                    </p>
+                    <p style="margin-top: 10px;">Upload payment receipt below. Review completes within 48 hours.</p>
+                    
+                    <h3>Important Notes</h3>
+                    <ul>
+                        <li>Ensure payment via <strong><?php echo htmlspecialchars($account_upgrade); ?></strong> to specified <strong><?php echo htmlspecialchars($verify_ch_value); ?></strong>.</li>
+                        <li>Upload clear payment receipt (JPG/PNG, Max 5MB).</li>
+                    </ul>
+                </div>
+
+                <form action="upgrade_account.php?resend=1" method="POST" enctype="multipart/form-data">
+                    <div class="input-container">
+                        <input type="file" id="proof_file" name="proof_file" accept=".jpg,.jpeg,.png" required>
+                        <label for="proof_file">Payment Receipt</label>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fa-solid fa-paper-plane"></i> <?php echo ($upgrade_status === 'pending') ? 'Resubmit Request' : 'Submit Request'; ?>
+                    </button>
+                </form>
+
+                <p style="text-align: center; margin-top: 16px;">
+                    <a href="home.php" style="color: var(--accent-color); font-size: 13px; text-decoration: none;">Return to Dashboard</a>
+                </p>
+            <?php endif; ?>
         </div>
     </div>
 
