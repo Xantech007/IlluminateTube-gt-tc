@@ -132,7 +132,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Withdraw | Illuminate Tube</title>
+    <title>Profile | Illuminate Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -164,7 +164,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Fixed Header Overlay */
         .top-header {
             position: fixed;
-            top: 0;
+            top: 62;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -231,7 +231,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 80px 20px 100px 20px; /* Adjusted padding to prevent overlap with top header and bottom footer */
+            padding: 80px 20px 210px 20px; /* Increased bottom padding to push cards up */
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
@@ -239,18 +239,12 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         .card-inner {
             width: 100%;
             max-width: 440px;
-            max-height: calc(100vh - 180px); /* Restrict card height to prevent overflowing screen boundaries */
-            overflow-y: auto; /* Enable internal scrolling if device screen height is small */
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 24px;
             padding: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .card-inner::-webkit-scrollbar {
-            display: none;
         }
 
         .card-inner h2 {
@@ -443,7 +437,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
     <!-- Scrollable TikTok Snap Feed -->
     <div class="tiktok-feed" id="tiktokFeed">
-        
+
         <!-- Slide 1: Withdrawal Options -->
         <div class="profile-card-slide">
             <div class="card-inner">
