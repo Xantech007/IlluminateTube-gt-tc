@@ -9,18 +9,21 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT name, email, verification_status, country FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT name, email, balance, verification_status, country FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
     if (!$user) {
         session_destroy();
         header('Location: ../signin.php');
         exit;
     }
+
     $username = htmlspecialchars($user['name']);
     $email = htmlspecialchars($user['email']);
+    $balance = number_format($user['balance'] ?? 0, 2);
     $verification_status = $user['verification_status'] ?? 'not_verified';
-    $user_country = htmlspecialchars($user['country']);
+    $user_country = htmlspecialchars($user['country'] ?? '');
 } catch (PDOException $e) {
     error_log('Database error: ' . $e->getMessage(), 3, '../debug.log');
     header('Location: ../signin.php?error=database');
@@ -40,10 +43,11 @@ try {
     ");
     $stmt->execute([$user_country]);
     $settings = $stmt->fetch(PDO::FETCH_ASSOC);
-   
+
     if ($settings && !empty($settings['images'])) {
         $region_image = htmlspecialchars(trim($settings['images']));
     }
+
     if (!$settings) {
         $error = 'Verification settings not found for your country. Please contact support.';
         $crypto = 0;
@@ -139,9 +143,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="Verify your Cash Tube account to enable withdrawals." />
-    <meta name="keywords" content="Cash Tube, verify account, cryptocurrency, payment verification" />
-    <meta name="author" content="Cash Tube" />
     <title>Verify Account | Cash Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -151,13 +152,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         :root {
             --bg-color: #000000;
             --text-color: #ffffff;
-            --subtext-color: #9ca3af;
             --accent-color: #22c55e;
             --accent-hover: #16a34a;
             --menu-bg: rgba(17, 24, 39, 0.85);
             --menu-text: #ffffff;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --border-color: rgba(255, 255, 255, 0.12);
         }
 
         * {
@@ -184,43 +182,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             z-index: 100;
             display: flex;
             align-items: center;
-            justify-content: space-between; /* Pushes profile to left and balance to right */
+            justify-content: space-between;
             padding: 16px 20px;
             background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
             pointer-events: none;
         }
-        
+
         .top-header * {
             pointer-events: auto;
         }
-        
+
         .user-badge {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
             padding: 6px 14px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        
+
         .user-badge img {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            object-fit: cover;
         }
-        
-        .header-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #ffffff;
-        }
-        
+
         .balance-badge {
-            display: flex;
-            align-items: center;
             background: rgba(34, 197, 94, 0.2);
             border: 1px solid var(--accent-color);
             backdrop-filter: blur(8px);
@@ -231,158 +220,120 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #4ade80;
         }
 
-        /* Fullscreen Snap Container */
-        .tiktok-feed {
+        /* Fixed Card Screen Centered */
+        .page-wrapper {
             width: 100%;
             height: 100vh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tiktok-feed::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Individual Snap Slide Card */
-        .profile-card-slide {
-            width: 100%;
-            height: 100vh;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 60px 20px 80px 20px;
+            padding: 20px;
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
-        /* Card Container styling with fixed height & vertical scroll */
+        /* Fixed 65vh Height Card */
         .card-inner {
             width: 100%;
             max-width: 440px;
             height: 65vh;
-            overflow-y: auto;
-            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 24px;
             padding: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        .card-inner::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .card-inner::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
         .card-inner h2 {
             font-size: 20px;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-align: center;
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            flex-shrink: 0;
         }
 
         .card-inner h2 i {
             color: var(--accent-color);
         }
 
+        /* Vertically Scrollable Content Area */
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .scrollable-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .scrollable-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
         .instructions {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             font-size: 14px;
-            color: var(--subtext-color);
-            line-height: 1.6;
+            color: #d1d5db;
+            line-height: 1.5;
         }
 
         .instructions h3 {
             font-size: 16px;
             font-weight: 600;
             color: #ffffff;
-            margin-bottom: 12px;
-        }
-
-        .instructions p {
-            margin-bottom: 12px;
-        }
-
-        .instructions strong {
-            color: #ffffff;
+            margin: 14px 0 8px 0;
         }
 
         .instructions ul {
             list-style-type: disc;
             padding-left: 20px;
-            margin-bottom: 12px;
-        }
-
-        .instructions ul li {
-            margin-bottom: 6px;
         }
 
         .copyable {
             cursor: pointer;
             padding: 2px 6px;
-            border-radius: 4px;
             background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            transition: background-color 0.2s ease;
-        }
-
-        .copyable:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: #4ade80;
         }
 
         .payment-image {
             text-align: center;
-            margin: 20px 0;
+            margin: 16px 0;
         }
 
         .payment-image img {
-            max-width: 100%;
-            width: 280px;
+            width: 100%;
+            max-width: 260px;
             height: auto;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .input-container {
             position: relative;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            margin-top: 10px;
         }
 
-        .input-container input, 
         .input-container input[type="file"] {
             width: 100%;
-            padding: 14px 12px;
-            font-size: 15px;
-            border: 1px solid var(--border-color);
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
             background: rgba(0, 0, 0, 0.4);
             color: #ffffff;
             outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        .input-container input[type="file"] {
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        .input-container input:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
         }
 
         .input-container label {
@@ -390,7 +341,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             top: -10px;
             left: 10px;
             font-size: 11px;
-            background: #000000;
+            background: #000;
             padding: 0 6px;
             color: var(--accent-color);
             border-radius: 4px;
@@ -406,53 +357,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: none;
             border-radius: 12px;
             cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-            margin-top: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            transition: transform 0.2s ease;
+            margin-top: 8px;
         }
 
         .submit-btn:active, .resend-btn:active {
             transform: scale(0.96);
         }
 
-        .error {
-            text-align: center;
-            color: #ef4444;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .success {
-            text-align: center;
-            color: #4ade80;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
+        .error { text-align: center; color: #ef4444; margin-bottom: 16px; font-size: 14px; }
+        .success { text-align: center; color: #4ade80; margin-bottom: 16px; font-size: 14px; }
 
         .action-links {
             text-align: center;
-            margin-top: 20px;
-            line-height: 2;
+            margin-top: 16px;
         }
 
-        .action-links a, .action-links button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            font-size: 14px;
+        .action-links a {
+            display: inline-block;
             color: var(--accent-color);
             text-decoration: none;
-        }
-
-        .action-links button {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
+            font-size: 14px;
+            margin-top: 10px;
         }
 
         /* Notifications Toast */
@@ -460,17 +386,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             position: fixed;
             top: 70px;
             right: 20px;
-            background: rgba(17, 24, 39, 0.95);
-            color: var(--text-color);
+            background: rgba(17, 24, 39, 0.9);
+            color: #fff;
             padding: 12px 20px;
             border-radius: 12px;
             border: 1px solid var(--accent-color);
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             z-index: 1000;
+            font-size: 13px;
             display: flex;
             align-items: center;
+            gap: 10px;
             animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-out 3s forwards;
-            max-width: 300px;
         }
 
         @keyframes slideInRight {
@@ -482,7 +409,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             to { opacity: 0; transform: translateY(-20px); }
         }
 
-        /* Fixed Bottom Menu */
+        /* Fixed Bottom Navigation */
         .bottom-menu {
             position: fixed;
             bottom: 0;
@@ -498,7 +425,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             z-index: 100;
         }
 
-        .bottom-menu a, .bottom-menu button {
+        .bottom-menu a,
+        .bottom-menu button {
             color: var(--menu-text);
             text-decoration: none;
             font-size: 13px;
@@ -514,7 +442,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 4px;
         }
 
-        .bottom-menu a.active, .bottom-menu a:hover, .bottom-menu button:hover {
+        .bottom-menu a.active,
+        .bottom-menu a:hover,
+        .bottom-menu button:hover {
             color: var(--accent-color);
         }
     </style>
@@ -524,37 +454,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Top Header Overlay -->
     <div class="top-header">
         <div class="user-badge">
-            <img src="img/top.png" alt="Cash Tube Logo">
-            <span class="header-title">Verify Account</span>
+            <img src="img/top.png" alt="Logo">
+            <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
+        </div>
+        <div class="balance-badge">
+            $<span id="balance"><?php echo $balance; ?></span>
         </div>
     </div>
 
-    <!-- Scrollable TikTok-Style Snap Feed Container -->
-    <div class="tiktok-feed" id="tiktokFeed">
-        <div class="profile-card-slide">
-            <div class="card-inner">
-                <h2><i class="fas fa-lock"></i> Account Verification</h2>
+    <!-- Centered 65vh Scrollable Card -->
+    <div class="page-wrapper">
+        <div class="card-inner">
+            <h2><i class="fas fa-lock"></i> Account Verification</h2>
 
+            <div class="scrollable-content">
                 <?php if ($verification_status === 'verified'): ?>
                     <p class="success">Your account is already verified!</p>
-                    <p style="text-align: center; margin-top: 16px;"><a href="home.php" style="color: var(--accent-color); text-decoration: none;">Return to Dashboard</a></p>
+                    <p style="text-align: center;"><a href="home.php" style="color: var(--accent-color);">Return to Dashboard</a></p>
 
                 <?php elseif ($verification_status === 'pending' && !isset($_GET['resend'])): ?>
                     <p class="success">Your verification request is pending review.</p>
-                    <p style="text-align: center; margin: 20px 0; color: var(--subtext-color); font-size: 14px;">
+                    <p style="text-align: center; margin: 16px 0; color: #9ca3af; font-size: 14px;">
                         Your previous proof is under review. You can resend a clearer receipt if needed.
                     </p>
                     <div class="action-links">
-                        <a href="home.php">Return to Dashboard</a>
                         <button type="button" onclick="window.location.href='verify_account.php?resend=1'" class="resend-btn">
                             Resend Verification Request
                         </button>
+                        <a href="home.php">Return to Dashboard</a>
                     </div>
 
                 <?php else: ?>
-                    <!-- Show full form (first time or resending) -->
                     <?php if ($verification_status === 'pending'): ?>
-                        <div style="background: rgba(34,197,94,0.15); padding: 14px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-size: 13px; border: 1px solid rgba(34,197,94,0.3);">
+                        <div style="background: rgba(34,197,94,0.15); padding: 12px; border-radius: 12px; margin-bottom: 16px; text-align: center; font-size: 13px;">
                             <strong>Resend Mode Active</strong><br>You are uploading a new or corrected payment proof.
                         </div>
                     <?php endif; ?>
@@ -573,14 +505,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         <?php endif; ?>
 
-                        <p><strong><?php echo htmlspecialchars($verify_medium); ?>:</strong> <?php echo htmlspecialchars($vcn_value); ?></p>
+                        <p style="margin-top: 10px;"><strong><?php echo htmlspecialchars($verify_medium); ?>:</strong> <?php echo htmlspecialchars($vcn_value); ?></p>
                         <p><strong><?php echo htmlspecialchars($verify_ch_name); ?>:</strong> <?php echo htmlspecialchars($vc_value); ?></p>
                         <p><strong><?php echo htmlspecialchars($verify_ch_value); ?>:</strong> 
                             <span class="copyable" data-copy="<?php echo htmlspecialchars($vcv_value); ?>" title="Tap to copy">
                                 <?php echo htmlspecialchars($vcv_value); ?>
                             </span>
                         </p>
-                        <p>After completing the payment, upload a payment receipt below. Your request will be reviewed within 48 hours.</p>
+                        <p style="margin-top: 10px;">After completing the payment, upload a payment receipt below. Your request will be reviewed within 48 hours.</p>
                        
                         <h3>Important Notes</h3>
                         <ul>
@@ -601,7 +533,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </button>
                     </form>
 
-                    <p style="text-align: center; margin-top: 20px;"><a href="home.php" style="color: var(--accent-color); text-decoration: none; font-size: 14px;">Return to Dashboard</a></p>
+                    <p style="text-align: center; margin-top: 16px;"><a href="home.php" style="color: var(--accent-color); font-size: 14px; text-decoration: none;">Return to Dashboard</a></p>
                 <?php endif; ?>
             </div>
         </div>
@@ -609,7 +541,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div id="notificationContainer"></div>
 
-    <!-- Fixed Bottom Menu -->
+    <!-- Fixed Bottom Menu Navigation -->
     <div class="bottom-menu" role="navigation">
         <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
         <a href="profile.php" class="active"><i class="fa-solid fa-user"></i>Profile</a>
@@ -629,58 +561,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
         <?php endif; ?>
 
-        // LiveChat
-        window.__lc = window.__lc || {};
-        window.__lc.license = 15808029;
-        (function(n, t, c) { /* LiveChat code */ })(window, document, [].slice);
-
-        // Bottom Menu Active State
-        const menuItems = document.querySelectorAll('.bottom-menu a');
-        menuItems.forEach(item => item.addEventListener('click', () => {
-            menuItems.forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-        }));
-
-        // Input Label Animations
-        function updateLabelPosition(input) {
-            const label = input.nextElementSibling;
-            if (label && label.tagName === 'LABEL') {
-                if (input.value !== '') label.classList.add('active');
-                else label.classList.remove('active');
-            }
-        }
-        document.querySelectorAll('.input-container input').forEach(input => {
-            updateLabelPosition(input);
-            input.addEventListener('input', () => updateLabelPosition(input));
-            input.addEventListener('focus', () => input.nextElementSibling?.classList.add('active'));
-            input.addEventListener('blur', () => updateLabelPosition(input));
-        });
-
-        // Logout Event
         document.getElementById('logoutBtn').addEventListener('click', () => {
-            Swal.fire({ 
-                title: 'Log out?', 
-                text: 'Are you sure?', 
-                icon: 'question', 
-                showCancelButton: true, 
-                confirmButtonColor: '#22c55e', 
-                cancelButtonColor: '#d33', 
-                confirmButtonText: 'Yes, log out' 
-            })
-            .then(result => {
+            Swal.fire({
+                title: 'Log out?',
+                text: 'Are you sure?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#22c55e',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, log out'
+            }).then(result => {
                 if (result.isConfirmed) {
-                    $.ajax({ 
-                        url: 'logout.php', 
-                        type: 'POST', 
-                        dataType: 'json', 
-                        success: res => { if (res.success) location.href = '../signin.php'; else Swal.fire('Error', 'Logout failed', 'error'); }, 
-                        error: () => Swal.fire('Error', 'Server error', 'error') 
+                    $.ajax({
+                        url: 'logout.php',
+                        type: 'POST',
+                        dataType: 'json',
+                        success: res => { if (res.success) location.href = '../signin.php'; else Swal.fire('Error', 'Logout failed', 'error'); },
+                        error: () => Swal.fire('Error', 'Server error', 'error')
                     });
                 }
             });
         });
 
-        // Copyable Elements
         const copyableElements = document.querySelectorAll('.copyable');
         let pressTimer;
         const isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -694,13 +596,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
 
-        // Notifications System
         const notificationContainer = document.getElementById('notificationContainer');
         function fetchNotifications() {
-            $.ajax({ 
-                url: 'fetch_notifications.php', 
-                type: 'GET', 
-                dataType: 'json', 
+            $.ajax({
+                url: 'fetch_notifications.php',
+                type: 'GET',
+                dataType: 'json',
                 success: notifs => {
                     notificationContainer.innerHTML = '';
                     notifs.forEach((n, i) => {
@@ -717,7 +618,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         fetchNotifications();
         setInterval(fetchNotifications, 20000);
 
-        // Prevent Context Menu
         document.addEventListener('contextmenu', e => e.preventDefault());
     </script>
 </body>
