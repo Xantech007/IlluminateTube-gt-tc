@@ -203,10 +203,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--text-color);
         }
 
-        /* Fixed Top Header */
+        /* Fixed Header Overlay */
         .top-header {
             position: fixed;
-            top: 0;
+            top: 62;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -230,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             backdrop-filter: blur(8px);
             padding: 6px 14px;
             border-radius: 20px;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .user-badge img {
