@@ -229,9 +229,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             scroll-snap-stop: always;
             position: relative;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 80px 20px 80px 20px; /* Reduced bottom padding since bottom menu is no longer absolute overlay */
+            padding: 70px 20px 0 20px;
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
@@ -243,10 +244,11 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 24px;
-            padding: 24px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            max-height: calc(100vh - 160px);
+            max-height: calc(100vh - 150px);
             overflow-y: auto;
+            margin: auto;
         }
 
         .card-inner::-webkit-scrollbar {
@@ -256,7 +258,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         .card-inner h2 {
             font-size: 20px;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-align: center;
             color: #ffffff;
             display: flex;
@@ -267,13 +269,13 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
         .input-container {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .input-container input,
         .input-container select {
             width: 100%;
-            padding: 14px 12px;
+            padding: 12px 12px;
             font-size: 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
@@ -307,7 +309,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
         .submit-btn, .verify-btn, .change-passcode-btn {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             background: var(--accent-color);
             color: #fff;
             font-size: 15px;
@@ -316,7 +318,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             border-radius: 12px;
             cursor: pointer;
             transition: transform 0.2s ease;
-            margin-top: 8px;
+            margin-top: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -344,7 +346,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             color: #ef4444;
             font-size: 13px;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         /* Notifications Toast */
@@ -375,12 +377,10 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             to { opacity: 0; transform: translateY(-20px); }
         }
 
-        /* Attached Bottom Navigation */
+        /* Attached Bottom Navigation Block */
         .bottom-menu {
-            position: absolute;
-            bottom: 0;
-            left: 0;
             width: 100%;
+            flex-shrink: 0;
             background: var(--menu-bg);
             backdrop-filter: blur(10px);
             display: flex;
@@ -444,7 +444,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     <!-- Scrollable TikTok Snap Feed -->
     <div class="tiktok-feed" id="tiktokFeed">
         
-        <!-- Slide 1: Withdrawal Options (Moved to First) -->
+        <!-- Slide 1: Withdrawal Options -->
         <div class="profile-card-slide">
             <div class="card-inner">
                 <h2><i class="fa-solid fa-wallet"></i> <?php echo $section_header; ?></h2>
@@ -495,7 +495,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             </div>
         </div>
 
-        <!-- Slide 2: Profile Settings (Moved to Second) -->
+        <!-- Slide 2: Profile Settings -->
         <div class="profile-card-slide">
             <div class="card-inner">
                 <h2><i class="fa-solid fa-user-gear"></i> Profile Settings</h2>
