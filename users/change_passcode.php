@@ -96,16 +96,17 @@ $error_message   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : nu
 
         html, body {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
             background-color: var(--bg-color);
             color: var(--text-color);
         }
 
-        /* Fixed Header Overlay */
+        /* Fixed Top Header */
         .top-header {
             position: fixed;
-            top: 62px;
+            top: 0;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -113,20 +114,16 @@ $error_message   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : nu
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
-            pointer-events: none;
-        }
-
-        .top-header * {
-            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .user-badge {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.05);
             padding: 6px 14px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -141,7 +138,6 @@ $error_message   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : nu
         .balance-badge {
             background: rgba(34, 197, 94, 0.2);
             border: 1px solid var(--accent-color);
-            backdrop-filter: blur(8px);
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 14px;
@@ -149,34 +145,18 @@ $error_message   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : nu
             color: #4ade80;
         }
 
-        /* TikTok Style Fullscreen Feed Wrapper */
-        .tiktok-feed {
+        /* Normal Page Container */
+        .page-content {
             width: 100%;
-            height: 100vh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tiktok-feed::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Individual Snap Slide Card */
-        .profile-card-slide {
-            width: 100%;
-            height: 100vh;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            position: relative;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 80px 20px 210px 20px;
+            padding: 90px 20px 90px 20px;
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
-        /* Card Container styling */
+        /* Card Container Styling */
         .card-inner {
             width: 100%;
             max-width: 440px;
@@ -329,7 +309,7 @@ $error_message   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : nu
 </head>
 <body>
 
-    <!-- Header Overlay -->
+    <!-- Top Header -->
     <div class="top-header">
         <div class="user-badge">
             <img src="img/top.png" alt="Logo">
@@ -353,39 +333,34 @@ $error_message   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : nu
         </div>
     <?php endif; ?>
 
-    <!-- Scrollable TikTok Snap Feed -->
-    <div class="tiktok-feed" id="tiktokFeed">
+    <!-- Main Content Area -->
+    <main class="page-content">
+        <div class="card-inner">
+            <h2><i class="fa-solid fa-key"></i> Change Password</h2>
+            <form id="passwordForm" action="process_change_password.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
-        <!-- Passcode Change Card Slide -->
-        <div class="profile-card-slide">
-            <div class="card-inner">
-                <h2><i class="fa-solid fa-key"></i> Change Password</h2>
-                <form id="passwordForm" action="process_change_password.php" method="POST">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                <div class="input-container">
+                    <label for="old_password">Old Password</label>
+                    <input type="password" id="old_password" name="old_password" required>
+                </div>
 
-                    <div class="input-container">
-                        <label for="old_password">Old Password</label>
-                        <input type="password" id="old_password" name="old_password" required>
-                    </div>
+                <div class="input-container">
+                    <label for="new_password">New Password</label>
+                    <input type="password" id="new_password" name="new_password" required>
+                </div>
 
-                    <div class="input-container">
-                        <label for="new_password">New Password</label>
-                        <input type="password" id="new_password" name="new_password" required>
-                    </div>
+                <div class="input-container">
+                    <label for="confirm_password">Confirm New Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
 
-                    <div class="input-container">
-                        <label for="confirm_password">Confirm New Password</label>
-                        <input type="password" id="confirm_password" name="confirm_password" required>
-                    </div>
-
-                    <button type="submit" class="submit-btn">
-                        <i class="fa-solid fa-lock"></i> Change Password
-                    </button>
-                </form>
-            </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fa-solid fa-lock"></i> Change Password
+                </button>
+            </form>
         </div>
-
-    </div>
+    </main>
 
     <div id="notificationContainer"></div>
 
