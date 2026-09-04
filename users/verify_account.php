@@ -184,36 +184,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             z-index: 100;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 12px 20px;
+            justify-content: space-between; /* Pushes profile to left and balance to right */
+            padding: 16px 20px;
             background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
             pointer-events: none;
         }
-
+        
         .top-header * {
             pointer-events: auto;
         }
-
+        
         .user-badge {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px);
             padding: 6px 14px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
-
+        
         .user-badge img {
             width: 32px;
             height: 32px;
-            border-radius: 8px;
+            border-radius: 50%;
+            object-fit: cover;
         }
-
+        
         .header-title {
-            font-size: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        
+        .balance-badge {
+            display: flex;
+            align-items: center;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid var(--accent-color);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 700;
+            color: #4ade80;
         }
 
         /* Fullscreen Snap Container */
