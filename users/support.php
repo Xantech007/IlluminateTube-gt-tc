@@ -119,8 +119,8 @@ if (empty($telegram_raw)) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="Contact Cash Tube's support team 24/7 via Telegram for assistance with your account, login, or general inquiries." />
-    <title>Support | Cash Tube</title>
+    <meta name="description" content="Contact Illuminate Tube's support team 24/7 via Telegram for assistance with your account, login, or general inquiries." />
+    <title>Support | Illuminate Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
