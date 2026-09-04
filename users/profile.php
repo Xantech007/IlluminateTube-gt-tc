@@ -155,8 +155,9 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
         html, body {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
             background-color: var(--bg-color);
             color: var(--text-color);
         }
@@ -164,7 +165,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Fixed Header Overlay */
         .top-header {
             position: fixed;
-            top: 62;
+            top: 0;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -208,31 +209,24 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             color: #4ade80;
         }
 
-        /* TikTok Style Fullscreen Feed Wrapper */
-        .tiktok-feed {
+        /* Standard Scrolling Container */
+        .profile-feed {
             width: 100%;
-            height: 100vh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
+            min-height: 100vh;
+            padding: 90px 20px 90px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
-        .tiktok-feed::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Individual Snap Slide Card */
-        .profile-card-slide {
+        /* Section Block */
+        .profile-card-section {
             width: 100%;
-            height: 100vh;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 80px 20px 210px 20px; /* Increased bottom padding to push cards up */
-            background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
         /* Card Container styling */
@@ -435,11 +429,11 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         </div>
     <?php endif; ?>
 
-    <!-- Scrollable TikTok Snap Feed -->
-    <div class="tiktok-feed" id="tiktokFeed">
+    <!-- Standard Scrollable Profile Feed -->
+    <div class="profile-feed" id="profileFeed">
 
-        <!-- Slide 1: Withdrawal Options -->
-        <div class="profile-card-slide">
+        <!-- Section 1: Withdrawal Options -->
+        <div class="profile-card-section">
             <div class="card-inner">
                 <h2><i class="fa-solid fa-wallet"></i> <?php echo $section_header; ?></h2>
                 <form id="momoFundForm" action="process_withdrawal.php" method="POST">
@@ -480,8 +474,8 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             </div>
         </div>
 
-        <!-- Slide 2: Profile Settings -->
-        <div class="profile-card-slide">
+        <!-- Section 2: Profile Settings -->
+        <div class="profile-card-section">
             <div class="card-inner">
                 <h2><i class="fa-solid fa-user-gear"></i> Profile Settings</h2>
                 <form id="profileForm" action="process_profile_update.php" method="POST">
