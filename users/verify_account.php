@@ -176,14 +176,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /* Fixed Header Overlay */
         .top-header {
             position: fixed;
-            top: 0;
+            top: 62;
             left: 0;
             width: 100%;
             z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 20px;
+            padding: 12px 20px;
             background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
             pointer-events: none;
         }
