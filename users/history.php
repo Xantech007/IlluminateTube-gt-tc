@@ -119,7 +119,7 @@ try {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="View your activity and withdrawal history, including video watches and withdrawals." />
-    <title>History | Cash Tube</title>
+    <title>History | Illuminate Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -221,8 +221,8 @@ try {
             position: relative;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            padding: 70px 20px 85px 20px;
+            align-items: center;
+            padding: 80px 20px 100px 20px;
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
@@ -230,21 +230,25 @@ try {
         .card-inner {
             width: 100%;
             max-width: 550px;
-            max-height: calc(100vh - 155px);
+            max-height: calc(100vh - 180px);
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 24px;
-            padding: 20px;
+            padding: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
         }
 
+        .card-inner::-webkit-scrollbar {
+            display: none;
+        }
+
         .card-inner h2 {
             font-size: 20px;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             text-align: center;
             color: #ffffff;
             display: flex;
