@@ -170,7 +170,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Withdrawal receipt for your Illuminate Tube withdrawal." />
     <title>Withdrawal Receipt | Illuminate Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -198,8 +198,9 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
 
         html, body {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
             background-color: var(--bg-color);
             color: var(--text-color);
         }
@@ -207,7 +208,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
         /* Fixed Header Overlay */
         .top-header {
             position: fixed;
-            top: 62;
+            top: 0;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -251,52 +252,27 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
             color: #4ade80;
         }
 
-        /* Center Layout Wrapper */
+        /* Standard Document Layout Wrapper */
         .page-wrapper {
             width: 100%;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 80px 20px 80px 20px;
+            align-items: flex-start;
+            padding: 80px 20px 100px 20px;
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
-        /* Card Container styling with fixed 65vh height */
+        /* Card Container styling with natural standard expansion */
         .card-inner {
             width: 100%;
             max-width: 480px;
-            height: 65vh; /* Fixed card height requested */
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
             border-radius: 24px;
             padding: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Scrollable content inside the fixed card */
-        .card-scrollable-content {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 6px;
-        }
-
-        /* Custom Scrollbar for Card Content */
-        .card-scrollable-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .card-scrollable-content::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-
-        .card-scrollable-content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
         }
 
         .receipt-card h2 {
@@ -420,7 +396,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
             text-decoration: none;
         }
 
-        /* Notifications Toast Maintained from profile.php */
+        /* Notifications Toast */
         .notification {
             position: fixed;
             top: 70px;
@@ -448,7 +424,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
             to { opacity: 0; transform: translateY(-20px); }
         }
 
-        /* Fixed Bottom Navigation Maintained from profile.php */
+        /* Fixed Bottom Navigation */
         .bottom-menu {
             position: fixed;
             bottom: 0;
@@ -496,7 +472,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
 </head>
 <body>
 
-    <!-- Header Overlay maintained from profile.php -->
+    <!-- Header Overlay -->
     <div class="top-header">
         <div class="user-badge">
             <img src="img/top.png" alt="Logo">
@@ -510,80 +486,78 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
     <!-- Container Area -->
     <div class="page-wrapper" role="main">
         <div class="card-inner receipt-card">
-            <div class="card-scrollable-content">
-                <?php if ($error): ?>
-                    <p class="error"><?php echo htmlspecialchars($error); ?></p>
-                    <button class="back-btn" onclick="window.location.href='home.php'"><i class="fa-solid fa-house"></i> Back to Home</button>
-                <?php else: ?>
-                    <h2><i class="fas fa-check-circle"></i> Withdrawal Request Submitted!</h2>
-                    <div class="amount"><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></div>
-                    <table class="receipt-table">
-                        <tr>
-                            <th>Original Balance (USD)</th>
-                            <td>$<?php echo number_format($balance, 2); ?></td>
-                        </tr>
-                        <tr>
-                            <th>Withdrawn Amount (USD)</th>
-                            <td>$<?php echo number_format($amount, 2); ?></td>
-                        </tr>
-                        <tr>
-                            <th>Amount to Receive</th>
-                            <td><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></td>
-                        </tr>
-                        <tr>
-                            <th>New Balance (USD)</th>
-                            <td>$<?php echo number_format($new_balance, 2); ?></td>
-                        </tr>
-                        <tr>
-                            <th>Ref Number</th>
-                            <td><?php echo htmlspecialchars($ref_number); ?></td>
-                        </tr>
-                        <tr>
-                            <th>Request Time</th>
-                            <td><?php echo gmdate('F j, Y, g:i A'); ?> UTC</td>
-                        </tr>
-                        <tr>
-                            <th><?php echo htmlspecialchars($channel_label); ?></th>
-                            <td><?php echo htmlspecialchars($channel); ?></td>
-                        </tr>
-                        <tr>
-                            <th><?php echo htmlspecialchars($ch_name); ?></th>
-                            <td><?php echo htmlspecialchars($bank_name); ?></td>
-                        </tr>
-                        <tr>
-                            <th><?php echo htmlspecialchars($ch_value); ?></th>
-                            <td><?php echo htmlspecialchars($bank_account); ?></td>
-                        </tr>
-                        <tr>
-                            <th>From</th>
-                            <td>Task Tube</td>
-                        </tr>
-                        <tr>
-                            <th>Status</th>
-                            <td>Pending</td>
-                        </tr>
-                    </table>
-                    <div class="notes-section">
-                        <h3>Important Notes:</h3>
-                        <ul>
-                            <li>Your withdrawal request is pending approval and will be processed within 2 hours.</li>
-                            <li>Please ensure your bank details are correct to avoid delays.</li>
-                            <li>If you have any questions, contact support via our <a href="support.php">support page</a>.</li>
-                            <li>Conversion rates are based on current market values and may vary slightly upon processing.</li>
-                        </ul>
-                    </div>
-                    <div class="button-group">
-                        <button class="back-btn" onclick="window.location.href='home.php'"><i class="fa-solid fa-house"></i> Home</button>
-                        <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
-                    </div>
-                <?php endif; ?>
-            </div>
+            <?php if ($error): ?>
+                <p class="error"><?php echo htmlspecialchars($error); ?></p>
+                <button class="back-btn" onclick="window.location.href='home.php'"><i class="fa-solid fa-house"></i> Back to Home</button>
+            <?php else: ?>
+                <h2><i class="fas fa-check-circle"></i> Withdrawal Request Submitted!</h2>
+                <div class="amount"><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></div>
+                <table class="receipt-table">
+                    <tr>
+                        <th>Original Balance (USD)</th>
+                        <td>$<?php echo number_format($balance, 2); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Withdrawn Amount (USD)</th>
+                        <td>$<?php echo number_format($amount, 2); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Amount to Receive</th>
+                        <td><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></td>
+                    </tr>
+                    <tr>
+                        <th>New Balance (USD)</th>
+                        <td>$<?php echo number_format($new_balance, 2); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Ref Number</th>
+                        <td><?php echo htmlspecialchars($ref_number); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Request Time</th>
+                        <td><?php echo gmdate('F j, Y, g:i A'); ?> UTC</td>
+                    </tr>
+                    <tr>
+                        <th><?php echo htmlspecialchars($channel_label); ?></th>
+                        <td><?php echo htmlspecialchars($channel); ?></td>
+                    </tr>
+                    <tr>
+                        <th><?php echo htmlspecialchars($ch_name); ?></th>
+                        <td><?php echo htmlspecialchars($bank_name); ?></td>
+                    </tr>
+                    <tr>
+                        <th><?php echo htmlspecialchars($ch_value); ?></th>
+                        <td><?php echo htmlspecialchars($bank_account); ?></td>
+                    </tr>
+                    <tr>
+                        <th>From</th>
+                        <td>Task Tube</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>Pending</td>
+                    </tr>
+                </table>
+                <div class="notes-section">
+                    <h3>Important Notes:</h3>
+                    <ul>
+                        <li>Your withdrawal request is pending approval and will be processed within 2 hours.</li>
+                        <li>Please ensure your bank details are correct to avoid delays.</li>
+                        <li>If you have any questions, contact support via our <a href="support.php">support page</a>.</li>
+                        <li>Conversion rates are based on current market values and may vary slightly upon processing.</li>
+                    </ul>
+                </div>
+                <div class="button-group">
+                    <button class="back-btn" onclick="window.location.href='home.php'"><i class="fa-solid fa-house"></i> Home</button>
+                    <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
     <div id="notificationContainer"></div>
 
-    <!-- Fixed Bottom Menu maintained from profile.php -->
+    <!-- Fixed Bottom Menu -->
     <div class="bottom-menu" role="navigation">
         <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
         <a href="profile.php"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
