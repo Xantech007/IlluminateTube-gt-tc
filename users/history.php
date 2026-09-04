@@ -146,16 +146,17 @@ try {
 
         html, body {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
             background-color: var(--bg-color);
             color: var(--text-color);
         }
 
         /* Fixed Header Overlay */
         .top-header {
-            position: fixed;
-            top: 62px;
+            position: sticky;
+            top: 0;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -163,12 +164,9 @@ try {
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
-            pointer-events: none;
-        }
-
-        .top-header * {
-            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .user-badge {
@@ -199,38 +197,20 @@ try {
             color: #4ade80;
         }
 
-        /* TikTok Style Fullscreen Feed Wrapper */
-        .tiktok-feed {
+        /* Standard Page Wrapper */
+        .page-container {
             width: 100%;
-            height: 100vh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tiktok-feed::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Individual Snap Slide Card */
-        .profile-card-slide {
-            width: 100%;
-            height: 100vh;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            position: relative;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 24px 20px 100px 20px;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 80px 20px 210px 20px;
-            background: radial-gradient(circle at center, #111827 0%, #000000 100%);
+            flex-direction: column;
+            gap: 20px;
         }
 
         /* Card Container styling */
         .card-inner {
             width: 100%;
-            max-width: 550px;
-            max-height: calc(100vh - 290px);
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -251,13 +231,11 @@ try {
             align-items: center;
             justify-content: center;
             gap: 10px;
-            flex-shrink: 0;
         }
 
         .table-container {
             width: 100%;
             overflow-x: auto;
-            overflow-y: auto;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(0, 0, 0, 0.3);
@@ -422,72 +400,67 @@ try {
         </div>
     </div>
 
-    <!-- Scrollable TikTok Snap Feed -->
-    <div class="tiktok-feed" id="tiktokFeed">
-        
-        <!-- Slide 1: Activity & Withdrawal History -->
-        <div class="profile-card-slide">
-            <div class="card-inner">
-                <h2><i class="fa-solid fa-clock-rotate-left"></i> History Log</h2>
-                <?php if ($history): ?>
-                    <div class="table-container">
-                        <table class="history-table">
-                            <thead>
+    <!-- Standard Scrollable Content Wrapper -->
+    <main class="page-container">
+        <div class="card-inner">
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> History Log</h2>
+            <?php if ($history): ?>
+                <div class="table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Details</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($history as $item): ?>
                                 <tr>
-                                    <th>Action</th>
-                                    <th>Details</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($history as $item): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($item['action']); ?></td>
-                                        <td>
-                                            <?php if ($item['source'] === 'withdrawal'): ?>
-                                                <strong><?php echo htmlspecialchars($channel_label); ?>:</strong> <?php echo htmlspecialchars($item['channel']); ?><br>
-                                                <strong><?php echo htmlspecialchars($ch_name); ?>:</strong> <?php echo htmlspecialchars($item['bank_name']); ?><br>
-                                                <strong><?php echo htmlspecialchars($ch_value); ?>:</strong> <?php echo htmlspecialchars($item['bank_account']); ?><br>
-                                                <small style="color: var(--subtext-color);">Ref: <?php echo htmlspecialchars($item['ref_number']); ?></small>
-                                            <?php else: ?>
-                                                -
-                                            <?php endif; ?>
-                                        </td>
-                                        <td class="amount">
+                                    <td><?php echo htmlspecialchars($item['action']); ?></td>
+                                    <td>
+                                        <?php if ($item['source'] === 'withdrawal'): ?>
+                                            <strong><?php echo htmlspecialchars($channel_label); ?>:</strong> <?php echo htmlspecialchars($item['channel']); ?><br>
+                                            <strong><?php echo htmlspecialchars($ch_name); ?>:</strong> <?php echo htmlspecialchars($item['bank_name']); ?><br>
+                                            <strong><?php echo htmlspecialchars($ch_value); ?>:</strong> <?php echo htmlspecialchars($item['bank_account']); ?><br>
+                                            <small style="color: var(--subtext-color);">Ref: <?php echo htmlspecialchars($item['ref_number']); ?></small>
+                                        <?php else: ?>
+                                            -
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="amount">
+                                        <?php
+                                        $currency = $item['source'] === 'withdrawal' && !empty($item['currency']) ? htmlspecialchars($item['currency']) : '$';
+                                        echo $currency . number_format($item['amount'], 2);
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($item['source'] === 'withdrawal'): ?>
                                             <?php
-                                            $currency = $item['source'] === 'withdrawal' && !empty($item['currency']) ? htmlspecialchars($item['currency']) : '$';
-                                            echo $currency . number_format($item['amount'], 2);
+                                            $status = $item['status'];
+                                            $display_status = $status === 'approved' ? 'Completed' : ($status === 'rejected' ? 'Rejected' : 'Pending');
+                                            $status_class = $status === 'approved' ? 'status-completed' : ($status === 'rejected' ? 'status-rejected' : 'status-pending');
                                             ?>
-                                        </td>
-                                        <td>
-                                            <?php if ($item['source'] === 'withdrawal'): ?>
-                                                <?php
-                                                $status = $item['status'];
-                                                $display_status = $status === 'approved' ? 'Completed' : ($status === 'rejected' ? 'Rejected' : 'Pending');
-                                                $status_class = $status === 'approved' ? 'status-completed' : ($status === 'rejected' ? 'status-rejected' : 'status-pending');
-                                                ?>
-                                                <span class="status-box <?php echo $status_class; ?>">
-                                                    <?php echo htmlspecialchars($display_status); ?>
-                                                </span>
-                                            <?php else: ?>
-                                                -
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><small><?php echo gmdate('M j, Y H:i', strtotime($item['created_at'])) . ' UTC'; ?></small></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php else: ?>
-                    <p class="no-data"><i class="fa-solid fa-box-open" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>No activity or withdrawal history available.</p>
-                <?php endif; ?>
-            </div>
+                                            <span class="status-box <?php echo $status_class; ?>">
+                                                <?php echo htmlspecialchars($display_status); ?>
+                                            </span>
+                                        <?php else: ?>
+                                            -
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><small><?php echo gmdate('M j, Y H:i', strtotime($item['created_at'])) . ' UTC'; ?></small></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <p class="no-data"><i class="fa-solid fa-box-open" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>No activity or withdrawal history available.</p>
+            <?php endif; ?>
         </div>
-
-    </div>
+    </main>
 
     <div id="notificationContainer"></div>
 
