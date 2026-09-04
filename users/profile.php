@@ -164,7 +164,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
         /* Fixed Header Overlay */
         .top-header {
-            position: fixed;
+            position: sticky;
             top: 0;
             left: 0;
             width: 100%;
@@ -173,12 +173,9 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
-            pointer-events: none;
-        }
-
-        .top-header * {
-            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .user-badge {
@@ -208,6 +205,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             font-weight: 700;
             color: #4ade80;
         }
+
 
         /* Standard Scrolling Container */
         .profile-feed {
