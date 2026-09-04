@@ -531,7 +531,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
                     </tr>
                     <tr>
                         <th>From</th>
-                        <td>Task Tube</td>
+                        <td>Illumnate Tube</td>
                     </tr>
                     <tr>
                         <th>Status</th>
