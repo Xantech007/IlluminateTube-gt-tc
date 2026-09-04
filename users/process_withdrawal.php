@@ -1,6 +1,15 @@
 <?php
-session_start();
-require_once '../database/conn.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+ob_start();
+session_start([
+    'cookie_path' => '/',
+    'cookie_lifetime' => 86400,
+    'cookie_secure' => isset($_SERVER['HTTPS']),
+    'cookie_httponly' => true,
+]);
 
 // Set time zone to UTC for request time
 date_default_timezone_set('UTC');
@@ -9,6 +18,7 @@ date_default_timezone_set('UTC');
 if (!isset($_SESSION['user_id'])) {
     error_log('No user_id in session, redirecting to signin', 3, '../debug.log');
     header('Location: ../signin.php');
+    ob_end_flush();
     exit;
 }
 
@@ -16,6 +26,17 @@ if (!isset($_SESSION['user_id'])) {
 if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
     error_log('CSRF validation failed for user ID: ' . $_SESSION['user_id'], 3, '../debug.log');
     header('Location: home.php?error=Invalid+CSRF+token');
+    ob_end_flush();
+    exit;
+}
+
+// Include database connection
+try {
+    require_once '../database/conn.php';
+} catch (Exception $e) {
+    error_log('Failed to include conn.php: ' . $e->getMessage(), 3, '../debug.log');
+    echo 'Failed to connect to database. Check logs for details.';
+    ob_end_flush();
     exit;
 }
 
@@ -32,6 +53,7 @@ try {
         error_log('User not found for ID: ' . $_SESSION['user_id'], 3, '../debug.log');
         session_destroy();
         header('Location: ../signin.php?error=user_not_found');
+        ob_end_flush();
         exit;
     }
     $username = htmlspecialchars($user['name']);
@@ -42,6 +64,7 @@ try {
 } catch (PDOException $e) {
     error_log('Database error: ' . $e->getMessage(), 3, '../debug.log');
     header('Location: home.php?error=Database+error');
+    ob_end_flush();
     exit;
 }
 
@@ -49,6 +72,7 @@ try {
 if ($verification_status !== 'verified' && $upgrade_status !== 'upgraded') {
     error_log('User ID: ' . $_SESSION['user_id'] . ' neither verified nor upgraded for withdrawal', 3, '../debug.log');
     header('Location: home.php?error=Please+verify+or+upgrade+your+account+before+withdrawing+funds');
+    ob_end_flush();
     exit;
 }
 
@@ -146,42 +170,23 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Withdrawal receipt for your Task Tube withdrawal." />
-    <meta name="keywords" content="Task Tube, withdrawal, bank, receipt" />
-    <meta name="author" content="Task Tube" />
-    <title>Withdrawal Receipt | Task Tube</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="Withdrawal receipt for your Illuminate Tube withdrawal." />
+    <title>Withdrawal Receipt | Illuminate Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --bg-color: #f7f9fc;
-            --gradient-bg: linear-gradient(135deg, #f7f9fc, #e5e7eb);
-            --card-bg: #ffffff;
-            --text-color: #1a1a1a;
-            --subtext-color: #6b7280;
-            --border-color: #d1d5db;
-            --shadow-color: rgba(0, 0, 0, 0.1);
+            --bg-color: #000000;
+            --text-color: #ffffff;
             --accent-color: #22c55e;
             --accent-hover: #16a34a;
-            --menu-bg: #1a1a1a;
+            --menu-bg: rgba(17, 24, 39, 0.85);
             --menu-text: #ffffff;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #1f2937;
-            --gradient-bg: linear-gradient(135deg, #1f2937, #374151);
-            --card-bg: #2d3748;
-            --text-color: #e5e7eb;
             --subtext-color: #9ca3af;
-            --border-color: #4b5563;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --accent-color: #34d399;
-            --accent-hover: #22c55e;
-            --menu-bg: #111827;
-            --menu-text: #e5e7eb;
+            --border-color: rgba(255, 255, 255, 0.12);
         }
 
         * {
@@ -191,103 +196,139 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
             font-family: 'Inter', sans-serif;
         }
 
-        body {
-            background: var(--bg-color);
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
             color: var(--text-color);
-            min-height: 100vh;
-            padding-bottom: 100px;
-            transition: all 0.3s ease;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px;
-            position: relative;
-        }
-
-        .header {
+        /* Fixed Header Overlay */
+        .top-header {
+            position: fixed;
+            top: 62;
+            left: 0;
+            width: 100%;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 24px 0;
-            animation: slideIn 0.5s ease-out;
+            padding: 12px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+            pointer-events: none;
         }
 
-        .header img {
-            width: 64px;
-            height: 64px;
-            margin-right: 16px;
-            border-radius: 8px;
+        .top-header * {
+            pointer-events: auto;
         }
 
-        .header-text h1 {
-            font-size: 26px;
-            font-weight: 700;
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        .header-text p {
-            font-size: 16px;
-            color: var(--subtext-color);
-            margin-top: 4px;
+        .user-badge img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
         }
 
-        .theme-toggle {
-            background: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
+        .balance-badge {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid var(--accent-color);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 20px;
             font-size: 14px;
-            font-weight: 500;
-            transition: background 0.3s ease, transform 0.2s ease;
+            font-weight: 700;
+            color: #4ade80;
         }
 
-        .theme-toggle:hover {
-            background: var(--accent-hover);
-            transform: scale(1.02);
+        /* Center Layout Wrapper */
+        .page-wrapper {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px 80px 20px;
+            background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
-        .receipt-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 6px 16px var(--shadow-color);
-            margin: 24px 0;
-            animation: slideIn 0.5s ease-out 0.6s backwards;
-            text-align: center;
+        /* Card Container styling with fixed 65vh height */
+        .card-inner {
+            width: 100%;
+            max-width: 480px;
+            height: 65vh; /* Fixed card height requested */
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Scrollable content inside the fixed card */
+        .card-scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        /* Custom Scrollbar for Card Content */
+        .card-scrollable-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .card-scrollable-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .card-scrollable-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
         }
 
         .receipt-card h2 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
             color: var(--accent-color);
-        }
-
-        .receipt-card h2 i {
-            font-size: 1.2rem;
-            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .receipt-card .amount {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 700;
-            margin: 20px 0;
+            margin: 16px 0;
+            text-align: center;
+            color: #ffffff;
         }
 
         .receipt-table {
             width: 100%;
-            max-width: 600px;
-            margin: 20px auto;
             border-collapse: collapse;
-            font-size: 16px;
+            font-size: 14px;
+            margin-bottom: 20px;
         }
 
         .receipt-table th,
         .receipt-table td {
-            padding: 12px;
+            padding: 10px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
         }
@@ -295,122 +336,149 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
         .receipt-table th {
             font-weight: 600;
             color: var(--subtext-color);
-            width: 40%;
+            width: 45%;
         }
 
         .receipt-table td {
             font-weight: 500;
-            color: var(--text-color);
+            color: #ffffff;
+        }
+
+        .back-btn, .print-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .back-btn {
-            width: 100%;
-            max-width: 200px;
-            padding: 14px;
             background: var(--accent-color);
             color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-            margin-top: 10px;
-            margin-right: 10px;
         }
 
         .back-btn:hover {
             background: var(--accent-hover);
-            transform: scale(1.02);
+        }
+
+        .print-btn {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .print-btn:hover {
+            background: #2563eb;
+        }
+
+        .back-btn:active, .print-btn:active {
+            transform: scale(0.96);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
         }
 
         .error {
             text-align: center;
-            color: red;
+            color: #ef4444;
             margin-bottom: 20px;
             font-size: 14px;
         }
 
+        .notes-section {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--subtext-color);
+        }
+
+        .notes-section h3 {
+            font-size: 15px;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .notes-section ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        .notes-section li {
+            margin-bottom: 6px;
+        }
+
+        .notes-section a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        /* Notifications Toast Maintained from profile.php */
         .notification {
             position: fixed;
-            top: 20px;
+            top: 70px;
             right: 20px;
-            background: var(--card-bg);
-            color: var(--text-color);
-            padding: 16px 24px;
+            background: rgba(17, 24, 39, 0.9);
+            color: #fff;
+            padding: 12px 20px;
             border-radius: 12px;
-            border: 2px solid var(--accent-color);
-            box-shadow: 0 4px 12px var(--shadow-color), 0 0 8px var(--accent-color);
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             z-index: 1000;
+            font-size: 13px;
             display: flex;
             align-items: center;
+            gap: 10px;
             animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-out 3s forwards;
-            max-width: 300px;
-            transition: transform 0.2s ease;
-        }
-
-        .notification:hover {
-            transform: scale(1.05);
-        }
-
-        .notification::before {
-            content: '🔒';
-            font-size: 1.2rem;
-            margin-right: 12px;
-            color: var(--accent-color);
-        }
-
-        .notification.error::before {
-            content: '⚠️';
-        }
-
-        .notification span {
-            font-size: 14px;
-            font-weight: 500;
         }
 
         @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
+            to { opacity: 0; transform: translateY(-20px); }
         }
 
+        /* Fixed Bottom Navigation Maintained from profile.php */
         .bottom-menu {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             background: var(--menu-bg);
+            backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 14px 0;
-            box-shadow: 0 -2px 8px var(--shadow-color);
+            padding: 12px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
         }
 
         .bottom-menu a,
         .bottom-menu button {
             color: var(--menu-text);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            padding: 10px 18px;
+            padding: 6px 14px;
             transition: color 0.3s ease;
             background: none;
             border: none;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
         }
 
         .bottom-menu a.active,
@@ -419,246 +487,112 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
             color: var(--accent-color);
         }
 
-        #gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: var(--gradient-bg);
-            transition: all 0.3s ease;
-        }
-
-        .notes-section {
-            margin-top: 20px;
-            font-size: 14px;
-            color: var(--subtext-color);
-            text-align: left;
-            max-width: 600px;
-            margin: 20px auto;
-        }
-
-        .notes-section h3 {
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: var(--text-color);
-        }
-
-        .notes-section ul {
-            list-style-type: disc;
-            padding-left: 20px;
-        }
-
-        .print-btn {
-            width: 100%;
-            max-width: 200px;
-            padding: 14px;
-            background: #007bff;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-            margin-top: 10px;
-        }
-
-        .print-btn:hover {
-            background: #0056b3;
-            transform: scale(1.02);
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-            }
-
-            .header-text h1 {
-                font-size: 22px;
-            }
-
-            .receipt-card {
-                padding: 20px;
-            }
-
-            .receipt-card .amount {
-                font-size: 30px;
-            }
-
-            .receipt-table {
-                font-size: 14px;
-            }
-
-            .notification {
-                max-width: 250px;
-                right: 10px;
-                top: 10px;
-            }
-
+        @media (max-width: 480px) {
             .button-group {
                 flex-direction: column;
-                align-items: center;
-            }
-
-            .back-btn, .print-btn {
-                margin-right: 0;
             }
         }
     </style>
 </head>
 <body>
-    <div id="gradient"></div>
-    <div class="container" role="main">
-        <div class="header">
-            <div style="display: flex; align-items: center;">
-                <img src="img/top.png" alt="Cash Tube Logo" aria-label="Cash Tube Logo">
-                <div class="header-text">
-                    <h1>Withdrawal Receipt for <?php echo htmlspecialchars($username); ?></h1>
-                    <p>Detailed summary of your withdrawal request</p>
-                </div>
-            </div>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Toggle Dark Mode</button>
-        </div>
 
-        <div class="receipt-card">
-            <?php if ($error): ?>
-                <p class="error"><?php echo htmlspecialchars($error); ?></p>
-                <button class="back-btn" onclick="window.location.href='home.php'">Back to Home</button>
-            <?php else: ?>
-                <h2><i class="fas fa-check-circle"></i> Withdrawal Request Submitted!</h2>
-                <div class="amount"><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></div>
-                <table class="receipt-table">
-                    <tr>
-                        <th>Original Balance (USD)</th>
-                        <td>$<?php echo number_format($balance, 2); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Withdrawn Amount (USD)</th>
-                        <td>$<?php echo number_format($amount, 2); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Amount to Receive</th>
-                        <td><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></td>
-                    </tr>
-                    <tr>
-                        <th>New Balance (USD)</th>
-                        <td>$<?php echo number_format($new_balance, 2); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Ref Number</th>
-                        <td><?php echo htmlspecialchars($ref_number); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Request Time</th>
-                        <td><?php echo gmdate('F j, Y, g:i A'); ?> UTC</td>
-                    </tr>
-                    <tr>
-                        <th><?php echo htmlspecialchars($channel_label); ?></th>
-                        <td><?php echo htmlspecialchars($channel); ?></td>
-                    </tr>
-                    <tr>
-                        <th><?php echo htmlspecialchars($ch_name); ?></th>
-                        <td><?php echo htmlspecialchars($bank_name); ?></td>
-                    </tr>
-                    <tr>
-                        <th><?php echo htmlspecialchars($ch_value); ?></th>
-                        <td><?php echo htmlspecialchars($bank_account); ?></td>
-                    </tr>
-                    <tr>
-                        <th>From</th>
-                        <td>Task Tube</td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td>Pending</td>
-                    </tr>
-                </table>
-                <div class="notes-section">
-                    <h3>Important Notes:</h3>
-                    <ul>
-                        <li>Your withdrawal request is pending approval and will be processed within 2 hours.</li>
-                        <li>Please ensure your bank details are correct to avoid delays.</li>
-                        <li>If you have any questions, contact support via our <a href="support.php">support page</a>.</li>
-                        <li>Conversion rates are based on current market values and may vary slightly upon processing.</li>
-                    </ul>
-                </div>
-                <div class="button-group">
-                    <button class="back-btn" onclick="window.location.href='home.php'">Back to Home</button>
-                    <button class="print-btn" onclick="window.print()">Print Receipt</button>
-                </div>
-            <?php endif; ?>
+    <!-- Header Overlay maintained from profile.php -->
+    <div class="top-header">
+        <div class="user-badge">
+            <img src="img/top.png" alt="Logo">
+            <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
         </div>
-
-        <div id="notificationContainer"></div>
+        <div class="balance-badge">
+            $<span id="balance"><?php echo number_format($new_balance, 2); ?></span>
+        </div>
     </div>
 
+    <!-- Container Area -->
+    <div class="page-wrapper" role="main">
+        <div class="card-inner receipt-card">
+            <div class="card-scrollable-content">
+                <?php if ($error): ?>
+                    <p class="error"><?php echo htmlspecialchars($error); ?></p>
+                    <button class="back-btn" onclick="window.location.href='home.php'"><i class="fa-solid fa-house"></i> Back to Home</button>
+                <?php else: ?>
+                    <h2><i class="fas fa-check-circle"></i> Withdrawal Request Submitted!</h2>
+                    <div class="amount"><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></div>
+                    <table class="receipt-table">
+                        <tr>
+                            <th>Original Balance (USD)</th>
+                            <td>$<?php echo number_format($balance, 2); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Withdrawn Amount (USD)</th>
+                            <td>$<?php echo number_format($amount, 2); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Amount to Receive</th>
+                            <td><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></td>
+                        </tr>
+                        <tr>
+                            <th>New Balance (USD)</th>
+                            <td>$<?php echo number_format($new_balance, 2); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Ref Number</th>
+                            <td><?php echo htmlspecialchars($ref_number); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Request Time</th>
+                            <td><?php echo gmdate('F j, Y, g:i A'); ?> UTC</td>
+                        </tr>
+                        <tr>
+                            <th><?php echo htmlspecialchars($channel_label); ?></th>
+                            <td><?php echo htmlspecialchars($channel); ?></td>
+                        </tr>
+                        <tr>
+                            <th><?php echo htmlspecialchars($ch_name); ?></th>
+                            <td><?php echo htmlspecialchars($bank_name); ?></td>
+                        </tr>
+                        <tr>
+                            <th><?php echo htmlspecialchars($ch_value); ?></th>
+                            <td><?php echo htmlspecialchars($bank_account); ?></td>
+                        </tr>
+                        <tr>
+                            <th>From</th>
+                            <td>Task Tube</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>Pending</td>
+                        </tr>
+                    </table>
+                    <div class="notes-section">
+                        <h3>Important Notes:</h3>
+                        <ul>
+                            <li>Your withdrawal request is pending approval and will be processed within 2 hours.</li>
+                            <li>Please ensure your bank details are correct to avoid delays.</li>
+                            <li>If you have any questions, contact support via our <a href="support.php">support page</a>.</li>
+                            <li>Conversion rates are based on current market values and may vary slightly upon processing.</li>
+                        </ul>
+                    </div>
+                    <div class="button-group">
+                        <button class="back-btn" onclick="window.location.href='home.php'"><i class="fa-solid fa-house"></i> Home</button>
+                        <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationContainer"></div>
+
+    <!-- Fixed Bottom Menu maintained from profile.php -->
     <div class="bottom-menu" role="navigation">
-        <a href="home.php" class="active">Home</a>
-        <a href="profile.php">Profile</a>
-        <a href="history.php">History</a>
-        <a href="support.php">Support</a>
-        <button id="logoutBtn" aria-label="Log out">Logout</button>
+        <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="profile.php"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
+        <a href="history.php" class="active"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
+        <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
+        <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
     </div>
 
     <script>
-        window.__lc = window.__lc || {};
-        window.__lc.license = 15808029;
-        (function(n, t, c) {
-            function i(n) { return e._h ? e._h.apply(null, n) : e._q.push(n) }
-            var e = {
-                _q: [], _h: null, _v: "2.0",
-                on: function() { i(["on", c.call(arguments)]) },
-                once: function() { i(["once", c.call(arguments)]) },
-                off: function() { i(["off", c.call(arguments)]) },
-                get: function() { if (!e._h) throw new Error("[LiveChatWidget] You can't use getters before load."); return i(["get", c.call(arguments)]) },
-                call: function() { i(["call", c.call(arguments)]) },
-                init: function() {
-                    var n = t.createElement("script");
-                    n.async = true;
-                    n.type = "text/javascript";
-                    n.src = "https://cdn.livechatinc.com/tracking.js";
-                    t.head.appendChild(n);
-                }
-            };
-            !n.__lc.asyncInit && e.init();
-            n.LiveChatWidget = n.LiveChatWidget || e;
-        })(window, document, [].slice);
-
-        // Dark Mode Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            body.setAttribute('data-theme', 'dark');
-            themeToggle.textContent = 'Toggle Light Mode';
-        }
-
-        themeToggle.addEventListener('click', () => {
-            const isDark = body.getAttribute('data-theme') === 'dark';
-            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            themeToggle.textContent = isDark ? 'Toggle Dark Mode' : 'Toggle Light Mode';
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        });
-
-        // Menu interactions
-        const menuItems = document.querySelectorAll('.bottom-menu a');
-        menuItems.forEach((item) => {
-            item.addEventListener('click', () => {
-                menuItems.forEach((menuItem) => {
-                    menuItem.classList.remove('active');
-                });
-                item.classList.add('active');
-            });
-        });
-
         // Logout Button
         document.getElementById('logoutBtn').addEventListener('click', () => {
             Swal.fire({
@@ -709,11 +643,11 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
                     notificationContainer.innerHTML = '';
                     notifications.forEach((message, index) => {
                         const notification = document.createElement('div');
-                        notification.className = `notification ${message.type || 'success'}`;
+                        notification.className = 'notification';
                         notification.setAttribute('role', 'alert');
                         notification.innerHTML = `<span>${message.text}</span>`;
                         notificationContainer.appendChild(notification);
-                        notification.style.top = `${20 + index * 80}px`;
+                        notification.style.top = `${70 + index * 60}px`;
                         setTimeout(() => notification.remove(), 3500);
                     });
                 },
@@ -726,48 +660,6 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
         fetchNotifications();
         setInterval(fetchNotifications, 20000);
 
-        // Gradient Animation
-        var colors = [
-            [62, 35, 255],
-            [60, 255, 60],
-            [255, 35, 98],
-            [45, 175, 230],
-            [255, 0, 255],
-            [255, 128, 0]
-        ];
-        var step = 0;
-        var colorIndices = [0, 1, 2, 3];
-        var gradientSpeed = 0.002;
-        const gradientElement = document.getElementById('gradient');
-
-        function updateGradient() {
-            var c0_0 = colors[colorIndices[0]];
-            var c0_1 = colors[colorIndices[1]];
-            var c1_0 = colors[colorIndices[2]];
-            var c1_1 = colors[colorIndices[3]];
-            var istep = 1 - step;
-            var r1 = Math.round(istep * c0_0[0] + step * c0_1[0]);
-            var g1 = Math.round(istep * c0_0[1] + step * c0_1[1]);
-            var b1 = Math.round(istep * c0_0[2] + step * c0_1[2]);
-            var color1 = `rgb(${r1},${g1},${b1})`;
-            var r2 = Math.round(istep * c1_0[0] + step * c1_1[0]);
-            var g2 = Math.round(istep * c1_0[1] + step * c1_1[1]);
-            var b2 = Math.round(istep * c1_0[2] + step * c1_1[2]);
-            var color2 = `rgb(${r2},${g2},${b2})`;
-            gradientElement.style.background = `linear-gradient(135deg, ${color1}, ${color2})`;
-            step += gradientSpeed;
-            if (step >= 1) {
-                step %= 1;
-                colorIndices[0] = colorIndices[1];
-                colorIndices[2] = colorIndices[3];
-                colorIndices[1] = (colorIndices[1] + Math.floor(1 + Math.random() * (colors.length - 1))) % colors.length;
-                colorIndices[3] = (colorIndices[3] + Math.floor(1 + Math.random() * (colors.length - 1))) % colors.length;
-            }
-            requestAnimationFrame(updateGradient);
-        }
-
-        requestAnimationFrame(updateGradient);
-
         // Context Menu Disable
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
@@ -775,3 +667,4 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
     </script>
 </body>
 </html>
+<?php ob_end_flush(); ?>
