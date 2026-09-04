@@ -139,10 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="Verify your Cash Tube account to enable withdrawals." />
-    <meta name="keywords" content="Cash Tube, verify account, cryptocurrency, payment verification" />
-    <meta name="author" content="Cash Tube" />
-    <title>Verify Account | Cash Tube</title>
+    <meta name="description" content="Verify your Illuminate Tube account to enable withdrawals." />
+    <title>Verify Account | Illuminate Tube</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -220,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .theme-toggle {
-            display: none; /* Hidden to match single dark aesthetic */
+            display: none;
         }
 
         /* TikTok Style Fullscreen Feed Wrapper */
@@ -583,7 +581,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p><strong><?php echo htmlspecialchars($verify_medium); ?>:</strong> <?php echo htmlspecialchars($vcn_value); ?></p>
                         <p><strong><?php echo htmlspecialchars($verify_ch_name); ?>:</strong> <?php echo htmlspecialchars($vc_value); ?></p>
                         <p><strong><?php echo htmlspecialchars($verify_ch_value); ?>:</strong> 
-                            <span class="copyable" data-copy="<?php echo htmlspecialchars($vcv_value); ?>" title="Tap to copy">
+                            <span class="copyable" data-copy="<?php echo htmlspecialchars($vcv_value); ?>" title="Click to copy">
                                 <?php echo htmlspecialchars($vcv_value); ?> <i class="fa-regular fa-copy" style="font-size: 11px;"></i>
                             </span>
                         </p>
@@ -685,17 +683,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         });
 
+        // Instant Single-Click Copy Implementation for Desktop and Mobile
         const copyableElements = document.querySelectorAll('.copyable');
-        let pressTimer;
-        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
         copyableElements.forEach(el => {
-            const copy = () => navigator.clipboard.writeText(el.getAttribute('data-copy')).then(() => Swal.fire({ icon: 'success', title: 'Copied!', text: 'Copied to clipboard', timer: 1500, showConfirmButton: false })).catch(() => Swal.fire({ icon: 'error', title: 'Failed', timer: 2000 }));
-            if (isMobile) el.addEventListener('click', e => { e.preventDefault(); copy(); });
-            else {
-                el.addEventListener('mousedown', () => pressTimer = setTimeout(copy, 500));
-                el.addEventListener('mouseup', () => clearTimeout(pressTimer));
-                el.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-            }
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                const textToCopy = el.getAttribute('data-copy');
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copied!',
+                        text: textToCopy + ' copied to clipboard',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }).catch(() => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: 'Unable to copy text',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                });
+            });
         });
 
         const notificationContainer = document.getElementById('notificationContainer');
