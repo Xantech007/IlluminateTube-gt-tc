@@ -164,7 +164,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         /* Fixed Header Overlay */
         .top-header {
             position: fixed;
-            top: 62px;
+            top: 0;
             left: 0;
             width: 100%;
             z-index: 100;
@@ -229,10 +229,9 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             scroll-snap-stop: always;
             position: relative;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 70px 20px 0 20px;
+            padding: 80px 20px 100px 20px; /* Adjusted padding to prevent overlap with top header and bottom footer */
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
@@ -240,15 +239,14 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         .card-inner {
             width: 100%;
             max-width: 440px;
+            max-height: calc(100vh - 180px); /* Restrict card height to prevent overflowing screen boundaries */
+            overflow-y: auto; /* Enable internal scrolling if device screen height is small */
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 24px;
-            padding: 20px;
+            padding: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            max-height: calc(100vh - 150px);
-            overflow-y: auto;
-            margin: auto;
         }
 
         .card-inner::-webkit-scrollbar {
@@ -258,7 +256,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         .card-inner h2 {
             font-size: 20px;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             text-align: center;
             color: #ffffff;
             display: flex;
@@ -269,13 +267,13 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
         .input-container {
             position: relative;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .input-container input,
         .input-container select {
             width: 100%;
-            padding: 12px 12px;
+            padding: 14px 12px;
             font-size: 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
@@ -309,7 +307,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
         .submit-btn, .verify-btn, .change-passcode-btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: var(--accent-color);
             color: #fff;
             font-size: 15px;
@@ -318,7 +316,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             border-radius: 12px;
             cursor: pointer;
             transition: transform 0.2s ease;
-            margin-top: 6px;
+            margin-top: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -346,7 +344,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             color: #ef4444;
             font-size: 13px;
             text-align: center;
-            margin-top: 8px;
+            margin-top: 10px;
         }
 
         /* Notifications Toast */
@@ -377,10 +375,12 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             to { opacity: 0; transform: translateY(-20px); }
         }
 
-        /* Attached Bottom Navigation Block */
+        /* Fixed Bottom Navigation */
         .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            flex-shrink: 0;
             background: var(--menu-bg);
             backdrop-filter: blur(10px);
             display: flex;
@@ -484,15 +484,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     </button>
                 <?php endif; ?>
             </div>
-            
-            <!-- Attached Bottom Menu -->
-            <div class="bottom-menu" role="navigation">
-                <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
-                <a href="profile.php" class="active"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
-                <a href="history.php"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
-                <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
-                <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
-            </div>
         </div>
 
         <!-- Slide 2: Profile Settings -->
@@ -526,20 +517,20 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     <button type="button" class="change-passcode-btn" onclick="window.location.href='change_passcode.php'"><i class="fa-solid fa-key"></i> Change Passcode</button>
                 </form>
             </div>
-            
-            <!-- Attached Bottom Menu -->
-            <div class="bottom-menu" role="navigation">
-                <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
-                <a href="profile.php" class="active"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
-                <a href="history.php"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
-                <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
-                <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
-            </div>
         </div>
 
     </div>
 
     <div id="notificationContainer"></div>
+
+    <!-- Fixed Bottom Menu -->
+    <div class="bottom-menu" role="navigation">
+        <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="profile.php" class="active"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
+        <a href="history.php"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
+        <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
+        <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
+    </div>
 
     <script>
         // Profile Form AJAX Handler
@@ -612,7 +603,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         }
 
         // Logout handling
-        $(document).on('click', '#logoutBtn', function() {
+        document.getElementById('logoutBtn').addEventListener('click', () => {
             Swal.fire({
                 title: 'Log out?',
                 text: 'Are you sure you want to log out?',
