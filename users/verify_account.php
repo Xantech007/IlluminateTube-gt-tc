@@ -220,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .card-inner {
             width: 100%;
             max-width: 440px;
-            max-height: 80vh;
+            max-height: 65vh;
             display: flex;
             flex-direction: column;
             background: rgba(255, 255, 255, 0.05);
