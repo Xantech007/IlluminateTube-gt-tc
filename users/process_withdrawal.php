@@ -42,7 +42,11 @@ try {
 
 // Fetch user data
 try {
-    $stmt = $pdo->prepare("SELECT name, balance, COALESCE(country, '') AS country, verification_status, upgrade_status FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("
+        SELECT name, balance, verification_status, COALESCE(country, '') AS country, upgrade_status
+        FROM users 
+        WHERE id = ?
+    ");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$user) {
@@ -53,18 +57,10 @@ try {
         exit;
     }
     $username = htmlspecialchars($user['name']);
-    $balance = number_format($user['balance'], 2);
+    $balance = $user['balance'];
+    $verification_status = $user['verification_status'];
+    $upgrade_status = $user['upgrade_status'] ?? 'not_upgraded';
     $user_country = htmlspecialchars($user['country']);
-
-    // Check verification and upgrade statuses
-    $account_status_badge = '';
-    if (strtolower($user['verification_status'] ?? '') === 'verified') {
-        $account_status_badge = '<span class="status-tag status-verified"><i class="fa-solid fa-circle-check"></i> Account Verified</span>';
-    } elseif (strtolower($user['upgrade_status'] ?? '') === 'upgraded') {
-        $account_status_badge = '<span class="status-tag status-upgraded"><i class="fa-solid fa-circle-up"></i> Account Upgraded</span>';
-    } else {
-        $account_status_badge = '<span class="status-tag status-unverified"><i class="fa-solid fa-circle-xmark"></i> Not Verified or Upgraded</span>';
-    }
 } catch (PDOException $e) {
     error_log('Database error: ' . $e->getMessage(), 3, '../debug.log');
     header('Location: home.php?error=Database+error');
@@ -472,35 +468,6 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
                 flex-direction: column;
             }
         }
-
-        .status-tag {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .status-verified {
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.4);
-        }
-        
-        .status-upgraded {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.4);
-        }
-        
-        .status-unverified {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.4);
-        }
-        
     </style>
 </head>
 <body>
@@ -509,13 +476,10 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
     <div class="top-header">
         <div class="user-badge">
             <img src="img/top.png" alt="Logo">
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
-                <?php echo $account_status_badge; ?>
-            </div>
+            <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
         </div>
         <div class="balance-badge">
-            $<span id="balance"><?php echo $balance; ?></span>
+            $<span id="balance"><?php echo number_format($new_balance, 2); ?></span>
         </div>
     </div>
 
