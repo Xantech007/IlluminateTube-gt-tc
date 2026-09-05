@@ -488,18 +488,50 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             text-align: center;
             padding: 24px;
         }
+
+        .status-tag {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-verified {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+        
+        .status-upgraded {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        
+        .status-unverified {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        
     </style>
 </head>
 <body>
 
-    <!-- Fixed Header -->
+    <!-- Header Overlay -->
     <div class="top-header">
         <div class="user-badge">
             <img src="img/top.png" alt="Logo">
-            <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
+                <?php echo $account_status_badge; ?>
+            </div>
         </div>
         <div class="balance-badge">
-            $<span id="balance"><?php echo $total_display_balance; ?></span>
+            $<span id="balance"><?php echo $balance; ?></span>
         </div>
     </div>
 
