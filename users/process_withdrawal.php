@@ -66,11 +66,11 @@ try {
 
     // Generate account status badge markup
     if ($verification_status === 'verified') {
-        $account_status_badge = '<span class="status-tag status-verified"><i class="fa-solid fa-circle-check"></i> Verified</span>';
+        $account_status_badge = '<span class="status-tag status-verified"><i class="fa-solid fa-circle-check"></i> Account Verified</span>';
     } elseif ($upgrade_status === 'upgraded') {
-        $account_status_badge = '<span class="status-tag status-upgraded"><i class="fa-solid fa-shield-halved"></i> Upgraded</span>';
+        $account_status_badge = '<span class="status-tag status-upgraded"><i class="fa-solid fa-circle-up"></i> Account Upgraded</span>';
     } else {
-        $account_status_badge = '<span class="status-tag status-unverified"><i class="fa-solid fa-circle-xmark"></i> Unverified</span>';
+        $account_status_badge = '<span class="status-tag status-unverified"><i class="fa-solid fa-circle-xmark"></i> Not Verified or Upgraded</span>';
     }
 
 } catch (PDOException $e) {
