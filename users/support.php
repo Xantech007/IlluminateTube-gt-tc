@@ -55,6 +55,8 @@ try {
         $account_status_badge = '<span class="status-tag status-verified"><i class="fa-solid fa-circle-check"></i> Account Verified</span>';
     } elseif (strtolower($user['upgrade_status'] ?? '') === 'upgraded') {
         $account_status_badge = '<span class="status-tag status-upgraded"><i class="fa-solid fa-circle-up"></i> Account Upgraded</span>';
+    } else {
+        $account_status_badge = '<span class="status-tag status-unverified"><i class="fa-solid fa-circle-xmark"></i> Not Verified or Upgraded</span>';
     }
 } catch (PDOException $e) {
     error_log('Database error in support.php: ' . $e->getMessage(), 3, '../debug.log');
@@ -420,6 +422,12 @@ if (empty($telegram_raw)) {
             background: rgba(59, 130, 246, 0.2);
             color: #60a5fa;
             border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        
+        .status-unverified {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
         }
         
     </style>
