@@ -93,7 +93,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Tube - Admin Dashboard</title>
+    <title>Illuminate Tube - Admin Dashboard</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -318,7 +318,7 @@ try {
 </head>
 <body>
     <div class="dashboard-container">
-        <h2>Welcome to Task Tube Admin Dashboard</h2>
+        <h2>Welcome to Illuminate Tube Admin Dashboard</h2>
         <p>Hello, <?php echo htmlspecialchars($_SESSION['admin_email']); ?>!</p>
         <p>Total Registered Users: <strong><?php echo $user_count; ?></strong></p>
 
