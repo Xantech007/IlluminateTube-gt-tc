@@ -645,6 +645,19 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             }
         }
 
+        function pauseAllVideos() {
+            document.querySelectorAll('.feed-video').forEach(vid => {
+                vid.pause();
+            });
+        }
+
+        function playActiveVideo(video) {
+            pauseAllVideos();
+            if (video) {
+                video.play().catch(err => console.log('Autoplay prevented:', err));
+            }
+        }
+
         function scrollToNextVideo(card) {
             const remainingCards = Array.from(document.querySelectorAll('.video-card')).filter(c => c.style.display !== 'none' && c !== card);
             if (remainingCards.length > 0) {
@@ -654,7 +667,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             }
         }
 
-        // IntersectionObserver for video autoplay and timer countdown
+        // IntersectionObserver for active video playing & pausing inactive videos
         const observerOptions = {
             root: feed,
             threshold: 0.6
@@ -666,7 +679,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                 if (!video) return;
 
                 if (entry.isIntersecting) {
-                    video.play().catch(err => console.log('Autoplay prevented:', err));
+                    playActiveVideo(video);
                 } else {
                     video.pause();
                 }
@@ -690,7 +703,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
             video.addEventListener('click', function() {
                 if (video.paused) {
-                    video.play();
+                    playActiveVideo(video);
                 } else {
                     video.pause();
                 }
@@ -766,6 +779,13 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     }
                 });
             });
+        });
+
+        // Pause sound when changing page focus
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                pauseAllVideos();
+            }
         });
 
         // Like button toggle
