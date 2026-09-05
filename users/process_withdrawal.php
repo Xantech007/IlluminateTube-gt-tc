@@ -364,7 +364,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
         .receipt-amount-box .label {
             font-size: 10px;
             text-transform: uppercase;
-            color: #555;
+            color: #22c55e;
             letter-spacing: 0.5px;
         }
 
