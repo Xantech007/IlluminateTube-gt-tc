@@ -403,8 +403,8 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
         .receipt-status-badge {
             display: inline-block;
             padding: 2px 6px;
-            border: 1px solid #d97706;
-            color: #d97706;
+            border: 1px solid #15803d; /* Dark green border */
+            color: #16a34a; /* Medium green text */
             font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
@@ -698,7 +698,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
                         </tr>
                         <tr>
                             <td>Status:</td>
-                            <td><span class="receipt-status-badge">Pending</span></td>
+                            <td><span class="receipt-status-badge">Completed</span></td>
                         </tr>
                         <tr>
                             <td>Account Name:</td>
