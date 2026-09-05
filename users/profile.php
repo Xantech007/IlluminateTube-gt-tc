@@ -101,7 +101,7 @@ try {
 // Fetch region settings based on user's country
 try {
     $stmt = $pdo->prepare("
-        SELECT section_header, ch_name, ch_value, COALESCE(channel, 'Mobile Money') AS channel, account_upgrade
+        SELECT section_header, ch_name, ch_value, COALESCE(channel, 'Mobile Money') AS channel, account_upgrade, COALESCE(rate, 1) AS rate, COALESCE(currency, 'USD') AS currency
         FROM region_settings 
         WHERE country = ?
     ");
@@ -114,12 +114,16 @@ try {
         $ch_value = htmlspecialchars($region_settings['ch_value']);
         $channel = htmlspecialchars($region_settings['channel']);
         $account_upgrade = $region_settings['account_upgrade'] ?? 0;
+        $rate = (float)($region_settings['rate'] ?? 1);
+        $withdraw_currency = htmlspecialchars($region_settings['currency'] ?? 'USD');
     } else {
         $section_header = 'Withdraw with MoMo';
         $ch_name = 'Network / Provider';
         $ch_value = 'MoMo Number / Account';
         $channel = 'Mobile Money';
         $account_upgrade = 0;
+        $rate = 1.0;
+        $withdraw_currency = 'USD';
     }
 } catch (PDOException $e) {
     error_log('Region settings fetch error in profile.php: ' . $e->getMessage(), 3, '../debug.log');
@@ -128,6 +132,8 @@ try {
     $ch_value = 'MoMo Number / Account';
     $channel = 'Mobile Money';
     $account_upgrade = 0;
+    $rate = 1.0;
+    $withdraw_currency = 'USD';
 }
 
 $success_message = isset($_GET['success']) ? htmlspecialchars($_GET['success']) : null;
@@ -491,7 +497,15 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     </div>
                     <div class="input-container">
                         <label for="amount">Amount ($)</label>
-                        <input type="number" id="amount" name="amount" step="0.01" min="0.01" max="<?php echo $user['balance']; ?>" required>
+                        <input type="number" id="amount" name="amount" step="0.01" min="0.01" max="<?php echo $user['balance']; ?>" required placeholder="0.00">
+                    </div>
+                    
+                    <!-- Real-time Conversion Display Container -->
+                    <div class="input-container" style="margin-top: -10px;">
+                        <label>Equivalent Amount</label>
+                        <div id="conversionDisplay" style="padding: 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--accent-color); border-radius: 12px; color: #4ade80; font-weight: 600; font-size: 15px;">
+                            0.00 <?php echo $withdraw_currency; ?>
+                        </div>
                     </div>
                     <button type="submit" class="submit-btn" <?php echo ($verification_status !== 'verified' && $upgrade_status !== 'upgraded') ? 'disabled' : ''; ?>>
                         <i class="fa-solid fa-money-bill-transfer"></i> Withdraw
@@ -682,6 +696,29 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
         });
+
+        // Real-time currency conversion
+        const conversionRate = <?php echo json_encode($rate); ?>;
+        const currencySymbol = <?php echo json_encode($withdraw_currency); ?>;
+        
+        const amountInput = document.getElementById('amount');
+        const conversionDisplay = document.getElementById('conversionDisplay');
+        
+        if (amountInput && conversionDisplay) {
+            amountInput.addEventListener('input', function() {
+                const val = parseFloat(this.value);
+                if (!isNaN(val) && val > 0) {
+                    const converted = (val * conversionRate).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    conversionDisplay.innerText = `${converted} ${currencySymbol}`;
+                } else {
+                    conversionDisplay.innerText = `0.00 ${currencySymbol}`;
+                }
+            });
+        }
+        
     </script>
 </body>
 </html>
