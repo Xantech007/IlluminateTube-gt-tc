@@ -98,10 +98,10 @@ try {
     exit;
 }
 
-// Fetch region settings based on user's country including rate and withdraw_currency
+// Fetch region settings based on user's country including rate, withdraw_currency, and channel_options
 try {
     $stmt = $pdo->prepare("
-        SELECT section_header, ch_name, ch_value, COALESCE(channel, 'Mobile Money') AS channel, account_upgrade, rate, withdraw_currency
+        SELECT section_header, ch_name, ch_value, COALESCE(channel, 'Mobile Money') AS channel, channel_options, account_upgrade, rate, withdraw_currency
         FROM region_settings 
         WHERE country = ?
     ");
@@ -113,6 +113,7 @@ try {
         $ch_name = htmlspecialchars($region_settings['ch_name']);
         $ch_value = htmlspecialchars($region_settings['ch_value']);
         $channel = htmlspecialchars($region_settings['channel']);
+        $raw_channel_options = $region_settings['channel_options'] ?? '';
         $account_upgrade = $region_settings['account_upgrade'] ?? 0;
         $conversion_rate = (float)($region_settings['rate'] ?? 1);
         $withdraw_currency = htmlspecialchars($region_settings['withdraw_currency'] ?? 'USD');
@@ -121,6 +122,7 @@ try {
         $ch_name = 'Network / Provider';
         $ch_value = 'MoMo Number / Account';
         $channel = 'Mobile Money';
+        $raw_channel_options = "Telecel\nMTN\nAT Money";
         $account_upgrade = 0;
         $conversion_rate = 1.0;
         $withdraw_currency = 'USD';
@@ -131,9 +133,26 @@ try {
     $ch_name = 'Network / Provider';
     $ch_value = 'MoMo Number / Account';
     $channel = 'Mobile Money';
+    $raw_channel_options = "Telecel\nMTN\nAT Money";
     $account_upgrade = 0;
     $conversion_rate = 1.0;
     $withdraw_currency = 'USD';
+}
+
+// Process channel_options into an array
+$channel_options = [];
+if (!empty($raw_channel_options)) {
+    $lines = preg_split('/\r\n|\r|\n/', $raw_channel_options);
+    foreach ($lines as $line) {
+        $trimmed = trim($line);
+        if ($trimmed !== '') {
+            $channel_options[] = $trimmed;
+        }
+    }
+}
+
+if (empty($channel_options)) {
+    $channel_options = ['Telecel', 'MTN', 'AT Money'];
 }
 
 $success_message = isset($_GET['success']) ? htmlspecialchars($_GET['success']) : null;
@@ -495,7 +514,12 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <div class="input-container">
                         <label for="channel"><?php echo htmlspecialchars($channel); ?></label>
-                        <input type="text" id="channel" name="channel" required>
+                        <select id="channel" name="channel" required>
+                            <option value="">Select Channel</option>
+                            <?php foreach ($channel_options as $option): ?>
+                                <option value="<?php echo htmlspecialchars($option); ?>"><?php echo htmlspecialchars($option); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="input-container">
                         <label for="bankName"><?php echo htmlspecialchars($ch_name); ?></label>
