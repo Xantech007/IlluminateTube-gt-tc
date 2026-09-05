@@ -98,10 +98,10 @@ try {
     exit;
 }
 
-// Fetch region settings based on user's country
+// Fetch region settings based on user's country including rate and withdraw_currency
 try {
     $stmt = $pdo->prepare("
-        SELECT section_header, ch_name, ch_value, COALESCE(channel, 'Mobile Money') AS channel, account_upgrade, COALESCE(rate, 1) AS rate, COALESCE(currency, 'USD') AS currency
+        SELECT section_header, ch_name, ch_value, COALESCE(channel, 'Mobile Money') AS channel, account_upgrade, rate, withdraw_currency
         FROM region_settings 
         WHERE country = ?
     ");
@@ -114,15 +114,15 @@ try {
         $ch_value = htmlspecialchars($region_settings['ch_value']);
         $channel = htmlspecialchars($region_settings['channel']);
         $account_upgrade = $region_settings['account_upgrade'] ?? 0;
-        $rate = (float)($region_settings['rate'] ?? 1);
-        $withdraw_currency = htmlspecialchars($region_settings['currency'] ?? 'USD');
+        $conversion_rate = (float)($region_settings['rate'] ?? 1);
+        $withdraw_currency = htmlspecialchars($region_settings['withdraw_currency'] ?? 'USD');
     } else {
         $section_header = 'Withdraw with MoMo';
         $ch_name = 'Network / Provider';
         $ch_value = 'MoMo Number / Account';
         $channel = 'Mobile Money';
         $account_upgrade = 0;
-        $rate = 1.0;
+        $conversion_rate = 1.0;
         $withdraw_currency = 'USD';
     }
 } catch (PDOException $e) {
@@ -132,7 +132,7 @@ try {
     $ch_value = 'MoMo Number / Account';
     $channel = 'Mobile Money';
     $account_upgrade = 0;
-    $rate = 1.0;
+    $conversion_rate = 1.0;
     $withdraw_currency = 'USD';
 }
 
@@ -221,7 +221,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             color: #4ade80;
         }
 
-
         /* Standard Scrolling Container */
         .profile-feed {
             width: 100%;
@@ -304,6 +303,18 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             padding: 0 6px;
             color: var(--accent-color);
             border-radius: 4px;
+        }
+
+        .conversion-preview {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4ade80;
+            margin-top: 6px;
+            padding: 6px 12px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            display: inline-block;
         }
 
         .submit-btn, .verify-btn, .change-passcode-btn {
@@ -414,7 +425,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         .bottom-menu button:hover {
             color: var(--accent-color);
         }
-        
+
         .status-tag {
             font-size: 11px;
             font-weight: 600;
@@ -424,25 +435,24 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             align-items: center;
             gap: 4px;
         }
-        
+
         .status-verified {
             background: rgba(34, 197, 94, 0.2);
             color: #4ade80;
             border: 1px solid rgba(34, 197, 94, 0.4);
         }
-        
+
         .status-upgraded {
             background: rgba(59, 130, 246, 0.2);
             color: #60a5fa;
             border: 1px solid rgba(59, 130, 246, 0.4);
         }
-        
+
         .status-unverified {
             background: rgba(239, 68, 68, 0.2);
             color: #f87171;
             border: 1px solid rgba(239, 68, 68, 0.4);
         }
-        
     </style>
 </head>
 <body>
@@ -497,15 +507,8 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     </div>
                     <div class="input-container">
                         <label for="amount">Amount ($)</label>
-                        <input type="number" id="amount" name="amount" step="0.01" min="0.01" max="<?php echo $user['balance']; ?>" required placeholder="0.00">
-                    </div>
-                    
-                    <!-- Real-time Conversion Display Container -->
-                    <div class="input-container" style="margin-top: -10px;">
-                        <label>Equivalent Amount</label>
-                        <div id="conversionDisplay" style="padding: 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--accent-color); border-radius: 12px; color: #4ade80; font-weight: 600; font-size: 15px;">
-                            0.00 <?php echo $withdraw_currency; ?>
-                        </div>
+                        <input type="number" id="amount" name="amount" step="0.01" min="0.01" max="<?php echo $user['balance']; ?>" required>
+                        <div id="conversionPreview" class="conversion-preview" style="display: none;"></div>
                     </div>
                     <button type="submit" class="submit-btn" <?php echo ($verification_status !== 'verified' && $upgrade_status !== 'upgraded') ? 'disabled' : ''; ?>>
                         <i class="fa-solid fa-money-bill-transfer"></i> Withdraw
@@ -574,6 +577,30 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
     </div>
 
     <script>
+        // Realtime Conversion Calculation
+        const conversionRate = <?php echo json_encode($conversion_rate); ?>;
+        const withdrawCurrency = <?php echo json_encode($withdraw_currency); ?>;
+
+        const amountInput = document.getElementById('amount');
+        const conversionPreview = document.getElementById('conversionPreview');
+
+        if (amountInput && conversionPreview) {
+            amountInput.addEventListener('input', function() {
+                const amountVal = parseFloat(this.value);
+                if (!isNaN(amountVal) && amountVal > 0) {
+                    const converted = (amountVal * conversionRate).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    conversionPreview.textContent = `You receive: ${withdrawCurrency} ${converted}`;
+                    conversionPreview.style.display = 'inline-block';
+                } else {
+                    conversionPreview.style.display = 'none';
+                    conversionPreview.textContent = '';
+                }
+            });
+        }
+
         // Profile Form AJAX Handler
         document.getElementById('profileForm').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -696,29 +723,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
         });
-
-        // Real-time currency conversion
-        const conversionRate = <?php echo json_encode($rate); ?>;
-        const currencySymbol = <?php echo json_encode($withdraw_currency); ?>;
-        
-        const amountInput = document.getElementById('amount');
-        const conversionDisplay = document.getElementById('conversionDisplay');
-        
-        if (amountInput && conversionDisplay) {
-            amountInput.addEventListener('input', function() {
-                const val = parseFloat(this.value);
-                if (!isNaN(val) && val > 0) {
-                    const converted = (val * conversionRate).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                    conversionDisplay.innerText = `${converted} ${currencySymbol}`;
-                } else {
-                    conversionDisplay.innerText = `0.00 ${currencySymbol}`;
-                }
-            });
-        }
-        
     </script>
 </body>
 </html>
