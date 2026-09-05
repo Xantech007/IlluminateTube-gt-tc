@@ -66,11 +66,11 @@ try {
 
     // Generate account status badge markup
     if ($verification_status === 'verified') {
-        $account_status_badge = '<span class="status-tag status-verified"><i class="fa-solid fa-circle-check"></i> Account Verified</span>';
+        $account_status_badge = '<span class="status-pill status-verified"><i class="fa-solid fa-circle-check"></i> Verified Account</span>';
     } elseif ($upgrade_status === 'upgraded') {
-        $account_status_badge = '<span class="status-tag status-upgraded"><i class="fa-solid fa-circle-up"></i> Account Upgraded</span>';
+        $account_status_badge = '<span class="status-pill status-upgraded"><i class="fa-solid fa-circle-up"></i> Upgraded</span>';
     } else {
-        $account_status_badge = '<span class="status-tag status-unverified"><i class="fa-solid fa-circle-xmark"></i> Not Verified or Upgraded</span>';
+        $account_status_badge = '<span class="status-pill status-unverified"><i class="fa-solid fa-circle-xmark"></i> Unverified</span>';
     }
 
 } catch (PDOException $e) {
@@ -117,7 +117,6 @@ try {
     }
 } catch (PDOException $e) {
     error_log('Region settings fetch error for user ID: ' . $_SESSION['user_id'] . ': ' . $e->getMessage(), 3, '../debug.log');
-    // Fallback values on error
     $section_header = 'Withdraw Funds';
     $ch_name = 'Bank Name';
     $ch_value = 'Bank Account';
@@ -132,7 +131,7 @@ $bank_name = htmlspecialchars($_POST['bank_name'] ?? '', ENT_QUOTES, 'UTF-8');
 $bank_account = htmlspecialchars($_POST['bank_account'] ?? '', ENT_QUOTES, 'UTF-8');
 $amount = filter_var($_POST['amount'] ?? 0, FILTER_VALIDATE_FLOAT);
 $error = null;
-$new_balance = $balance; // Default to original balance in case of error
+$new_balance = $balance;
 
 if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount > 0) {
     if ($amount > $balance) {
@@ -146,15 +145,12 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
         try {
             $pdo->beginTransaction();
 
-            // Deduct raw amount from balance
             $new_balance = $balance - $amount;
             $stmt = $pdo->prepare("UPDATE users SET balance = ? WHERE id = ?");
             $stmt->execute([$new_balance, $_SESSION['user_id']]);
 
-            // Generate unique reference number
             $ref_number = strtoupper(substr(uniqid(), 0, 10));
 
-            // Insert withdrawal record with converted amount and currency
             $stmt = $pdo->prepare("
                 INSERT INTO withdrawals (user_id, amount, currency, channel, bank_name, bank_account, ref_number, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
@@ -167,7 +163,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
             $pdo->rollBack();
             error_log('Withdrawal error for user ID: ' . $_SESSION['user_id'] . ': ' . $e->getMessage(), 3, '../debug.log');
             $error = 'An error occurred while processing your withdrawal.';
-            $new_balance = $balance; // Reset to original if transaction fails
+            $new_balance = $balance;
         }
     }
 } else {
@@ -185,39 +181,59 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="Withdrawal receipt for your Illuminate Tube withdrawal." />
     <title>Withdrawal Receipt | Illuminate Tube</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Modern Typography & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
         :root {
-            --bg-color: #000000;
-            --text-color: #ffffff;
-            --accent-color: #22c55e;
-            --accent-hover: #16a34a;
-            --menu-bg: rgba(17, 24, 39, 0.85);
-            --menu-text: #ffffff;
-            --subtext-color: #9ca3af;
-            --border-color: rgba(255, 255, 255, 0.12);
+            --bg-dark: #080b11;
+            --surface-card: rgba(18, 24, 38, 0.75);
+            --surface-glass: rgba(255, 255, 255, 0.03);
+            --border-glow: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(34, 197, 94, 0.3);
+            
+            --accent-emerald: #10b981;
+            --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-main);
         }
 
-        html, body {
+        body {
             width: 100%;
             min-height: 100vh;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
             overflow-x: hidden;
-            overflow-y: auto;
-            background-color: var(--bg-color);
-            color: var(--text-color);
         }
 
-        /* Fixed Header Overlay */
+        /* Top Header Navigation Bar */
         .top-header {
             position: sticky;
             top: 0;
@@ -227,400 +243,629 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 20px;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .user-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .user-badge img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-        }
-
-        .balance-badge {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid var(--accent-color);
-            backdrop-filter: blur(8px);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 700;
-            color: #4ade80;
-        }
-
-
-        /* Center Layout Wrapper */
-        .page-wrapper {
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 90px 20px 90px 20px;
-            background: radial-gradient(circle at center, #111827 0%, #000000 100%);
-        }
-
-        /* Card Container styling with standard fit */
-        .card-inner {
-            width: 100%;
-            max-width: 480px;
-            background: rgba(255, 255, 255, 0.05);
+            padding: 14px 24px;
+            background: rgba(8, 11, 17, 0.8);
             backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-emerald);
+            box-shadow: 0 0 10px var(--accent-emerald-glow);
+        }
+
+        .user-details {
             display: flex;
             flex-direction: column;
+            gap: 2px;
         }
 
-        .receipt-card h2 {
-            font-size: 20px;
+        .user-name {
+            font-family: var(--font-heading);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+        }
+
+        .status-pill {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .status-verified {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-upgraded {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-unverified {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .balance-chip {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.05));
+            border: 1px solid var(--border-accent);
+            padding: 8px 16px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .balance-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .balance-amount {
+            font-family: var(--font-heading);
+            font-size: 15px;
             font-weight: 700;
-            margin-bottom: 16px;
+            color: #10b981;
+        }
+
+        /* Page Layout Center */
+        .page-wrapper {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px 110px 20px;
+        }
+
+        /* Receipt Card Styling */
+        .receipt-card {
+            width: 100%;
+            max-width: 520px;
+            background: var(--surface-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glow);
+            border-radius: 28px;
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            animation: cardAppear 0.4s ease-out forwards;
+        }
+
+        .receipt-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #06b6d4, #3b82f6);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .status-header {
             text-align: center;
-            color: var(--accent-color);
+            margin-bottom: 24px;
+        }
+
+        .status-icon-ring {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px auto;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            color: var(--accent-emerald);
+            font-size: 28px;
+            box-shadow: 0 0 20px var(--accent-emerald-glow);
         }
 
-        .receipt-card .amount {
-            font-size: 32px;
+        .status-header h2 {
+            font-family: var(--font-heading);
+            font-size: 22px;
             font-weight: 700;
-            margin: 16px 0;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .status-header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Main Display Amount */
+        .payout-box {
+            background: var(--surface-glass);
+            border: 1px solid var(--border-glow);
+            border-radius: 18px;
+            padding: 20px;
             text-align: center;
-            color: #ffffff;
+            margin-bottom: 24px;
         }
 
-        .receipt-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .receipt-table th,
-        .receipt-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .receipt-table th {
+        .payout-box .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
             font-weight: 600;
-            color: var(--subtext-color);
-            width: 45%;
+            margin-bottom: 4px;
         }
 
-        .receipt-table td {
-            font-weight: 500;
-            color: #ffffff;
+        .payout-box .value {
+            font-family: var(--font-heading);
+            font-size: 36px;
+            font-weight: 800;
+            color: #34d399;
+            letter-spacing: -0.5px;
         }
 
-        .back-btn, .print-btn {
-            width: 100%;
-            padding: 12px;
+        /* Receipt Breakdown Rows */
+        .receipt-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+            font-size: 14px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-key {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .badge-pending {
+            background: rgba(234, 179, 8, 0.15);
+            color: #facc15;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        /* Information / Notice Box */
+        .notice-card {
+            background: rgba(30, 41, 59, 0.4);
+            border-left: 3px solid var(--accent-cyan);
+            border-radius: 0 12px 12px 0;
+            padding: 14px 16px;
+            margin-bottom: 24px;
+        }
+
+        .notice-card h4 {
+            font-size: 13px;
+            color: #38bdf8;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .notice-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .notice-card li {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 4px;
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .notice-card li::before {
+            content: "•";
+            color: var(--accent-cyan);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .notice-card a {
+            color: #38bdf8;
+            text-decoration: underline;
+        }
+
+        /* Action Buttons */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-action {
+            height: 48px;
+            border-radius: 14px;
             font-size: 14px;
             font-weight: 600;
             border: none;
-            border-radius: 12px;
             cursor: pointer;
-            transition: transform 0.2s ease, background 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-        }
-
-        .back-btn {
-            background: var(--accent-color);
-            color: #fff;
-        }
-
-        .back-btn:hover {
-            background: var(--accent-hover);
-        }
-
-        .print-btn {
-            background: #3b82f6;
-            color: #fff;
-        }
-
-        .print-btn:hover {
-            background: #2563eb;
-        }
-
-        .back-btn:active, .print-btn:active {
-            transform: scale(0.96);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        .error {
-            text-align: center;
-            color: #ef4444;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .notes-section {
-            margin-top: 16px;
-            font-size: 13px;
-            color: var(--subtext-color);
-        }
-
-        .notes-section h3 {
-            font-size: 15px;
-            margin-bottom: 8px;
-            color: #ffffff;
-        }
-
-        .notes-section ul {
-            list-style-type: disc;
-            padding-left: 20px;
-        }
-
-        .notes-section li {
-            margin-bottom: 6px;
-        }
-
-        .notes-section a {
-            color: var(--accent-color);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
         }
 
-        /* Notifications Toast */
-        .notification {
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-emerald), #059669);
+            color: #ffffff;
+            box-shadow: 0 4px 20px var(--accent-emerald-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border-glow);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-action:active {
+            transform: scale(0.97);
+        }
+
+        /* Error Box State */
+        .error-container {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .error-icon {
+            font-size: 48px;
+            color: #ef4444;
+            margin-bottom: 12px;
+        }
+
+        .error-msg {
+            color: #f87171;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Notification Toast Container */
+        .toast-wrapper {
             position: fixed;
-            top: 70px;
+            top: 80px;
             right: 20px;
-            background: rgba(17, 24, 39, 0.9);
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 12px;
-            border: 1px solid var(--accent-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            background: rgba(15, 23, 42, 0.95);
+            color: var(--text-primary);
+            padding: 14px 20px;
+            border-radius: 14px;
+            border: 1px solid var(--accent-emerald);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
             font-size: 13px;
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-out 3s forwards;
+            animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.5s ease-out 3s forwards;
         }
 
         @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(100px); }
+            from { opacity: 0; transform: translateX(50px); }
             to { opacity: 1; transform: translateX(0); }
         }
 
         @keyframes fadeOut {
-            to { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 0; transform: translateY(-10px); }
         }
 
-        /* Fixed Bottom Navigation */
-        .bottom-menu {
+        /* Bottom Fixed Navigation Bar */
+        .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: var(--menu-bg);
-            backdrop-filter: blur(10px);
+            height: 70px;
+            background: rgba(8, 11, 17, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-glow);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 12px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 100;
+            padding: 0 10px;
         }
 
-        .bottom-menu a,
-        .bottom-menu button {
-            color: var(--menu-text);
+        .nav-item {
+            color: var(--text-muted);
             text-decoration: none;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 500;
-            padding: 6px 14px;
-            transition: color 0.3s ease;
-            background: none;
-            border: none;
-            cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
         }
 
-        .bottom-menu a.active,
-        .bottom-menu a:hover,
-        .bottom-menu button:hover {
-            color: var(--accent-color);
+        .nav-item i {
+            font-size: 18px;
         }
 
-        @media (max-width: 480px) {
-            .button-group {
-                flex-direction: column;
+        .nav-item.active,
+        .nav-item:hover {
+            color: var(--accent-emerald);
+        }
+
+        .nav-item.active {
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        /* Print Layout Rules */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+
+            .top-header, .bottom-nav, .action-grid, .notice-card {
+                display: none !important;
+            }
+
+            .page-wrapper {
+                padding: 0 !important;
+            }
+
+            .receipt-card {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                max-width: 100% !important;
+            }
+
+            .status-header h2, .payout-box .value, .detail-value {
+                color: #000000 !important;
+            }
+
+            .payout-box {
+                background: #f8fafc !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+
+            .detail-key {
+                color: #475569 !important;
             }
         }
 
-        .status-tag {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+        @media (max-width: 480px) {
+            .receipt-card {
+                padding: 24px 20px;
+            }
+
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .payout-box .value {
+                font-size: 28px;
+            }
         }
-        
-        .status-verified {
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.4);
-        }
-        
-        .status-upgraded {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.4);
-        }
-        
-        .status-unverified {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.4);
-        }
-        
     </style>
 </head>
 <body>
 
     <!-- Header Overlay -->
-    <div class="top-header">
-        <div class="user-badge">
-            <img src="img/top.png" alt="Logo">
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
+    <header class="top-header">
+        <div class="user-profile">
+            <div class="avatar-wrapper">
+                <img src="img/top.png" alt="Logo" class="avatar-img" />
+            </div>
+            <div class="user-details">
+                <span class="user-name"><?php echo $username; ?></span>
                 <?php echo $account_status_badge; ?>
             </div>
         </div>
-        <div class="balance-badge">
-            $<span id="balance"><?php echo $balance; ?></span>
+        <div class="balance-chip">
+            <span class="balance-label">Balance</span>
+            <span class="balance-amount">$<span id="balance"><?php echo number_format($balance, 2); ?></span></span>
         </div>
-    </div>
+    </header>
 
-    <!-- Container Area -->
-    <div class="page-wrapper" role="main">
-        <div class="card-inner receipt-card">
+    <!-- Main Content Container -->
+    <main class="page-wrapper" role="main">
+        <div class="receipt-card">
             <?php if ($error): ?>
-                <p class="error"><?php echo htmlspecialchars($error); ?></p>
-                <button class="back-btn" onclick="window.location.href='home.php'"><i class="fa-solid fa-house"></i> Back to Home</button>
+                <div class="error-container">
+                    <i class="fa-solid fa-circle-exclamation error-icon"></i>
+                    <p class="error-msg"><?php echo htmlspecialchars($error); ?></p>
+                    <button class="btn-action btn-primary" style="width: 100%;" onclick="window.location.href='home.php'">
+                        <i class="fa-solid fa-house"></i> Return to Dashboard
+                    </button>
+                </div>
             <?php else: ?>
-                <h2><i class="fas fa-check-circle"></i> Withdrawal Request Submitted!</h2>
-                <div class="amount"><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></div>
-                <table class="receipt-table">
-                    <tr>
-                        <th>Original Balance (USD)</th>
-                        <td>$<?php echo number_format($balance, 2); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Withdrawn Amount (USD)</th>
-                        <td>$<?php echo number_format($amount, 2); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Amount to Receive</th>
-                        <td><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></td>
-                    </tr>
-                    <tr>
-                        <th>New Balance (USD)</th>
-                        <td>$<?php echo number_format($new_balance, 2); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Ref Number</th>
-                        <td><?php echo htmlspecialchars($ref_number); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Request Time</th>
-                        <td><?php echo gmdate('F j, Y, g:i A'); ?> UTC</td>
-                    </tr>
-                    <tr>
-                        <th><?php echo htmlspecialchars($channel_label); ?></th>
-                        <td><?php echo htmlspecialchars($channel); ?></td>
-                    </tr>
-                    <tr>
-                        <th><?php echo htmlspecialchars($ch_name); ?></th>
-                        <td><?php echo htmlspecialchars($bank_name); ?></td>
-                    </tr>
-                    <tr>
-                        <th><?php echo htmlspecialchars($ch_value); ?></th>
-                        <td><?php echo htmlspecialchars($bank_account); ?></td>
-                    </tr>
-                    <tr>
-                        <th>From</th>
-                        <td>Illumnate Tube</td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td>Pending</td>
-                    </tr>
-                </table>
-                <div class="notes-section">
-                    <h3>Important Notes:</h3>
+                <div class="status-header">
+                    <div class="status-icon-ring">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h2>Withdrawal Submitted</h2>
+                    <p>Your payout request is currently processing</p>
+                </div>
+
+                <div class="payout-box">
+                    <div class="label">Amount to Receive</div>
+                    <div class="value"><?php echo htmlspecialchars($currency_symbol) . number_format($converted_amount, 2); ?></div>
+                </div>
+
+                <div class="receipt-details">
+                    <div class="detail-row">
+                        <span class="detail-key">Reference Code</span>
+                        <span class="detail-value" style="font-family: monospace; letter-spacing: 0.5px;"><?php echo htmlspecialchars($ref_number); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Original Amount</span>
+                        <span class="detail-value">$<?php echo number_format($amount, 2); ?> USD</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">New USD Balance</span>
+                        <span class="detail-value">$<?php echo number_format($new_balance, 2); ?> USD</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Payout Method</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($channel); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key"><?php echo htmlspecialchars($ch_name); ?></span>
+                        <span class="detail-value"><?php echo htmlspecialchars($bank_name); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key"><?php echo htmlspecialchars($ch_value); ?></span>
+                        <span class="detail-value"><?php echo htmlspecialchars($bank_account); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Submitted On</span>
+                        <span class="detail-value"><?php echo gmdate('M j, Y • g:i A'); ?> UTC</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Status</span>
+                        <span class="detail-value"><span class="badge-pending"><i class="fa-solid fa-clock"></i> Pending Approval</span></span>
+                    </div>
+                </div>
+
+                <div class="notice-card">
+                    <h4><i class="fa-solid fa-circle-info"></i> Important Information</h4>
                     <ul>
-                        <li>Your withdrawal request is pending approval and will be processed within 2 hours.</li>
-                        <li>Please ensure your bank details are correct to avoid delays.</li>
-                        <li>If you have any questions, contact support via our <a href="support.php">support page</a>.</li>
-                        <li>Conversion rates are based on current market values and may vary slightly upon processing.</li>
+                        <li>Withdrawals are typically reviewed and settled within 2 hours.</li>
+                        <li>Verify your banking credentials to prevent potential delays.</li>
+                        <li>Need assistance? Reach out via our <a href="support.php">Support Portal</a>.</li>
                     </ul>
                 </div>
-                <div class="button-group">
-                    <button class="back-btn" onclick="window.location.href='home.php'"><i class="fa-solid fa-house"></i> Home</button>
-                    <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+
+                <div class="action-grid">
+                    <button class="btn-action btn-secondary" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i> Save Receipt
+                    </button>
+                    <button class="btn-action btn-primary" onclick="window.location.href='home.php'">
+                        <i class="fa-solid fa-house"></i> Home
+                    </button>
                 </div>
             <?php endif; ?>
         </div>
-    </div>
+    </main>
 
-    <div id="notificationContainer"></div>
+    <div id="notificationContainer" class="toast-wrapper"></div>
 
-    <!-- Fixed Bottom Menu -->
-    <div class="bottom-menu" role="navigation">
-        <a href="home.php"><i class="fa-solid fa-house"></i>Home</a>
-        <a href="profile.php"><i class="fa-solid fa-money-bill"></i>Withdraw</a>
-        <a href="history.php" class="active"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
-        <a href="support.php"><i class="fa-solid fa-headset"></i>Support</a>
-        <button id="logoutBtn" aria-label="Log out"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
-    </div>
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav" role="navigation">
+        <a href="home.php" class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="profile.php" class="nav-item">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Withdraw</span>
+        </a>
+        <a href="history.php" class="nav-item active">
+            <i class="fa-solid fa-receipt"></i>
+            <span>History</span>
+        </a>
+        <a href="support.php" class="nav-item">
+            <i class="fa-solid fa-headset"></i>
+            <span>Support</span>
+        </a>
+        <button id="logoutBtn" class="nav-item" aria-label="Log out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </button>
+    </nav>
 
     <script>
-        // Logout Button
+        // Logout confirmation dialog
         document.getElementById('logoutBtn').addEventListener('click', () => {
             Swal.fire({
-                title: 'Log out?',
-                text: 'Are you sure you want to log out?',
-                icon: 'question',
+                title: 'Sign out of account?',
+                text: 'You will need to log back in to access your dashboard.',
+                icon: 'warning',
+                background: '#121826',
+                color: '#f8fafc',
                 showCancelButton: true,
-                confirmButtonColor: '#22c55e',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, log out'
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#334155',
+                confirmButtonText: 'Yes, Sign Out'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
@@ -633,16 +878,20 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
                             } else {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Error',
-                                    text: 'Failed to log out. Please try again.'
+                                    title: 'Action Failed',
+                                    text: 'Failed to log out. Please try again.',
+                                    background: '#121826',
+                                    color: '#f8fafc'
                                 });
                             }
                         },
                         error: function() {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Server Error',
-                                text: 'An error occurred while logging out.'
+                                title: 'Server Unreachable',
+                                text: 'An error occurred while terminating your session.',
+                                background: '#121826',
+                                color: '#f8fafc'
                             });
                         }
                     });
@@ -650,7 +899,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
             });
         });
 
-        // Notification Handling
+        // Dynamic Toast Notifications
         const notificationContainer = document.getElementById('notificationContainer');
         function fetchNotifications() {
             $.ajax({
@@ -659,18 +908,17 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
                 dataType: 'json',
                 success: function(notifications) {
                     notificationContainer.innerHTML = '';
-                    notifications.forEach((message, index) => {
+                    notifications.forEach((message) => {
                         const notification = document.createElement('div');
                         notification.className = 'notification';
                         notification.setAttribute('role', 'alert');
-                        notification.innerHTML = `<span>${message.text}</span>`;
+                        notification.innerHTML = `<i class="fa-solid fa-bell" style="color: #10b981;"></i> <span>${message.text}</span>`;
                         notificationContainer.appendChild(notification);
-                        notification.style.top = `${70 + index * 60}px`;
                         setTimeout(() => notification.remove(), 3500);
                     });
                 },
                 error: function() {
-                    console.error('Failed to fetch notifications');
+                    console.error('Failed to retrieve notifications');
                 }
             });
         }
@@ -678,7 +926,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
         fetchNotifications();
         setInterval(fetchNotifications, 20000);
 
-        // Context Menu Disable
+        // Context Menu Safeguard
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
         });
