@@ -566,7 +566,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         <div class="no-videos-container" id="noVideosMsg" style="<?php echo empty($videos) ? 'display: flex;' : 'display: none;'; ?>">
             <i class="fa-solid fa-circle-check" style="font-size: 56px; color: #22c55e; margin-bottom: 16px;"></i>
             <h2>All Videos Watched!</h2>
-            <p style="margin-top: 8px; color: #9ca3af;"><?php echo $video_error ?: 'You have watched all available videos for today. Please check back later for new ads!'; ?></p>
+            <p style="margin-top: 8px; color: #9ca3af;"><?php echo $video_error ?: 'Please verify or upgrade your account to unlock full access and continue earning rewards for watching videos.'; ?></p>
         </div>
     </div>
 
