@@ -177,7 +177,7 @@ try {
     }
 
     if (empty($videos)) {
-        $video_error = 'All videos have been watched! Check back later for new ads.';
+        $video_error = 'Please verify or upgrade your account to unlock full access to higher tier videos and continue earning rewards for watching videos.';
     }
 } catch (PDOException $e) {
     error_log('Video fetch error: ' . $e->getMessage(), 3, '../debug.log');
