@@ -678,7 +678,7 @@ if (!empty($channel) && !empty($bank_name) && !empty($bank_account) && $amount >
 
                     <div class="receipt-divider"></div>
 
-                    <div class="receipt-title">Withdrawal Request</div>
+                    <div class="receipt-title">Withdrawal Successful</div>
 
                     <div class="receipt-amount-box">
                         <div class="label">Amount to Receive</div>
