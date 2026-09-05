@@ -109,7 +109,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Tube - Manage Verification and Upgrade Requests</title>
+    <title>Illuminate Tube - Manage Verification and Upgrade Requests</title>
     <style>
         body {
             font-family: Arial, sans-serif;
