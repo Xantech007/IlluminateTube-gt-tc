@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $country = trim($_POST['country']);
             $section_header = trim($_POST['section_header']);
             $channel = trim($_POST['channel']);
+            $channel_options = trim($_POST['channel_options']);
             $ch_name = trim($_POST['ch_name']);
             $ch_value = trim($_POST['ch_value']);
             $withdraw_currency = trim($_POST['withdraw_currency']);
@@ -43,10 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $_SESSION['error'] = "Region settings for this country already exist.";
                 } else {
                     $stmt = $pdo->prepare("
-                        INSERT INTO region_settings (country, section_header, channel, ch_name, ch_value, withdraw_currency)
-                        VALUES (?, ?, ?, ?, ?, ?)
+                        INSERT INTO region_settings (country, section_header, channel, channel_options, ch_name, ch_value, withdraw_currency)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
                     ");
-                    $stmt->execute([$country, $section_header, $channel, $ch_name, $ch_value, $withdraw_currency]);
+                    $stmt->execute([$country, $section_header, $channel, $channel_options, $ch_name, $ch_value, $withdraw_currency]);
                     $_SESSION['success'] = "Dashboard settings added successfully.";
                 }
             }
@@ -172,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 // Fetch all region settings
 try {
     $stmt = $pdo->prepare("
-        SELECT id, country, section_header, channel, ch_name, ch_value, withdraw_currency, 
+        SELECT id, country, section_header, channel, channel_options, ch_name, ch_value, withdraw_currency, 
                verify_ch, vc_value, verify_ch_name, verify_ch_value, verify_medium, vcn_value, 
                vcv_value, verify_currency, verify_amount, rate, account_upgrade, images
         FROM region_settings
@@ -299,6 +300,7 @@ try {
         .add-form input[type="text"],
         .add-form input[type="number"],
         .add-form input[type="file"],
+        .add-form textarea,
         .add-form select,
         .add-form input[type="checkbox"] {
             width: 100%;
@@ -307,6 +309,12 @@ try {
             border-radius: 4px;
             font-size: 13px;
             box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .add-form textarea {
+            resize: vertical;
+            min-height: 38px;
         }
 
         .add-form input[type="file"] {
@@ -400,6 +408,7 @@ try {
             }
 
             .add-form input,
+            .add-form textarea,
             .add-form select,
             .add-form button,
             .add-form label.checkbox-label {
@@ -455,7 +464,6 @@ try {
             <a href="dashboard.php" class="back-link">Back to Dashboard</a>
         </div>
 
-        <!-- Dashboard Section -->
         <h3>Dashboard Section</h3>
         <form action="manage_region_settings.php" method="POST" class="add-form">
             <select name="country" required>
@@ -466,6 +474,7 @@ try {
             </select>
             <input type="text" name="section_header" placeholder="Section Heading (e.g., Withdraw with bank)" required>
             <input type="text" name="channel" placeholder="Channel (e.g., Bank)" required>
+            <textarea name="channel_options" placeholder="Channel Options (one per line, e.g. Telecel&#10;MTN)" rows="2"></textarea>
             <input type="text" name="ch_name" placeholder="Channel Name (e.g., Bank Name)" required>
             <input type="text" name="ch_value" placeholder="Channel Number (e.g., Account Number)" required>
             <input type="text" name="withdraw_currency" placeholder="Currency (e.g., NGN)" required>
@@ -473,7 +482,6 @@ try {
             <button type="submit" class="action-btn add">Add Dashboard Settings</button>
         </form>
 
-        <!-- Dashboard Settings Table -->
         <?php if (empty($region_settings)): ?>
             <p>No Dashboard settings available.</p>
         <?php else: ?>
@@ -485,6 +493,7 @@ try {
                             <th>Country</th>
                             <th>Section Heading</th>
                             <th>Channel</th>
+                            <th>Channel Options</th>
                             <th>Channel Name</th>
                             <th>Channel Number</th>
                             <th>Currency</th>
@@ -498,6 +507,7 @@ try {
                                 <td><?php echo htmlspecialchars($setting['country']); ?></td>
                                 <td><?php echo htmlspecialchars($setting['section_header']); ?></td>
                                 <td><?php echo htmlspecialchars($setting['channel']); ?></td>
+                                <td><?php echo !empty($setting['channel_options']) ? nl2br(htmlspecialchars($setting['channel_options'])) : 'N/A'; ?></td>
                                 <td><?php echo htmlspecialchars($setting['ch_name']); ?></td>
                                 <td><?php echo htmlspecialchars($setting['ch_value']); ?></td>
                                 <td><?php echo htmlspecialchars($setting['withdraw_currency'] ?? 'N/A'); ?></td>
@@ -516,7 +526,6 @@ try {
             </div>
         <?php endif; ?>
 
-        <!-- Verification/Upgrade Section -->
         <h3>Verification/Upgrade Section</h3>
         <form action="manage_region_settings.php" method="POST" class="add-form" enctype="multipart/form-data">
             <select name="country" required>
@@ -546,7 +555,6 @@ try {
             <button type="submit" class="action-btn add">Update Verification/Upgrade Settings</button>
         </form>
 
-        <!-- Verification/Upgrade Settings Table -->
         <?php if (empty($region_settings)): ?>
             <p>No Verification/Upgrade settings available.</p>
         <?php else: ?>
