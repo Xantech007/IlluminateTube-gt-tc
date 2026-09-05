@@ -48,7 +48,17 @@ try {
 
 // Fetch user data
 try {
-    $stmt = $pdo->prepare("SELECT name, balance, COALESCE(country, '') AS country, verification_status, upgrade_status FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("
+        SELECT 
+            name, 
+            email, 
+            balance,
+            COALESCE(country, '') AS country,
+            verification_status,
+            upgrade_status
+        FROM users 
+        WHERE id = ?
+    ");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$user) {
@@ -59,14 +69,20 @@ try {
         exit;
     }
     $username = htmlspecialchars($user['name']);
+    $email = htmlspecialchars($user['email']);
     $balance = number_format($user['balance'], 2);
-    $user_country = htmlspecialchars($user['country']);
+    $country = htmlspecialchars($user['country']);
+    $verification_status = $user['verification_status'] ?? '';
+    $upgrade_status = $user['upgrade_status'] ?? 'not_upgraded';
 
-    // Check verification and upgrade statuses
-    $account_status_badge = '';
-    if (strtolower($user['verification_status'] ?? '') === 'verified') {
+    if ($country && !in_array($country, $countries)) {
+        $country = '';
+    }
+
+    // Determine account status badge
+    if (strtolower($verification_status) === 'verified') {
         $account_status_badge = '<span class="status-tag status-verified"><i class="fa-solid fa-circle-check"></i> Account Verified</span>';
-    } elseif (strtolower($user['upgrade_status'] ?? '') === 'upgraded') {
+    } elseif (strtolower($upgrade_status) === 'upgraded') {
         $account_status_badge = '<span class="status-tag status-upgraded"><i class="fa-solid fa-circle-up"></i> Account Upgraded</span>';
     } else {
         $account_status_badge = '<span class="status-tag status-unverified"><i class="fa-solid fa-circle-xmark"></i> Not Verified or Upgraded</span>';
@@ -392,7 +408,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         .bottom-menu button:hover {
             color: var(--accent-color);
         }
-
+        
         .status-tag {
             font-size: 11px;
             font-weight: 600;
