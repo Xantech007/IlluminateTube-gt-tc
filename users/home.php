@@ -527,7 +527,6 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
             color: #f87171;
             border: 1px solid rgba(239, 68, 68, 0.4);
         }
-        
     </style>
 </head>
 <body>
@@ -572,6 +571,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                     <video 
                         class="feed-video" 
                         playsinline 
+                        muted
                         preload="<?php echo $index === 0 ? 'auto' : 'metadata'; ?>"
                         data-video-id="<?php echo $vid['id']; ?>" 
                         data-reward="<?php echo $vid['reward']; ?>">
@@ -647,6 +647,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
 
         function pauseAllVideos() {
             document.querySelectorAll('.feed-video').forEach(vid => {
+                vid.muted = true;
                 vid.pause();
             });
         }
@@ -654,6 +655,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
         function playActiveVideo(video) {
             pauseAllVideos();
             if (video) {
+                video.muted = false;
                 video.play().catch(err => console.log('Autoplay prevented:', err));
             }
         }
@@ -681,6 +683,7 @@ $error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null
                 if (entry.isIntersecting) {
                     playActiveVideo(video);
                 } else {
+                    video.muted = true;
                     video.pause();
                 }
             });
