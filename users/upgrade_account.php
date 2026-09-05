@@ -32,7 +32,7 @@ date_default_timezone_set('Africa/Lagos');
 
 // Fetch user data
 try {
-    $stmt = $pdo->prepare("SELECT name, email, balance, upgrade_status, country FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT name, email, balance, verification_status, upgrade_status, country FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$user) {
@@ -46,6 +46,15 @@ try {
     $balance = number_format($user['balance'] ?? 0, 2);
     $upgrade_status = $user['upgrade_status'] ?? 'not_upgraded';
     $user_country = htmlspecialchars($user['country'] ?? '');
+
+    // Generate badge status logic
+    if (strtolower($user['verification_status'] ?? '') === 'verified') {
+        $account_status_badge = '<span class="status-tag status-verified"><i class="fa-solid fa-circle-check"></i> Account Verified</span>';
+    } elseif (strtolower($user['upgrade_status'] ?? '') === 'upgraded') {
+        $account_status_badge = '<span class="status-tag status-upgraded"><i class="fa-solid fa-circle-up"></i> Account Upgraded</span>';
+    } else {
+        $account_status_badge = '<span class="status-tag status-unverified"><i class="fa-solid fa-circle-xmark"></i> Not Verified or Upgraded</span>';
+    }
 } catch (PDOException $e) {
     error_log('Database error: ' . $e->getMessage(), 3, '../debug.log');
     header('Location: ../signin.php?error=database');
@@ -468,6 +477,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             right: 20px;
             z-index: 1000;
         }
+
+        .status-tag {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-verified {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+        
+        .status-upgraded {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        
+        .status-unverified {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        
     </style>
 </head>
 <body>
@@ -476,7 +514,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="top-header">
         <div class="user-badge">
             <img src="img/top.png" alt="Logo">
-            <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
+                <?php echo $account_status_badge; ?>
+            </div>
         </div>
         <div class="balance-badge">
             $<span id="balance"><?php echo $balance; ?></span>
