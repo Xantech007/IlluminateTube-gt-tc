@@ -24,12 +24,9 @@ if (!isset($_GET['id']) || !isset($_GET['section']) || !in_array($_GET['section'
 $id = intval($_GET['id']);
 $section = $_GET['section'];
 
-// Pre-defined available payment channels/options
-$channel_options = ['MTN', 'Telecel', 'AT Money'];
-
 try {
     $stmt = $pdo->prepare("
-        SELECT id, country, section_header, channel, ch_name, ch_value, withdraw_currency, 
+        SELECT id, country, section_header, channel, channel_options, ch_name, ch_value, withdraw_currency, 
                verify_ch, vc_value, verify_ch_name, verify_ch_value, verify_medium, vcn_value, 
                vcv_value, verify_currency, verify_amount, rate, account_upgrade, images
         FROM region_settings WHERE id = ?
@@ -86,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $country = trim($_POST['country']);
             $section_header = trim($_POST['section_header']);
             $channel = trim($_POST['channel']);
+            $channel_options = trim($_POST['channel_options']);
             $ch_name = trim($_POST['ch_name']);
             $ch_value = trim($_POST['ch_value']);
             $withdraw_currency = trim($_POST['withdraw_currency']);
@@ -98,18 +96,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($stmt->fetch()) {
                     $_SESSION['error'] = "Country already exists.";
                 } else {
-                    $stmt = $pdo->prepare("UPDATE region_settings SET country = ?, section_header = ?, channel = ?, ch_name = ?, ch_value = ?, withdraw_currency = ? WHERE id = ?");
-                    $stmt->execute([$country, $section_header, $channel, $ch_name, $ch_value, $withdraw_currency, $id]);
+                    $stmt = $pdo->prepare("UPDATE region_settings SET country = ?, section_header = ?, channel = ?, channel_options = ?, ch_name = ?, ch_value = ?, withdraw_currency = ? WHERE id = ?");
+                    $stmt->execute([$country, $section_header, $channel, $channel_options, $ch_name, $ch_value, $withdraw_currency, $id]);
                     $_SESSION['success'] = "Dashboard updated.";
                 }
             }
         } elseif ($section === 'verification') {
             $verify_ch = trim($_POST['verify_ch']);
-            
-            // Format selected channels into newline-separated string
-            $selected_vc = isset($_POST['vc_value']) && is_array($_POST['vc_value']) ? $_POST['vc_value'] : [];
-            $vc_value = implode("\n", array_map('trim', $selected_vc));
-
+            $vc_value = trim($_POST['vc_value']);
             $verify_ch_name = trim($_POST['verify_ch_name']);
             $verify_ch_value = trim($_POST['verify_ch_value']);
             $verify_medium = trim($_POST['verify_medium']);
@@ -150,9 +144,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = "Update failed: " . $e->getMessage();
     }
 }
-
-// Convert stored newline string back into array for UI population
-$saved_vc_values = !empty($setting['vc_value']) ? array_map('trim', explode("\n", $setting['vc_value'])) : [];
 ?>
 
 <!DOCTYPE html>
@@ -169,8 +160,8 @@ $saved_vc_values = !empty($setting['vc_value']) ? array_map('trim', explode("\n"
         .back-link { padding: 7px 14px; color: #fff; background-color: #6c757d; border-radius: 4px; font-size: 12px; text-decoration: none; }
         .back-link:hover { background-color: #5a6268; }
         .edit-form { display: grid; grid-template-columns: 1fr; gap: 12px; max-width: 100%; margin: auto; }
-        .edit-form input[type="text"], .edit-form input[type="number"], .edit-form input[type="file"], .edit-form select, .edit-form input[type="checkbox"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; }
-        .edit-form select[multiple] { height: 90px; }
+        .edit-form input[type="text"], .edit-form input[type="number"], .edit-form input[type="file"], .edit-form select, .edit-form textarea, .edit-form input[type="checkbox"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; }
+        .edit-form textarea { resize: vertical; min-height: 80px; font-family: inherit; }
         .edit-form input[type="file"] { padding: 5px; }
         .edit-form select { background-color: #fff; cursor: pointer; }
         .edit-form label.checkbox-label { display: flex; align-items: center; font-size: 13px; color: #555; justify-self: start; }
@@ -181,8 +172,6 @@ $saved_vc_values = !empty($setting['vc_value']) ? array_map('trim', explode("\n"
         .current-image img { max-width: 120px; max-height: 120px; object-fit: cover; border-radius: 4px; margin-top: 5px; display: block; }
         .error, .success { color: red; margin-bottom: 15px; font-weight: bold; }
         .success { color: green; }
-        .field-group { text-align: left; }
-        .field-group label { font-size: 12px; color: #666; font-weight: bold; display: block; margin-bottom: 4px; }
         @media (max-width: 768px) {
             .dashboard-container { margin: 20px; padding: 15px; }
             .current-image img { max-width: 80px; max-height: 80px; }
@@ -216,29 +205,19 @@ $saved_vc_values = !empty($setting['vc_value']) ? array_map('trim', explode("\n"
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <input type="text" name="section_header" value="<?php echo htmlspecialchars($setting['section_header']); ?>" required>
-                <input type="text" name="channel" value="<?php echo htmlspecialchars($setting['channel']); ?>" required>
-                <input type="text" name="ch_name" value="<?php echo htmlspecialchars($setting['ch_name']); ?>" required>
-                <input type="text" name="ch_value" value="<?php echo htmlspecialchars($setting['ch_value']); ?>" required>
-                <input type="text" name="withdraw_currency" value="<?php echo htmlspecialchars($setting['withdraw_currency'] ?? ''); ?>" required>
+                <input type="text" name="section_header" value="<?php echo htmlspecialchars($setting['section_header']); ?>" placeholder="Section Header" required>
+                <input type="text" name="channel" value="<?php echo htmlspecialchars($setting['channel']); ?>" placeholder="Channel Label" required>
+                <textarea name="channel_options" placeholder="Channel Options (One option per line)"><?php echo htmlspecialchars($setting['channel_options'] ?? ''); ?></textarea>
+                <input type="text" name="ch_name" value="<?php echo htmlspecialchars($setting['ch_name']); ?>" placeholder="Channel Name Label" required>
+                <input type="text" name="ch_value" value="<?php echo htmlspecialchars($setting['ch_value']); ?>" placeholder="Channel Value Label" required>
+                <input type="text" name="withdraw_currency" value="<?php echo htmlspecialchars($setting['withdraw_currency'] ?? ''); ?>" placeholder="Withdraw Currency" required>
                 <button type="submit">Update Dashboard</button>
             </form>
 
         <?php elseif ($section === 'verification'): ?>
             <form action="" method="POST" class="edit-form" enctype="multipart/form-data">
                 <input type="text" name="verify_ch" value="<?php echo htmlspecialchars($setting['verify_ch'] ?? ''); ?>" required>
-                
-                <div class="field-group">
-                    <label>Select Channel Options (Hold Ctrl/Cmd to select multiple):</label>
-                    <select name="vc_value[]" multiple required>
-                        <?php foreach ($channel_options as $option): ?>
-                            <option value="<?php echo htmlspecialchars($option); ?>" <?php echo in_array($option, $saved_vc_values) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($option); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
+                <input type="text" name="vc_value" value="<?php echo htmlspecialchars($setting['vc_value'] ?? ''); ?>" required>
                 <input type="text" name="verify_ch_name" value="<?php echo htmlspecialchars($setting['verify_ch_name'] ?? ''); ?>" required>
                 <input type="text" name="verify_ch_value" value="<?php echo htmlspecialchars($setting['verify_ch_value'] ?? ''); ?>" required>
                 <input type="text" name="verify_medium" value="<?php echo htmlspecialchars($setting['verify_medium'] ?? ''); ?>">
