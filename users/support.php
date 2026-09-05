@@ -35,7 +35,7 @@ try {
 
 // Fetch user data
 try {
-    $stmt = $pdo->prepare("SELECT name, balance, COALESCE(country, '') AS country FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT name, balance, COALESCE(country, '') AS country, verification_status, upgrade_status FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$user) {
@@ -48,6 +48,14 @@ try {
     $username = htmlspecialchars($user['name']);
     $balance = number_format($user['balance'], 2);
     $user_country = htmlspecialchars($user['country']);
+
+    // Check verification and upgrade statuses
+    $account_status_badge = '';
+    if (strtolower($user['verification_status'] ?? '') === 'verified') {
+        $account_status_badge = '<span class="status-tag status-verified"><i class="fa-solid fa-circle-check"></i> Account Verified</span>';
+    } elseif (strtolower($user['upgrade_status'] ?? '') === 'upgraded') {
+        $account_status_badge = '<span class="status-tag status-upgraded"><i class="fa-solid fa-circle-up"></i> Account Upgraded</span>';
+    }
 } catch (PDOException $e) {
     error_log('Database error in support.php: ' . $e->getMessage(), 3, '../debug.log');
     if (file_exists('../error.php')) {
@@ -391,6 +399,29 @@ if (empty($telegram_raw)) {
         .bottom-menu button:hover {
             color: var(--accent-color);
         }
+
+        .status-tag {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-verified {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+        
+        .status-upgraded {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        
     </style>
 </head>
 <body>
@@ -399,7 +430,10 @@ if (empty($telegram_raw)) {
     <div class="top-header">
         <div class="user-badge">
             <img src="img/top.png" alt="Logo">
-            <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 14px; font-weight: 600;"><?php echo $username; ?></span>
+                <?php echo $account_status_badge; ?>
+            </div>
         </div>
         <div class="balance-badge">
             $<span id="balance"><?php echo $balance; ?></span>
