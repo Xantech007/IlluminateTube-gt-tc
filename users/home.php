@@ -53,9 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $update_balance = $pdo->prepare("UPDATE users SET balance = balance + ? WHERE id = ?");
         $update_balance->execute([$reward, $user_id]);
 
-        // 2. Log activity to prevent double rewards on refresh
-        $log_activity = $pdo->prepare("INSERT INTO activities (user_id, video_id, action, created_at) VALUES (?, ?, ?, NOW())");
-        $log_activity->execute([$user_id, $v_id, 'Watched video #' . $v_id]);
+        // 2. Log activity and saved earned amount to prevent double rewards on refresh
+        $log_activity = $pdo->prepare("INSERT INTO activities (user_id, video_id, action, amount, created_at) VALUES (?, ?, ?, ?, NOW())");
+        $log_activity->execute([$user_id, $v_id, 'Watched video #' . $v_id, $reward]);
 
         $pdo->commit();
 
