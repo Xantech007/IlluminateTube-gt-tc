@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // Fetch user data
 try {
     $stmt = $pdo->prepare("
-        SELECT name, balance, verification_status, COALESCE(country, '') AS country, upgrade_status
+        SELECT name, balance, COALESCE(country, '') AS country, verification_status, upgrade_status
         FROM users 
         WHERE id = ?
     ");
@@ -97,12 +97,23 @@ try {
         header('Location: ../signin.php?error=user_not_found');
         exit;
     }
+    
     $username = htmlspecialchars($user['name']);
     $db_balance = floatval($user['balance']);
-    $total_display_balance = number_format($db_balance, 2);
-    $verification_status = $user['verification_status'];
-    $user_country = htmlspecialchars($user['country']);
+    $balance = number_format($db_balance, 2);
+    $total_display_balance = $balance;
+    $verification_status = $user['verification_status'] ?? '';
     $upgrade_status = $user['upgrade_status'] ?? 'not_upgraded';
+    $user_country = htmlspecialchars($user['country']);
+
+    // Generate account status badge for user profile
+    if (strtolower($verification_status) === 'verified') {
+        $account_status_badge = '<span class="status-tag status-verified"><i class="fa-solid fa-circle-check"></i> Account Verified</span>';
+    } elseif (strtolower($upgrade_status) === 'upgraded') {
+        $account_status_badge = '<span class="status-tag status-upgraded"><i class="fa-solid fa-circle-up"></i> Account Upgraded</span>';
+    } else {
+        $account_status_badge = '<span class="status-tag status-unverified"><i class="fa-solid fa-circle-xmark"></i> Not Verified or Upgraded</span>';
+    }
 } catch (PDOException $e) {
     error_log('Database error: ' . $e->getMessage(), 3, '../debug.log');
     if (file_exists('../error')) {
