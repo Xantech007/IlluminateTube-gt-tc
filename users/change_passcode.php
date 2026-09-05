@@ -72,6 +72,35 @@ try {
     exit;
 }
 
+// Fetch region settings for labels
+try {
+    $stmt = $pdo->prepare("
+        SELECT COALESCE(ch_name, 'Bank Name') AS ch_name, 
+               COALESCE(ch_value, 'Bank Account') AS ch_value, 
+               COALESCE(channel, 'Bank') AS channel_label
+        FROM region_settings 
+        WHERE country = ?
+    ");
+    $stmt->execute([$user_country]);
+    $region_settings = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($region_settings) {
+        $ch_name = htmlspecialchars($region_settings['ch_name']);
+        $ch_value = htmlspecialchars($region_settings['ch_value']);
+        $channel_label = htmlspecialchars($region_settings['channel_label']);
+    } else {
+        $ch_name = 'Bank Name';
+        $ch_value = 'Bank Account';
+        $channel_label = 'Bank';
+        error_log('No region settings found for country: ' . $user_country, 3, '../debug.log');
+    }
+} catch (PDOException $e) {
+    error_log('Region settings fetch error in change_passcode.php: ' . $e->getMessage(), 3, '../debug.log');
+    $ch_name = 'Bank Name';
+    $ch_value = 'Bank Account';
+    $channel_label = 'Bank';
+}
+
 $success_message = isset($_GET['success']) ? htmlspecialchars($_GET['success']) : null;
 $error_message   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null;
 ?>
@@ -343,8 +372,6 @@ $error_message   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : nu
             color: #f87171;
             border: 1px solid rgba(239, 68, 68, 0.4);
         }
-
-        
     </style>
 </head>
 <body>
