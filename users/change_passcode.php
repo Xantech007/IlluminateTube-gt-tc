@@ -143,8 +143,9 @@ $error_message   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : nu
         }
 
         /* Fixed Top Header */
+        /* Sticky Top Header below translate widget */
         .top-header {
-            position: fixed;
+            position: sticky;
             top: 0;
             left: 0;
             width: 100%;
@@ -185,13 +186,14 @@ $error_message   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : nu
         }
 
         /* Normal Page Container */
+        /* Adjust page content padding so it flows naturally under the sticky header */
         .page-content {
             width: 100%;
-            min-height: 100vh;
+            min-height: calc(100vh - 60px);
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 90px 20px 90px 20px;
+            padding: 30px 20px 90px 20px; /* Reduced top padding from 90px to 30px */
             background: radial-gradient(circle at center, #111827 0%, #000000 100%);
         }
 
